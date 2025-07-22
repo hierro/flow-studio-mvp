@@ -1,0 +1,1061 @@
+{
+  "name": "TESTA_ANIMATIC",
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "1b609d62-c38c-45a2-8c5c-5a9498c1e57d",
+      "name": "Manual Trigger",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -1888,
+        80
+      ]
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-4.1",
+          "mode": "list",
+          "cachedResultName": "GPT-4.1"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "=You are the Lead Storyboard Artist at a premium animation production house. Your role is to compose natural, flowing {{$json.image_engine}} prompts that bring storyboard scenes to life while maintaining absolute visual consistency across all scenes in the project.\n\nCORE METHODOLOGY:\nYou receive scene data in SEQUENTIAL TEXT BLOCKS plus DETAILED COMPOSITION METHODOLOGY. Your job is to systematically apply the 5-step methodology to create natural, flowing prompts that maintain absolute visual consistency while serving specific narrative needs.\n\nSYSTEMATIC COMPOSITION PROTOCOL:\n1. FOUNDATION ESTABLISHMENT: Always begin with camera type as technical frame, use natural_description as narrative backbone\n2. ELEMENT HIERARCHY ENFORCEMENT: base_description (visual DNA) > consistency_rules (absolute constraints) > scene_variants (behavioral adaptations)\n3. SEQUENTIAL INTEGRATION: Process each element type using the specified methodology - locations establish stage, characters placed with identity, props included with appearance, actions layered as behaviors\n4. CONFLICT RESOLUTION: When base_description conflicts with scene_variants, consistency_rules always override - preserve visual identity, adapt only behaviors\n5. TECHNICAL PRECISION: Start with camera specification, maintain aspect ratio awareness, end within exact character limits\n\nCONSISTENCY ENFORCEMENT (ABSOLUTE HIERARCHY):\n1. BASE_DESCRIPTION = Visual DNA that never changes (character faces, location architecture, prop appearance)\n2. CONSISTENCY_RULES = Mandatory visual constraints that override all scene adaptations\n3. SCENE_VARIANTS = Behavioral adaptations layered ON TOP of unchanging base identity\n4. CONFLICT RESOLUTION: Consistency rules always win over scene variants - preserve visual identity, adapt only actions/states\n5. CROSS-SCENE CONTINUITY: Same elements must be visually recognizable across all scenes through base_description preservation\n\nCOMPOSITION STRATEGY:\n- FOLLOW the detailed methodology exactly as provided in the user prompt\n- START every prompt with camera type as technical frame specification  \n- USE base_description as unchanging foundation for each element\n- LAYER scene_variants as behavioral adaptations without altering core identity\n- MAINTAIN narrative flow guided by natural_description while systematically including all elements\n- ENFORCE character limits through optimization - every word must maximize visual information\n- RESOLVE conflicts using hierarchy: base_description > consistency_rules > scene_variants\n\nPROMPT QUALITY STANDARDS:\n- TECHNICAL OPENING: Always start with \"{{$json.camera_type}} of...\" for consistent framing\n- SYSTEMATIC INCLUSION: Every element from all 5 sequential steps must appear using base_description + variants\n- HIERARCHY COMPLIANCE: base_description preserved, consistency_rules enforced, scene_variants layered appropriately  \n- NATURAL FLOW: Reads like professional scene description while following systematic methodology\n- CHARACTER PRECISION: End within exactly {{$json.max_prompt_length}} characters - no exceptions\n- ENGINE OPTIMIZATION: Composed specifically for {{$json.image_engine}} technical requirements and {{$json.aspect_ratio}} framing\n\nOUTPUT REQUIREMENT:\nJSON format only: {\"scene_id\": number, \"prompt\": \"natural_flowing_prompt\", \"character_count\": exact_number}\n\nPROFESSIONAL STANDARD: You understand that visual consistency across scenes determines client approval. Every prompt must feel like part of a cohesive visual story while incorporating all provided elements through intelligent narrative composition.",
+              "role": "system"
+            },
+            {
+              "content": "=Scene {{$json.scene_id}} - {{$json.action_summary}}\n\nNARRATIVE FOUNDATION:\n\"{{$json.natural_description}}\"\n\nSTEP 1 - SET THE STAGE (LOCATIONS):\n{{$json.locations_text}}\n\nSTEP 2 - PLACE THE ACTORS (CHARACTERS):\n{{$json.characters_text}}\n\nSTEP 3 - ESTABLISH AVAILABLE OBJECTS (PROPS):\n{{$json.props_text}}\n\nSTEP 4 - DIRECT THE PERFORMANCE (ACTIONS):\n{{$json.actions_text}}\n\nELEMENT INTERACTIONS:\n{{$json.interactions_text}}\n\nSTEP 5 - CAMERA & STYLE:\nCamera: {{$json.camera_type}} - {{$json.composition_approach}}\nStyle: {{$json.overall_mood}} with {{$json.color_primary}} backgrounds, {{$json.line_work}} lines, {{$json.shading}} shading, {{$json.framing}} framing\n\nTECHNICAL SPECS:\n- Engine: {{$json.image_engine}}\n- Max Characters: {{$json.max_prompt_length}}\n- Aspect Ratio: {{$json.aspect_ratio}}\n\nCOMPOSITION METHODOLOGY:\n\n1. FOUNDATION ESTABLISHMENT:\n   - BEGIN with camera type as opening technical frame: \"{{$json.camera_type}} of...\"\n   - USE natural_description as narrative backbone and mood guide\n   - ESTABLISH aspect ratio and framing: \"{{$json.aspect_ratio}} composition showing...\"\n\n2. ELEMENT INTEGRATION PROTOCOL:\n   For each element type, follow this hierarchy:\n   - PRIMARY: Use base_description as unchanging visual foundation\n   - CONSTRAINTS: Apply consistency_rules as absolute visual requirements\n   - ADAPTATION: Layer scene-specific actions/states from variants\n   - NEVER modify base_description core identity, only add scene behaviors\n\n3. SEQUENTIAL COMPOSITION:\n   - LOCATIONS: Establish architectural foundation first, then apply lighting/view variants\n   - CHARACTERS: Place using base_description identity, then add scene actions/positions  \n   - PROPS: Include using base_description appearance, then add scene states/interactions\n   - ACTIONS: Show character behaviors from variants while maintaining base identity\n   - STYLE: Apply as overall aesthetic wrapper, not individual element modifications\n\n4. INTEGRATION RULES:\n   - CONSISTENCY RULES override scene variants when conflicts arise\n   - Base_description provides visual identity, variants provide scene behavior\n   - Natural_description guides narrative flow and mood interpretation\n   - All elements must appear, variants add specificity to base elements\n\n5. TECHNICAL REQUIREMENTS:\n   - START with camera type specification\n   - MAINTAIN {{$json.aspect_ratio}} composition awareness\n   - END within {{$json.max_prompt_length}} characters exactly\n   - OPTIMIZE for {{$json.image_engine}} technical specifications\n\nOUTPUT: JSON format {\"scene_id\": number, \"prompt\": \"composed_prompt\", \"character_count\": exact_number}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.8,
+      "position": [
+        -1280,
+        912
+      ],
+      "id": "f8699211-e18b-4f15-a63c-fe4f80755961",
+      "name": "Message a model",
+      "credentials": {
+        "openAiApi": {
+          "id": "iprhbEMUHMcQB36z",
+          "name": "OpenAI_Account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "combineBy": "combineAll",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.1,
+      "position": [
+        -1328,
+        64
+      ],
+      "id": "1f07bfba-1889-4163-9776-67e11fcd40e2",
+      "name": "Merge_Data"
+    },
+    {
+      "parameters": {
+        "mode": "raw",
+        "jsonOutput": "{\n  \"image_engine\": \"FLUX DEV\",\n  \"model_endpoint\": \"fal-ai/flux/dev\",\n  \"base_url\": \"https://queue.fal.run\",\n  \"max_prompt_length\": 800,\n  \"aspect_ratio\": \"16:9\"\n}",
+        "includeOtherFields": "=",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -1520,
+        -96
+      ],
+      "id": "fa72c1e3-2a64-413b-9c06-e3000c83aade",
+      "name": "GLOBAL CONFIG"
+    },
+    {
+      "parameters": {
+        "jsCode": "// STORYBOARD DATA FOR ITALIAN VACCINATION CAMPAIGN\nconst storyboardData = {\n  \"project_metadata\": {\n    \"title\": \"UN CONSIGLIO STELLARE\",\n    \"client\": \"Ministero della Salute\",\n    \"extraction_date\": \"2025-01-28\",\n    \"schema_version\": \"1.0\",\n    \"production_workflow\": \"animatic_to_video_scalable\"\n  },\n\n  \"global_style\": {\n    \"color_palette\": {\n      \"primary\": \"Deep blue backgrounds (library, tech elements)\",\n      \"secondary\": \"Warm amber/golden lighting\",\n      \"accent\": \"Bright cyan/blue (holograms, tech effects)\",\n      \"character_tones\": \"Natural skin tones, blue uniforms\"\n    },\n    \"rendering_style\": {\n      \"level\": \"simplified illustration transitioning to cinematic realism\",\n      \"line_work\": \"clean vector-style outlines\",\n      \"shading\": \"minimal, flat color zones with depth\",\n      \"detail_level\": \"stylized but scalable to photorealistic\"\n    },\n    \"composition\": {\n      \"framing\": \"cinematic storyboard frames\",\n      \"depth\": \"clear foreground/background separation\",\n      \"camera_style\": \"traditional film language (wide/medium/close-up)\",\n      \"aspect_ratio\": \"16:9\"\n    },\n    \"mood_style\": {\n      \"overall_mood\": \"educational, inspiring, warm\",\n      \"lighting_description\": \"soft, natural library lighting with holographic tech elements\",\n      \"atmosphere\": \"technological wonder, protective, educational\",\n      \"tone\": \"professional, accessible, reassuring\"\n    }\n  },\n\n  \"elements\": {\n    \"samantha\": {\n      \"element_type\": \"character\",\n      \"element_subtype\": \"primary\",\n      \"frequency\": 10,\n      \"scenes_present\": [1, 2, 3, 5, 6, 7, 9, 10, 11, 12],\n      \"base_description\": \"Samantha Cristoforetti, 47 years old, short brown hair, confident expression, blue ESA astronaut uniform with patches\",\n      \"consistency_rules\": [\n        \"Identical facial features and hair across all scenes\",\n        \"Blue ESA uniform must be consistent in color and design\",\n        \"Confident, authoritative expression maintained\",\n        \"Professional astronaut posture and demeanor\"\n      ],\n      \"variants_by_scene\": {\n        \"scene_1\": {\n          \"action\": \"standing confidently at entrance, welcoming gesture toward children\",\n          \"position\": \"foreground center, facing children group\",\n          \"expression\": \"warm, welcoming, confident\",\n          \"props_interaction\": \"none\",\n          \"dialogue_state\": \"introducing, setting context\"\n        },\n        \"scene_2\": {\n          \"action\": \"pointing at space imagery, explaining with gestures\",\n          \"position\": \"beside display area, angled toward children\",\n          \"expression\": \"focused, educational, protective\",\n          \"props_interaction\": \"gesturing toward space_imagery_displays\",\n          \"dialogue_state\": \"teaching, explaining dangers\"\n        },\n        \"scene_3\": {\n          \"action\": \"interacting with astronaut hologram, demonstrating\",\n          \"position\": \"at library table, engaging with hologram\",\n          \"expression\": \"knowledgeable, demonstrative\",\n          \"props_interaction\": \"activating/pointing to astronaut_hologram\",\n          \"dialogue_state\": \"demonstrating, showing equipment\"\n        }\n      }\n    },\n\n    \"children_group\": {\n      \"element_type\": \"character\",\n      \"element_subtype\": \"group\",\n      \"frequency\": 7,\n      \"scenes_present\": [1, 2, 4, 5, 7, 9, 12],\n      \"base_description\": \"5 diverse children aged 6-7, small stature, mixed gender, curious expressions, casual school clothes\",\n      \"consistency_rules\": [\n        \"Same 5 children throughout (consistent faces and diversity)\",\n        \"Age range 6-7 maintained across all scenes\",\n        \"Casual school clothing consistent per child\",\n        \"Curious, engaged expressions as baseline\"\n      ],\n      \"variants_by_scene\": {\n        \"scene_1\": {\n          \"action\": \"grouped together, looking around with wonder\",\n          \"position\": \"clustered near entrance, facing library interior\",\n          \"expression\": \"wonder, anticipation, slight awe\",\n          \"props_interaction\": \"carrying children_backpacks\",\n          \"dialogue_state\": \"listening, absorbing introduction\"\n        },\n        \"scene_2\": {\n          \"action\": \"attentively watching Samantha's explanation\",\n          \"position\": \"semicircle facing Samantha and displays\",\n          \"expression\": \"focused attention, learning engagement\",\n          \"props_interaction\": \"some still holding children_backpacks\",\n          \"dialogue_state\": \"engaged learning, processing information\"\n        }\n      }\n    },\n\n    \"circular_library\": {\n      \"element_type\": \"location\",\n      \"element_subtype\": \"primary\",\n      \"frequency\": 10,\n      \"scenes_present\": [1, 2, 3, 5, 6, 7, 9, 10, 11, 12],\n      \"base_description\": \"magnificent circular library with multiple levels, warm ambient lighting, wood and modern architectural elements, balcony overlooks\",\n      \"consistency_rules\": [\n        \"Circular architecture always prominent\",\n        \"Warm ambient lighting consistent throughout\",\n        \"Wood and modern elements balance maintained\",\n        \"Multi-level structure visible when relevant\"\n      ],\n      \"variants_by_scene\": {\n        \"scene_1\": {\n          \"view_angle\": \"wide establishing shot from entrance\",\n          \"focus_area\": \"full architectural magnificence, circular grandeur\",\n          \"lighting_state\": \"welcoming warm entrance lighting\",\n          \"architectural_details\": \"entrance perspective, full space visibility\",\n          \"camera_position\": \"entrance level, looking into main space\"\n        },\n        \"scene_2\": {\n          \"view_angle\": \"medium shot focusing on display area\",\n          \"focus_area\": \"educational zone with space imagery capability\",\n          \"lighting_state\": \"focused lighting on display area\",\n          \"architectural_details\": \"space imagery integration, teaching zone\",\n          \"camera_position\": \"interior, focusing on interaction area\"\n        },\n        \"scene_3\": {\n          \"view_angle\": \"close-up on library table area\",\n          \"focus_area\": \"table with holographic projection capability\",\n          \"lighting_state\": \"tech-enhanced lighting, hologram ambiance\",\n          \"architectural_details\": \"holographic technology integration\",\n          \"camera_position\": \"table level, intimate technology focus\"\n        }\n      }\n    },\n\n    \"space_imagery_displays\": {\n      \"element_type\": \"prop\",\n      \"element_subtype\": \"technological\",\n      \"frequency\": 4,\n      \"scenes_present\": [2, 4, 6, 8],\n      \"base_description\": \"educational space imagery and astronomical displays showing space operations, astronauts, and cosmic scenes\",\n      \"consistency_rules\": [\n        \"Educational content focus maintained\",\n        \"Professional space imagery quality\",\n        \"Integrated into library technology seamlessly\",\n        \"Blue-dominant color scheme for space content\"\n      ],\n      \"variants_by_scene\": {\n        \"scene_2\": {\n          \"state\": \"active, displaying space dangers and beauty\",\n          \"interaction_mode\": \"samantha pointing and explaining\",\n          \"visibility\": \"clearly visible, prominent in scene\",\n          \"technical_specs\": \"wall-mounted displays, clear resolution\",\n          \"position_relative\": \"background to teaching moment, supporting\"\n        }\n      }\n    },\n\n    \"earth_hologram\": {\n      \"element_type\": \"prop\",\n      \"element_subtype\": \"holographic\",\n      \"frequency\": 3,\n      \"scenes_present\": [5, 6, 8],\n      \"base_description\": \"realistic Earth hologram with glowing red indicator points concentrated on Italy, interactive and detailed\",\n      \"consistency_rules\": [\n        \"Realistic Earth appearance maintained\",\n        \"Red indicator points specifically on Italy\",\n        \"Holographic blue glow effect consistent\",\n        \"Interactive capability demonstrated\"\n      ],\n      \"variants_by_scene\": {\n        \"scene_5\": {\n          \"state\": \"approaching activation, becoming visible\",\n          \"interaction_mode\": \"children_group approaching with fascination\",\n          \"visibility\": \"emerging prominence, drawing attention\",\n          \"technical_specs\": \"holographic projection system activating\",\n          \"position_relative\": \"central space, becoming focal point\"\n        },\n        \"scene_6\": {\n          \"state\": \"fully active, Italy focus clearly visible\",\n          \"interaction_mode\": \"samantha explaining and pointing\",\n          \"visibility\": \"primary focus, red points on Italy prominent\",\n          \"technical_specs\": \"full holographic detail, interactive capability\",\n          \"position_relative\": \"central display, primary educational tool\"\n        }\n      }\n    },\n\n    \"astronaut_hologram\": {\n      \"element_type\": \"prop\",\n      \"element_subtype\": \"holographic\",\n      \"frequency\": 1,\n      \"scenes_present\": [3],\n      \"base_description\": \"full-body astronaut in complete spacesuit, holographic projection, realistic detail showing space protection equipment\",\n      \"consistency_rules\": [\n        \"Complete spacesuit with all details\",\n        \"Holographic blue glow effect\",\n        \"Realistic proportions and appearance\"\n      ],\n      \"variants_by_scene\": {\n        \"scene_3\": {\n          \"state\": \"fully active, demonstration mode\",\n          \"interaction_mode\": \"samantha demonstrating and explaining\",\n          \"visibility\": \"prominent, clear detail of spacesuit\",\n          \"technical_specs\": \"full holographic projection, interactive demonstration\",\n          \"position_relative\": \"library table, central demonstration focus\"\n        }\n      }\n    },\n\n    \"children_backpacks\": {\n      \"element_type\": \"prop\",\n      \"element_subtype\": \"physical\",\n      \"frequency\": 7,\n      \"scenes_present\": [1, 2, 4, 5, 7, 9, 12],\n      \"base_description\": \"casual school backpacks and books carried by children, age-appropriate school equipment\",\n      \"consistency_rules\": [\n        \"Age-appropriate school equipment\",\n        \"Casual, not uniform appearance\",\n        \"Proportional to children's size\"\n      ],\n      \"variants_by_scene\": {\n        \"scene_1\": {\n          \"state\": \"carried and held, arrival configuration\",\n          \"interaction_mode\": \"children_group naturally carrying\",\n          \"visibility\": \"clearly visible, establishing school context\",\n          \"technical_specs\": \"standard school backpacks and books\",\n          \"position_relative\": \"with children_group, natural school appearance\"\n        },\n        \"scene_2\": {\n          \"state\": \"mixed - some set aside, some still carried\",\n          \"interaction_mode\": \"transitioning to learning mode\",\n          \"visibility\": \"partially visible, learning focus emerging\",\n          \"technical_specs\": \"standard school equipment\",\n          \"position_relative\": \"secondary to learning interaction\"\n        }\n      }\n    },\n\n    \"library_entrance\": {\n      \"element_type\": \"location\",\n      \"element_subtype\": \"specific\",\n      \"frequency\": 1,\n      \"scenes_present\": [1],\n      \"base_description\": \"grand entrance portal to circular library, establishing architectural context and welcoming atmosphere\",\n      \"consistency_rules\": [\n        \"Architectural grandeur maintained\",\n        \"Welcoming portal appearance\",\n        \"Consistent with circular_library design\"\n      ],\n      \"variants_by_scene\": {\n        \"scene_1\": {\n          \"view_angle\": \"through entrance, looking into library\",\n          \"focus_area\": \"entrance portal framing library interior\",\n          \"lighting_state\": \"welcoming transition lighting\",\n          \"architectural_details\": \"grand entrance portal, threshold emphasis\",\n          \"camera_position\": \"entrance threshold, establishing perspective\"\n        }\n      }\n    },\n\n    \"warm_library_lighting\": {\n      \"element_type\": \"atmosphere\",\n      \"element_subtype\": \"lighting\",\n      \"frequency\": 10,\n      \"scenes_present\": [1, 2, 3, 5, 6, 7, 9, 10, 11, 12],\n      \"base_description\": \"soft, warm ambient lighting creating educational and welcoming atmosphere throughout library\",\n      \"consistency_rules\": [\n        \"Warm color temperature maintained\",\n        \"Soft, diffused quality consistent\",\n        \"Educational ambiance preserved\"\n      ],\n      \"variants_by_scene\": {\n        \"scene_1\": {\n          \"intensity\": \"welcoming, establishing mood\",\n          \"color_temperature\": \"warm amber, inviting\",\n          \"mood_contribution\": \"wonder and anticipation\",\n          \"effect_type\": \"ambient, architectural enhancement\",\n          \"coverage_area\": \"full library space, entrance emphasis\"\n        },\n        \"scene_2\": {\n          \"intensity\": \"focused on educational interaction\",\n          \"color_temperature\": \"warm amber with display enhancement\",\n          \"mood_contribution\": \"educational, protective\",\n          \"effect_type\": \"focused ambient with display lighting\",\n          \"coverage_area\": \"display area emphasis\"\n        },\n        \"scene_3\": {\n          \"intensity\": \"enhanced for technology demonstration\",\n          \"color_temperature\": \"warm amber with holographic blue accents\",\n          \"mood_contribution\": \"technological wonder\",\n          \"effect_type\": \"ambient with tech enhancement\",\n          \"coverage_area\": \"table area, hologram enhancement\"\n        }\n      }\n    }\n  },\n\n  \"scenes\": {\n    \"scene_1\": {\n      \"scene_id\": 1,\n      \"duration\": \"3 seconds\",\n      \"camera_type\": \"wide establishing shot\",\n      \"mood\": \"wonder and anticipation\",\n      \"natural_description\": \"The spot opens in a magnificent circular environment: it's the hall of the great library of the Monte Porzio Catone Astronomical Observatory. We immediately notice a group of children with a very special guide...\",\n      \"dialogue\": \"LO SPAZIO È UN LUOGO INOSPITALE E PERICOLOSO...\",\n      \"action_summary\": \"Introduction of the setting and characters\",\n      \"elements_present\": [\n        \"samantha\",\n        \"children_group\", \n        \"circular_library\",\n        \"children_backpacks\",\n        \"library_entrance\",\n        \"warm_library_lighting\"\n      ],\n      \"element_interactions\": [\n        {\n          \"primary_element\": \"samantha\",\n          \"secondary_element\": \"children_group\",\n          \"interaction_type\": \"welcoming_introduction\",\n          \"description\": \"Samantha welcomes children to library space\"\n        },\n        {\n          \"primary_element\": \"children_group\",\n          \"secondary_element\": \"circular_library\",\n          \"interaction_type\": \"discovery_wonder\",\n          \"description\": \"Children discovering magnificent library architecture\"\n        },\n        {\n          \"primary_element\": \"warm_library_lighting\",\n          \"secondary_element\": \"circular_library\",\n          \"interaction_type\": \"atmosphere_enhancement\",\n          \"description\": \"Lighting enhances architectural grandeur\"\n        }\n      ],\n      \"primary_focus\": \"establishing magnificent circular library architecture with character introduction\",\n      \"lighting_approach\": \"warm welcoming library lighting, architectural grandeur emphasis\",\n      \"composition_approach\": \"wide shot showing full space, character positioning for introduction\"\n    },\n\n    \"scene_2\": {\n      \"scene_id\": 2,\n      \"duration\": \"3 seconds\",\n      \"camera_type\": \"medium shot\",\n      \"mood\": \"educational, protective\",\n      \"natural_description\": \"Samantha, in the company of some small guests, shows them the beauty of space while explaining at the same time that it is a dangerous environment: it must be faced with the right protections.\",\n      \"dialogue\": \"MA C'È LA SCIENZA CHE PENSA A NOI.\",\n      \"action_summary\": \"Samantha explains space dangers and protection needs\",\n      \"elements_present\": [\n        \"samantha\",\n        \"children_group\",\n        \"circular_library\", \n        \"space_imagery_displays\",\n        \"children_backpacks\",\n        \"warm_library_lighting\"\n      ],\n      \"element_interactions\": [\n        {\n          \"primary_element\": \"samantha\",\n          \"secondary_element\": \"space_imagery_displays\",\n          \"interaction_type\": \"educational_demonstration\",\n          \"description\": \"Samantha pointing to and explaining space imagery\"\n        },\n        {\n          \"primary_element\": \"children_group\",\n          \"secondary_element\": \"space_imagery_displays\",\n          \"interaction_type\": \"focused_observation\",\n          \"description\": \"Children attentively watching space imagery\"\n        },\n        {\n          \"primary_element\": \"samantha\",\n          \"secondary_element\": \"children_group\",\n          \"interaction_type\": \"teaching_protection\",\n          \"description\": \"Samantha educating children about space dangers\"\n        }\n      ],\n      \"primary_focus\": \"Samantha teaching children about space dangers using imagery displays\",\n      \"lighting_approach\": \"focused lighting on display area, educational ambiance\",\n      \"composition_approach\": \"medium shot emphasizing teaching interaction and space displays\"\n    },\n\n    \"scene_3\": {\n      \"scene_id\": 3,\n      \"duration\": \"1.5 seconds\",\n      \"camera_type\": \"close-up on hologram interaction\",\n      \"mood\": \"technological wonder\",\n      \"natural_description\": \"Samantha interacts with the hologram of an astronaut, in his typical suit, which she knows very well.\",\n      \"dialogue\": \"VEDETE LE NOSTRE TUTE?\",\n      \"action_summary\": \"Holographic demonstration of space protection equipment\",\n      \"elements_present\": [\n        \"samantha\",\n        \"circular_library\",\n        \"astronaut_hologram\",\n        \"warm_library_lighting\"\n      ],\n      \"element_interactions\": [\n        {\n          \"primary_element\": \"samantha\",\n          \"secondary_element\": \"astronaut_hologram\",\n          \"interaction_type\": \"technology_demonstration\",\n          \"description\": \"Samantha demonstrating and explaining holographic astronaut equipment\"\n        },\n        {\n          \"primary_element\": \"astronaut_hologram\",\n          \"secondary_element\": \"circular_library\",\n          \"interaction_type\": \"technology_integration\",\n          \"description\": \"Hologram seamlessly integrated into library environment\"\n        }\n      ],\n      \"primary_focus\": \"close-up interaction between Samantha and astronaut hologram demonstration\",\n      \"lighting_approach\": \"tech-enhanced lighting, hologram blue glow effects\",\n      \"composition_approach\": \"close-up framing, technological demonstration focus\",\n      \"special_notes\": \"children not present in this scene, focus on technology demonstration\"\n    }\n  }\n};\n\nreturn storyboardData;"
+      },
+      "id": "f89f86fd-18ce-4971-b68c-f943464ba089",
+      "name": "Load Script Data",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -1520,
+        80
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// STORYBOARD DATA FOR ITALIAN VACCINATION CAMPAIGN\nconst schema = {\n  \"schema_metadata\": {\n    \"version\": \"1.0\",\n    \"purpose\": \"Abstract schema for parsing any storyboard/script into structured animatic production data\",\n    \"compatibility\": \"n8n workflow, UI interfaces, prompt generation systems\",\n    \"extraction_date\": \"2025-01-28\",\n    \"scope\": \"universal_storyboard_processing\"\n  },\n\n  \"element_type_schemas\": {\n    \"character\": {\n      \"description\": \"Living beings and personas in the scene\",\n      \"required_properties\": [\n        \"action\",\n        \"position\", \n        \"expression\",\n        \"props_interaction\",\n        \"dialogue_state\"\n      ],\n      \"subtypes\": [\n        \"primary\",\n        \"secondary\", \n        \"group\"\n      ],\n      \"consistency_fields\": [\n        \"appearance\",\n        \"costume\",\n        \"personality_traits\"\n      ],\n      \"property_descriptions\": {\n        \"action\": \"What the character is doing in the scene\",\n        \"position\": \"Where the character is positioned relative to other elements\",\n        \"expression\": \"Facial expression and emotional state\",\n        \"props_interaction\": \"How character interacts with props/objects (reference to element IDs)\",\n        \"dialogue_state\": \"Character's speaking/communication state\"\n      },\n      \"extraction_rules\": [\n        \"Identify all recurring human/persona references across scenes\",\n        \"Extract appearance descriptions from visual references and text\",\n        \"Map character actions per scene from script descriptions\",\n        \"Define consistency rules by comparing all character appearances\"\n      ]\n    },\n\n    \"location\": {\n      \"description\": \"Physical spaces and environments\",\n      \"required_properties\": [\n        \"view_angle\",\n        \"focus_area\",\n        \"lighting_state\", \n        \"architectural_details\",\n        \"camera_position\"\n      ],\n      \"subtypes\": [\n        \"primary\",\n        \"secondary\",\n        \"specific\"\n      ],\n      \"consistency_fields\": [\n        \"architecture\",\n        \"lighting_base\",\n        \"atmosphere\"\n      ],\n      \"property_descriptions\": {\n        \"view_angle\": \"Camera angle and perspective of the location\",\n        \"focus_area\": \"Which part of the location is emphasized\",\n        \"lighting_state\": \"Lighting conditions specific to this scene\",\n        \"architectural_details\": \"Specific architectural elements visible\",\n        \"camera_position\": \"Where camera is positioned relative to location\"\n      },\n      \"extraction_rules\": [\n        \"Identify all recurring location references across scenes\",\n        \"Extract architectural details from location descriptions and images\",\n        \"Map different camera angles/views per scene\",\n        \"Define consistency rules for architectural and atmospheric elements\"\n      ]\n    },\n\n    \"prop\": {\n      \"description\": \"Objects and items within scenes\",\n      \"required_properties\": [\n        \"state\",\n        \"interaction_mode\",\n        \"visibility\",\n        \"technical_specs\",\n        \"position_relative\"\n      ],\n      \"subtypes\": [\n        \"physical\",\n        \"technological\", \n        \"holographic\"\n      ],\n      \"consistency_fields\": [\n        \"appearance\",\n        \"functionality\",\n        \"size_scale\"\n      ],\n      \"property_descriptions\": {\n        \"state\": \"Current condition/status of the prop\",\n        \"interaction_mode\": \"How the prop is being used or interacted with (reference to element IDs)\",\n        \"visibility\": \"How prominent/visible the prop is in scene\",\n        \"technical_specs\": \"Technical capabilities or specifications\",\n        \"position_relative\": \"Position relative to other elements in scene\"\n      },\n      \"extraction_rules\": [\n        \"Identify all recurring object references across scenes\",\n        \"Extract object descriptions from script and visual references\",\n        \"Map different states/uses per scene\",\n        \"Classify by subtype based on technological capabilities\"\n      ]\n    },\n\n    \"atmosphere\": {\n      \"description\": \"Environmental effects and ambient conditions\",\n      \"required_properties\": [\n        \"intensity\",\n        \"color_temperature\",\n        \"mood_contribution\",\n        \"effect_type\",\n        \"coverage_area\"\n      ],\n      \"subtypes\": [\n        \"lighting\",\n        \"mood\",\n        \"effect\"\n      ],\n      \"consistency_fields\": [\n        \"base_characteristics\",\n        \"variation_range\"\n      ],\n      \"property_descriptions\": {\n        \"intensity\": \"Strength or prominence of the atmospheric effect\",\n        \"color_temperature\": \"Color characteristics of the effect\",\n        \"mood_contribution\": \"How the effect contributes to scene mood\",\n        \"effect_type\": \"Type of atmospheric effect being created\",\n        \"coverage_area\": \"Spatial coverage of the atmospheric effect\"\n      },\n      \"extraction_rules\": [\n        \"Identify recurring atmospheric/mood references across scenes\",\n        \"Extract lighting and mood descriptions from script and images\",\n        \"Map intensity and coverage variations per scene\",\n        \"Define consistency rules for base atmospheric characteristics\"\n      ]\n    }\n  },\n\n  \"scene_schema\": {\n    \"description\": \"Standard structure for all scene objects\",\n    \"required_properties\": [\n      \"scene_id\",\n      \"duration\",\n      \"camera_type\", \n      \"mood\",\n      \"natural_description\",\n      \"dialogue\",\n      \"action_summary\",\n      \"elements_present\",\n      \"element_interactions\",\n      \"primary_focus\",\n      \"lighting_approach\",\n      \"composition_approach\"\n    ],\n    \"optional_properties\": [\n      \"special_notes\",\n      \"technical_requirements\",\n      \"post_production_notes\"\n    ],\n    \"optional_property_handling\": {\n      \"rule\": \"Scenes may include additional properties beyond required ones based on script content\",\n      \"validation\": \"Optional properties should be descriptive and relevant to scene\",\n      \"examples\": \"special_notes for scene-specific information, technical_requirements for special effects\",\n      \"format\": \"Optional properties should be strings or arrays as appropriate to content\"\n    },\n    \"property_descriptions\": {\n      \"scene_id\": \"Unique identifier for the scene (integer)\",\n      \"duration\": \"Scene duration extracted from script\",\n      \"camera_type\": \"Type of camera shot/angle from storyboard\",\n      \"mood\": \"Overall emotional tone extracted from scene description\",\n      \"natural_description\": \"Natural language description from script (original text)\",\n      \"dialogue\": \"Spoken words in the scene (original text)\",\n      \"action_summary\": \"Brief summary of what happens (extracted/derived)\",\n      \"elements_present\": \"Array of element IDs present in scene\",\n      \"element_interactions\": \"Array of interaction objects between elements\",\n      \"primary_focus\": \"Main visual focus of the scene\",\n      \"lighting_approach\": \"Lighting strategy for the scene\",\n      \"composition_approach\": \"Visual composition strategy\"\n    },\n    \"extraction_rules\": [\n      \"Extract scene ID from sequential numbering\",\n      \"Extract duration from script timing information\",\n      \"Extract camera type from storyboard visual references or descriptions\",\n      \"Extract mood from script descriptions and visual mood references\",\n      \"Preserve original natural description text from script\",\n      \"Extract dialogue exactly as written in script\",\n      \"Derive action summary from scene description analysis\"\n    ]\n  },\n\n  \"element_interaction_schema\": {\n    \"description\": \"Structure for defining interactions between elements\",\n    \"required_properties\": [\n      \"primary_element\",\n      \"secondary_element\", \n      \"interaction_type\",\n      \"description\"\n    ],\n    \"property_descriptions\": {\n      \"primary_element\": \"ID of the primary element in the interaction\",\n      \"secondary_element\": \"ID of the secondary element in the interaction\",\n      \"interaction_type\": \"Type of interaction (project-specific, derived from script)\",\n      \"description\": \"Natural language description of the interaction\"\n    },\n    \"extraction_rules\": [\n      \"Identify direct interactions mentioned in script between elements\",\n      \"Create interaction_type labels based on the nature of interactions found\",\n      \"Focus on interactions that affect visual composition or narrative\",\n      \"Interaction types are project-specific and derived during extraction\"\n    ],\n    \"interaction_type_derivation\": {\n      \"methodology\": \"Create interaction_type by combining action verb with purpose/object\",\n      \"format\": \"[action_verb]_[purpose/object]\",\n      \"examples\": \"teaching → educational_demonstration, welcoming → welcoming_introduction, showcasing → technology_demonstration\",\n      \"validation\": \"interaction_type should be descriptive and unique within project\"\n    },\n    \"element_reference_validation\": {\n      \"props_interaction_references\": \"When element variants reference other elements, validate referenced element exists in elements list\",\n      \"interaction_mode_references\": \"When props reference characters in interaction_mode, validate character element exists\",\n      \"cross_reference_integrity\": \"All element ID references must point to valid elements in the project\"\n    },\n    \"extensible\": true,\n    \"note\": \"interaction_type values are project-specific and determined during extraction\"\n  },\n\n  \"global_style_schema\": {\n    \"description\": \"Overall style configuration extracted from storyboard visuals and descriptions\",\n    \"required_sections\": [\n      \"color_palette\",\n      \"rendering_style\",\n      \"composition\", \n      \"mood_style\"\n    ],\n    \"color_palette_properties\": [\n      \"primary\",\n      \"secondary\",\n      \"accent\",\n      \"character_tones\"\n    ],\n    \"rendering_style_properties\": [\n      \"level\",\n      \"line_work\",\n      \"shading\",\n      \"detail_level\"\n    ],\n    \"composition_properties\": [\n      \"framing\",\n      \"depth\",\n      \"camera_style\",\n      \"aspect_ratio\"\n    ],\n    \"mood_style_properties\": [\n      \"overall_mood\",\n      \"lighting_description\",\n      \"atmosphere\", \n      \"tone\"\n    ],\n    \"extraction_rules\": [\n      \"Extract color palette from storyboard visual references and style notes\",\n      \"Determine rendering style from storyboard illustration style\",\n      \"Extract composition approach from camera and framing descriptions\",\n      \"Derive mood style from script tone and visual atmosphere descriptions\"\n    ]\n  },\n\n  \"element_structure_schema\": {\n    \"description\": \"Standard structure for all element objects\",\n    \"required_properties\": [\n      \"element_type\",\n      \"element_subtype\",\n      \"frequency\",\n      \"scenes_present\",\n      \"base_description\",\n      \"consistency_rules\",\n      \"variants_by_scene\"\n    ],\n    \"property_descriptions\": {\n      \"element_type\": \"One of: character, location, prop, atmosphere\",\n      \"element_subtype\": \"Subtype from element_type schema\",\n      \"frequency\": \"Number of scenes where element appears\",\n      \"scenes_present\": \"Array of scene IDs where element appears\",\n      \"base_description\": \"Consistent description extracted from all appearances\",\n      \"consistency_rules\": \"Array of rules derived from analyzing all appearances\",\n      \"variants_by_scene\": \"Object with scene-specific property variations\"\n    },\n    \"extraction_rules\": [\n      \"Determine element_type based on semantic analysis of element\",\n      \"Assign element_subtype based on element characteristics\",\n      \"Calculate frequency by counting scene appearances\",\n      \"Build base_description by finding common elements across all appearances\",\n      \"Derive consistency_rules by comparing variations across scenes\",\n      \"Create variants_by_scene using element_type property schema\"\n    ],\n    \"variant_structure_rule\": \"Properties in variants_by_scene must match element_type schema properties\"\n  },\n\n  \"frequency_analysis_rules\": {\n    \"shared_element_threshold\": 2,\n    \"description\": \"Elements appearing in 2+ scenes are considered shared and need consistency rules\",\n    \"single_element_handling\": \"Elements appearing in 1 scene still follow same structure but with single variant\",\n    \"cross_scene_analysis\": \"All extraction must analyze complete script before defining base descriptions\"\n  },\n\n  \"consistency_extraction_methodology\": {\n    \"step_1\": \"Identify all element appearances across all scenes\",\n    \"step_2\": \"Group appearances by semantic similarity\",\n    \"step_3\": \"Extract common characteristics for base_description\",\n    \"step_4\": \"Identify variations that need consistency rules\",\n    \"step_5\": \"Map scene-specific variants using element_type property schema\",\n    \"step_6\": \"Validate that all variants conform to element_type schema\"\n  },\n\n  \"validation_rules\": {\n    \"element_type_validation\": \"All elements must have valid element_type from schema\",\n    \"property_validation\": \"All variant properties must match element_type schema\",\n    \"scene_consistency\": \"All scenes must follow scene_schema structure\",\n    \"reference_integrity\": \"All element references in scenes must exist in elements list\",\n    \"interaction_validation\": \"All interactions must reference valid elements\",\n    \"frequency_validation\": \"Element frequency must match scenes_present array length\",\n    \"element_reference_validation\": {\n      \"cross_element_references\": \"When element properties reference other elements (e.g., props_interaction: 'carrying element_id'), validate referenced element exists\",\n      \"interaction_mode_validation\": \"When prop interaction_mode references characters, validate character elements exist\",\n      \"consistency_check\": \"All element ID references must be valid and maintain referential integrity\"\n    }\n  },\n\n  \"usage_guidelines\": {\n    \"for_llm_prompts\": \"Use schema to understand element structure and generate consistent descriptions\",\n    \"for_ui_interfaces\": \"Use schema to build dynamic forms and validation\",\n    \"for_workflow_processing\": \"Use schema to ensure consistent data processing across different scripts\",\n    \"for_extensibility\": \"Add new element_types or properties following schema patterns\",\n    \"for_new_projects\": \"Apply same extraction methodology to any storyboard/script\"\n  },\n\n  \"abstraction_level\": {\n    \"schema_defines\": \"Structure, rules, and methodology for extraction\",\n    \"schema_does_not_define\": \"Project-specific content, interaction types, or element names\",\n    \"reusability\": \"This schema can be applied to any storyboard/script in any domain\",\n    \"project_specificity\": \"All content and interaction types are derived during extraction process\"\n  }};\n\nreturn schema;"
+      },
+      "id": "30c5012f-98fb-435c-a748-26c65fbd44f1",
+      "name": "Load Schema",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -1520,
+        -400
+      ]
+    },
+    {
+      "parameters": {
+        "content": "DATA LOADING",
+        "height": 720,
+        "width": 600,
+        "color": 7
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -1568,
+        -480
+      ],
+      "id": "05c24d08-ec02-4c58-8a17-f5cc930a665c",
+      "name": "Sticky Note1"
+    },
+    {
+      "parameters": {
+        "content": "PROMPTS GENERATION",
+        "height": 320,
+        "width": 1100
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -1584,
+        800
+      ],
+      "id": "e6dc5b36-5eda-4728-bcfe-0b443428b0bd",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "content": "FRAMES GENERATION",
+        "height": 680,
+        "width": 1520,
+        "color": 2
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -1584,
+        1152
+      ],
+      "id": "13eeb259-977d-4070-8be2-aab14238b923",
+      "name": "Sticky Note2"
+    },
+    {
+      "parameters": {
+        "content": "CONTENT COLLECTION",
+        "height": 680,
+        "width": 780,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -64,
+        1152
+      ],
+      "id": "bd19d654-1124-41e8-baa9-66060e19650d",
+      "name": "Sticky Note3"
+    },
+    {
+      "parameters": {
+        "content": "FLOW VALIDATION",
+        "height": 320,
+        "width": 1160,
+        "color": 3
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -448,
+        800
+      ],
+      "id": "c7511d8a-ece4-49b5-aa94-2be7f2e4d6ee",
+      "name": "Sticky Note4"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Prendi la config globale: primo oggetto\nconst config = items[0].json;\n\n// Prendi le scene: tutti gli altri oggetti\nconst scenes = items.slice(1);\n\nconst results = [];\n\nfor (const item of scenes) {\n  // Parse JSON string dentro message.content\n  const contentStr = item.json.message.content;\n  const contentObj = JSON.parse(contentStr);\n\n  // Merge dinamico: {...config, ...scene}\n  const merged = {\n    ...contentObj,\n    ...config  // aggiunge TUTTE le chiavi di config\n  };\n\n  results.push({ json: merged });\n}\n\nreturn results;\n"
+      },
+      "id": "84c755b8-9eb2-4eb2-ac99-7b73cb13a8ae",
+      "name": "Process Prompts",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -688,
+        880
+      ]
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "combineBy": "combineAll",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        -1328,
+        -208
+      ],
+      "id": "b905fb50-4d65-497f-b0fb-d717b7436597",
+      "name": "Merge"
+    },
+    {
+      "parameters": {
+        "jsCode": "const now = new Date();\n\nconst month = String(now.getMonth() + 1).padStart(2, '0'); // 01-12\nconst day = String(now.getDate()).padStart(2, '0');        // 01-31\nconst year = now.getFullYear();\n\nconst hours = String(now.getHours()).padStart(2, '0');     // 00-23\nconst minutes = String(now.getMinutes()).padStart(2, '0'); // 00-59\n\nconst timestamp = `${month}_${day}_${year}_${hours}_${minutes}`;\n\nreturn [{ json: { timestamp } }];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -1520,
+        -240
+      ],
+      "id": "c94e299e-20c3-4ec9-a32f-1d369d1a7874",
+      "name": "TIMESTAMP"
+    },
+    {
+      "parameters": {
+        "jsCode": "const input = items[0].json;\n\nconst timestamp = input.timestamp || 'NO_TIMESTAMP';\nconst project_title = input.project_metadata.title;\n\nconst newJson = {\n  // 1️⃣ Copia le chiavi principali\n  timestamp: input.timestamp,\n  image_engine: input.image_engine,\n  max_prompt_length: input.max_prompt_length,\n  aspect_ratio: input.aspect_ratio,\n  model_endpoint:input.model_endpoint,\n  base_url:input.base_url,\n  project_dest_folder: `${project_title}_${timestamp}`,\n\n  // 2️⃣ Inserisci project_metadata\n  project_metadata: input.project_metadata,\n\n  // 3️⃣ Subito dopo metti project_dest_folder\n\n\n  // 4️⃣ Poi tutto il resto (per esempio global_style, elements, scenes)\n  global_style: input.global_style,\n  elements: input.elements,\n  scenes: input.scenes\n};\n\nreturn [{ json: newJson }];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -1168,
+        64
+      ],
+      "id": "4980b552-acf0-46cf-ad51-480be1d4b9a5",
+      "name": "DATA_FINALIZER"
+    },
+    {
+      "parameters": {
+        "content": "IO SETUP",
+        "height": 720,
+        "width": 420,
+        "color": 7
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -880,
+        -480
+      ],
+      "id": "71bd1c04-636a-4c9e-b732-7e48383672cc",
+      "name": "Sticky Note5"
+    },
+    {
+      "parameters": {
+        "operation": "move",
+        "fileId": {
+          "__rl": true,
+          "value": "={{ $json.spreadsheetId }}",
+          "mode": "id"
+        },
+        "driveId": {
+          "__rl": true,
+          "value": "My Drive",
+          "mode": "list",
+          "cachedResultName": "My Drive",
+          "cachedResultUrl": "https://drive.google.com/drive/my-drive"
+        },
+        "folderId": {
+          "__rl": true,
+          "value": "={{ $('SERVICE_MERGE').item.json.id }}",
+          "mode": "id"
+        }
+      },
+      "id": "03174c72-c77e-4b9a-8217-89c6ad04368b",
+      "name": "Save to Drive",
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        -640,
+        -224
+      ],
+      "alwaysOutputData": true,
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "6Dqnp27IeQBVVDOZ",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "folder",
+        "name": "={{ $json.project_dest_folder }}",
+        "driveId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "My Drive"
+        },
+        "folderId": {
+          "__rl": true,
+          "value": "https://drive.google.com/drive/folders/1Q8pJN_Pay-sFOYj5Ow09tXuDFXdxzUww",
+          "mode": "url"
+        },
+        "options": {}
+      },
+      "id": "edc11771-dcdd-448a-8651-fb8daa6393e6",
+      "name": "CREATE_FOLDER",
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        -816,
+        -416
+      ],
+      "alwaysOutputData": true,
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "6Dqnp27IeQBVVDOZ",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "combineBy": "combineAll",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.1,
+      "position": [
+        -640,
+        -416
+      ],
+      "id": "c858fb31-5bd1-4853-ab06-82275b98d5fd",
+      "name": "SERVICE_MERGE"
+    },
+    {
+      "parameters": {
+        "resource": "spreadsheet",
+        "title": "={{ $json.project_dest_folder }}_REPORT",
+        "sheetsUi": {
+          "sheetValues": [
+            {
+              "title": "base"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.6,
+      "position": [
+        -816,
+        -224
+      ],
+      "id": "d89e83ac-2c5e-455b-a1ce-60823c8ebb21",
+      "name": "CREATE_REPORT_SHEET",
+      "alwaysOutputData": true,
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "HUZ70MUbODxjEnB2",
+          "name": "Google Sheets account 2"
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "name": "=scene_{{ $json.scene_id }}",
+        "driveId": {
+          "__rl": true,
+          "value": "My Drive",
+          "mode": "list",
+          "cachedResultName": "My Drive",
+          "cachedResultUrl": "https://drive.google.com/drive/my-drive"
+        },
+        "folderId": {
+          "__rl": true,
+          "value": "={{ $json.id }}",
+          "mode": "id"
+        },
+        "options": {}
+      },
+      "id": "a7a5fbba-f4e3-4bed-92d9-0f96a5ed0889",
+      "name": "Save to Drive1",
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        -416,
+        1648
+      ],
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "6Dqnp27IeQBVVDOZ",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "url": "={{ $json.response_url }}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "options": {
+          "timeout": 15000
+        }
+      },
+      "id": "24a06d84-2191-44a0-88fe-fbeb67de50e8",
+      "name": "GET_IMAGE_URL",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -608,
+        1440
+      ],
+      "alwaysOutputData": true,
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "H0PsvpCt0EuGMRIQ",
+          "name": "FAL"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "url": "={{ $json.images[0].url }}",
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "file"
+            }
+          },
+          "timeout": 60000
+        }
+      },
+      "id": "c05b879f-5d8f-4775-97aa-58dd8978c6aa",
+      "name": "DOWNLOAD_IMAGE",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -416,
+        1440
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $json.base_url }}/{{ $json.model_endpoint }}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"prompt\": \"{{ $json.prompt}}\",\n  \"image_size\": {\n    \"width\": 1024,\n    \"height\": 768\n  },\n  \"num_inference_steps\": 28,\n  \"guidance_scale\": 3.5\n}\n",
+        "options": {
+          "timeout": 30000
+        }
+      },
+      "id": "16380c16-af96-4478-9b50-91c869e5bd3a",
+      "name": "Submit to FAL.ai",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -1264,
+        1232
+      ],
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "H0PsvpCt0EuGMRIQ",
+          "name": "FAL"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        -1504,
+        1232
+      ],
+      "id": "bfa46703-a53a-49c8-8992-cfaa678d1639",
+      "name": "Loop Items"
+    },
+    {
+      "parameters": {
+        "amount": 1
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        -544,
+        1232
+      ],
+      "id": "77452e64-cbaf-4f52-a411-f88f1a37431f",
+      "name": "Wait",
+      "webhookId": "d8a1b769-5472-4590-a60b-5d89cbf0e9d4"
+    },
+    {
+      "parameters": {
+        "url": "={{ $json.status_url }}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "options": {
+          "timeout": 15000
+        }
+      },
+      "id": "571843db-e992-4aa1-8ee6-35106cd79775",
+      "name": "CHECK_STATUS",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -1040,
+        1232
+      ],
+      "alwaysOutputData": true,
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "H0PsvpCt0EuGMRIQ",
+          "name": "FAL"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.status }}",
+                    "rightValue": "IN_PROGRESS",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "3f4bb89b-e8e2-4784-b2c8-9c7447655f93"
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "90f4187e-3ffa-4a26-b2b9-940af4669464",
+                    "leftValue": "={{ $json.status }}",
+                    "rightValue": "IN_QUEUE",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "457d4628-2125-4bc6-8145-37fc430268c7",
+                    "leftValue": "={{ $json.status }}",
+                    "rightValue": "COMPLETED",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        -800,
+        1232
+      ],
+      "id": "8ddec706-116e-400d-9382-d6a17cbe0382",
+      "name": "ROUTE_STATUS"
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "combineBy": "combineAll",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        -608,
+        1648
+      ],
+      "id": "da922a81-9298-47d2-a92c-28a4a12b9474",
+      "name": "Merge1"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        -864,
+        880
+      ],
+      "id": "40bf5dc7-39b9-45ef-90a4-3809fde4e6df",
+      "name": "INJECT_CONFIG"
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "combineBy": "combineAll",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.1,
+      "position": [
+        -816,
+        0
+      ],
+      "id": "9de28f75-689d-4dad-b6a0-fb8dfb51c0b5",
+      "name": "Merge_Data1"
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "combineBy": "combineAll",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.1,
+      "position": [
+        -640,
+        48
+      ],
+      "id": "7d358f29-352b-49e4-8eee-8bbbc65cdc1f",
+      "name": "Merge_Data2"
+    },
+    {
+      "parameters": {
+        "jsCode": "// EXTRACT DATA - FLATTENED FOR N8N TEMPLATING\nconst data = $input.first().json;\nconst scenes = Object.keys(data.scenes);\nconst outputs = [];\n\nscenes.forEach(sceneKey => {\n  const sceneData = data.scenes[sceneKey];\n  \n  // FLATTEN LOCATIONS into simple strings\n  const locationElements = sceneData.elements_present\n    .filter(elementId => data.elements[elementId]?.element_type === 'location')\n    .map(elementId => {\n      const element = data.elements[elementId];\n      const rules = element.consistency_rules.join('; ');\n      return `${element.base_description}\\nConsistency Rules: ${rules}`;\n    });\n  const locations_text = locationElements.join('\\n\\n');\n  \n  // FLATTEN CHARACTERS into simple strings\n  const characterElements = sceneData.elements_present\n    .filter(elementId => data.elements[elementId]?.element_type === 'character')\n    .map(elementId => {\n      const element = data.elements[elementId];\n      const rules = element.consistency_rules.join('; ');\n      return `${element.base_description}\\nConsistency Rules: ${rules}`;\n    });\n  const characters_text = characterElements.join('\\n\\n');\n  \n  // FLATTEN PROPS into simple strings\n  const propElements = sceneData.elements_present\n    .filter(elementId => data.elements[elementId]?.element_type === 'prop')\n    .map(elementId => {\n      const element = data.elements[elementId];\n      const rules = element.consistency_rules.join('; ');\n      return `${element.base_description}\\nConsistency Rules: ${rules}`;\n    });\n  const props_text = propElements.join('\\n\\n');\n  \n  // FLATTEN ACTIONS into simple strings\n  const actionElements = sceneData.elements_present\n    .map(elementId => {\n      const element = data.elements[elementId];\n      const variant = element?.variants_by_scene?.[sceneKey];\n      if (variant) {\n        let actionText = `${elementId}: ${variant.action || 'positioned'} at ${variant.position || 'in scene'}`;\n        if (variant.props_interaction && variant.props_interaction !== 'none') {\n          actionText += `\\nInteracting with: ${variant.props_interaction}`;\n        }\n        return actionText;\n      }\n      return null;\n    })\n    .filter(action => action !== null);\n  const actions_text = actionElements.join('\\n\\n');\n  \n  // FLATTEN ELEMENT INTERACTIONS into simple strings\n  const interactions = sceneData.element_interactions || [];\n  const interactions_text = interactions.map(int => int.description).join('\\n');\n  \n  outputs.push({\n    json: {\n      // Technical Configuration\n      image_engine: data.image_engine,\n      base_url:data.base_url,\n      model_endpoint:data.model_endpoint,\n      project_dest_folder:data.project_dest_folder,\n      max_prompt_length: data.max_prompt_length,\n      aspect_ratio: data.aspect_ratio,\n      \n      // Scene Foundation\n      scene_id: sceneData.scene_id,\n      natural_description: sceneData.natural_description,\n      action_summary: sceneData.action_summary,\n      \n      // Flattened Elements as TEXT\n      locations_text: locations_text,\n      characters_text: characters_text,\n      props_text: props_text,\n      actions_text: actions_text,\n      interactions_text: interactions_text,\n      \n      // Camera & Style (simple properties)\n      camera_type: sceneData.camera_type,\n      composition_approach: sceneData.composition_approach,\n      color_primary: data.global_style.color_palette.primary,\n      color_secondary: data.global_style.color_palette.secondary,\n      line_work: data.global_style.rendering_style.line_work,\n      shading: data.global_style.rendering_style.shading,\n      framing: data.global_style.composition.framing,\n      depth: data.global_style.composition.depth,\n      overall_mood: data.global_style.mood_style.overall_mood\n    }\n  });\n});\n\nreturn outputs;"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -1504,
+        912
+      ],
+      "id": "78d1ad23-73a0-4e05-8e13-bea176168380",
+      "name": "EXTRACT SCENES"
+    },
+    {
+      "parameters": {
+        "path": "a1dbfc3a-b5fa-41be-9720-13960051b88d",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        -1920,
+        -336
+      ],
+      "id": "2ef1b85c-0a5b-4592-9338-f11da4e8af64",
+      "name": "Webhook",
+      "webhookId": "a1dbfc3a-b5fa-41be-9720-13960051b88d"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Manual Trigger": {
+      "main": [
+        [
+          {
+            "node": "Load Script Data",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "GLOBAL CONFIG",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Load Schema",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "TIMESTAMP",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Message a model": {
+      "main": [
+        [
+          {
+            "node": "INJECT_CONFIG",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "GLOBAL CONFIG": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Merge_Data": {
+      "main": [
+        [
+          {
+            "node": "DATA_FINALIZER",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Load Script Data": {
+      "main": [
+        [
+          {
+            "node": "Merge_Data",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Process Prompts": {
+      "main": [
+        [
+          {
+            "node": "Loop Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge": {
+      "main": [
+        [
+          {
+            "node": "Merge_Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "TIMESTAMP": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "DATA_FINALIZER": {
+      "main": [
+        [
+          {
+            "node": "CREATE_FOLDER",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "SERVICE_MERGE",
+            "type": "main",
+            "index": 1
+          },
+          {
+            "node": "Merge_Data2",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "CREATE_FOLDER": {
+      "main": [
+        [
+          {
+            "node": "SERVICE_MERGE",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "SERVICE_MERGE": {
+      "main": [
+        [
+          {
+            "node": "Merge_Data1",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "CREATE_REPORT_SHEET",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "CREATE_REPORT_SHEET": {
+      "main": [
+        [
+          {
+            "node": "Save to Drive",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Merge_Data1",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Save to Drive1": {
+      "main": [
+        []
+      ]
+    },
+    "GET_IMAGE_URL": {
+      "main": [
+        [
+          {
+            "node": "DOWNLOAD_IMAGE",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "DOWNLOAD_IMAGE": {
+      "main": [
+        [
+          {
+            "node": "Merge1",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Submit to FAL.ai": {
+      "main": [
+        [
+          {
+            "node": "CHECK_STATUS",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Items": {
+      "main": [
+        [],
+        [
+          {
+            "node": "Submit to FAL.ai",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Merge1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait": {
+      "main": [
+        [
+          {
+            "node": "CHECK_STATUS",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "CHECK_STATUS": {
+      "main": [
+        [
+          {
+            "node": "ROUTE_STATUS",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "ROUTE_STATUS": {
+      "main": [
+        [
+          {
+            "node": "Wait",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Wait",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "GET_IMAGE_URL",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Loop Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge1": {
+      "main": [
+        [
+          {
+            "node": "Save to Drive1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "INJECT_CONFIG": {
+      "main": [
+        [
+          {
+            "node": "Process Prompts",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge_Data1": {
+      "main": [
+        [
+          {
+            "node": "Merge_Data2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge_Data2": {
+      "main": [
+        [
+          {
+            "node": "EXTRACT SCENES",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "INJECT_CONFIG",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "EXTRACT SCENES": {
+      "main": [
+        [
+          {
+            "node": "Message a model",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Save to Drive": {
+      "main": [
+        []
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "63b04ad7-fe7e-4a64-8a67-1317e5306cf6",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "9034c3b2992f22f7d19b46604ec8a4fb225ca54f2b9310c377550809f6589adb"
+  },
+  "id": "LSRA8MPuWF0HAVZl",
+  "tags": []
+}

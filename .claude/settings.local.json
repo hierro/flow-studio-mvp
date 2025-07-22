@@ -1,0 +1,12 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(node project-scanner.js)",
+      "Bash(ls:*)",
+      "Bash(npm run dev:*)",
+      "Bash(rm:*)",
+      "mcp__ide__getDiagnostics"
+    ],
+    "deny": []
+  }
+}
