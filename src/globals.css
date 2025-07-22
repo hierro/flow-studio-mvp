@@ -11,3 +11,13 @@ body {
   color: #fff;
   min-height: 100vh;
 }
+
+/* Spinner animation for n8n loading */
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}

@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { getUserProjects, createProject, supabase } from '../lib/database'
+import { getUserProjects, createProject, deleteProject } from '../lib/database'
+import { supabase } from '../lib/supabase'
 import type { ProjectCardData } from '../types/project'
 
 interface DashboardPageProps {
@@ -14,6 +15,8 @@ export default function DashboardPage({ user }: DashboardPageProps) {
   const [showCreateModal, setShowCreateModal] = useState(false)
   const [createLoading, setCreateLoading] = useState(false)
   const [newProjectName, setNewProjectName] = useState('')
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState<string | null>(null)
+  const [deleteLoading, setDeleteLoading] = useState(false)
 
   useEffect(() => {
     loadProjects()
@@ -52,6 +55,22 @@ export default function DashboardPage({ user }: DashboardPageProps) {
 
   const handleProjectClick = (projectId: string) => {
     navigate(`/project/${projectId}`)
+  }
+
+  const handleDeleteProject = async (projectId: string) => {
+    if (!projectId || deleteLoading) return
+
+    setDeleteLoading(true)
+    const success = await deleteProject(projectId)
+    
+    if (success) {
+      setShowDeleteConfirm(null)
+      await loadProjects() // Reload projects
+    } else {
+      alert('Error deleting project. Please try again.')
+    }
+    
+    setDeleteLoading(false)
   }
 
   const formatDate = (dateString: string) => {
@@ -172,17 +191,39 @@ export default function DashboardPage({ user }: DashboardPageProps) {
                   }}>
                     {project.name}
                   </h3>
-                  <span style={{
-                    background: getStatusColor(project.status),
-                    color: '#fff',
-                    padding: '0.25rem 0.5rem',
-                    borderRadius: '12px',
-                    fontSize: '0.75rem',
-                    textTransform: 'uppercase',
-                    fontWeight: 'bold'
-                  }}>
-                    {project.status}
-                  </span>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation()
+                        setShowDeleteConfirm(project.id)
+                      }}
+                      style={{
+                        background: '#cc0000',
+                        color: '#fff',
+                        border: 'none',
+                        borderRadius: '4px',
+                        padding: '0.25rem 0.5rem',
+                        cursor: 'pointer',
+                        fontSize: '0.7rem',
+                        opacity: 0.8
+                      }}
+                      onMouseEnter={e => e.currentTarget.style.opacity = '1'}
+                      onMouseLeave={e => e.currentTarget.style.opacity = '0.8'}
+                    >
+                      🗑️
+                    </button>
+                    <span style={{
+                      background: getStatusColor(project.status),
+                      color: '#fff',
+                      padding: '0.25rem 0.5rem',
+                      borderRadius: '12px',
+                      fontSize: '0.75rem',
+                      textTransform: 'uppercase',
+                      fontWeight: 'bold'
+                    }}>
+                      {project.status}
+                    </span>
+                  </div>
                 </div>
 
                 <div style={{ marginBottom: '1rem' }}>
@@ -334,6 +375,98 @@ export default function DashboardPage({ user }: DashboardPageProps) {
                   }}
                 >
                   {createLoading ? 'Creating...' : 'Create Project'}
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Delete Project Confirmation Modal */}
+        {showDeleteConfirm && (
+          <div style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            background: 'rgba(0, 0, 0, 0.8)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            zIndex: 1000
+          }}>
+            <div style={{
+              background: '#1a1a1a',
+              padding: '2rem',
+              borderRadius: '8px',
+              width: '400px',
+              maxWidth: '90vw',
+              border: '1px solid #cc0000'
+            }}>
+              <h2 style={{
+                color: '#ff9999',
+                marginBottom: '1rem',
+                fontSize: '1.5rem',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '0.5rem'
+              }}>
+                ⚠️ Delete Project?
+              </h2>
+              
+              <div style={{
+                background: '#330000',
+                border: '1px solid #cc0000',
+                padding: '1rem',
+                borderRadius: '4px',
+                marginBottom: '1.5rem'
+              }}>
+                <p style={{ color: '#ff9999', margin: 0, marginBottom: '0.5rem' }}>
+                  This will permanently delete:
+                </p>
+                <ul style={{ color: '#ffcccc', margin: 0, paddingLeft: '1.5rem' }}>
+                  <li>All project data and phases</li>
+                  <li>All generated content and versions</li>
+                  <li>All n8n job history</li>
+                </ul>
+                <p style={{ color: '#ff6666', margin: 0, marginTop: '0.5rem', fontWeight: 'bold' }}>
+                  This action cannot be undone!
+                </p>
+              </div>
+
+              <div style={{
+                display: 'flex',
+                gap: '1rem',
+                justifyContent: 'flex-end'
+              }}>
+                <button
+                  onClick={() => setShowDeleteConfirm(null)}
+                  disabled={deleteLoading}
+                  style={{
+                    background: '#666',
+                    color: '#fff',
+                    padding: '0.75rem 1.5rem',
+                    border: 'none',
+                    borderRadius: '4px',
+                    cursor: deleteLoading ? 'not-allowed' : 'pointer'
+                  }}
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={() => handleDeleteProject(showDeleteConfirm)}
+                  disabled={deleteLoading}
+                  style={{
+                    background: deleteLoading ? '#880000' : '#cc0000',
+                    color: '#fff',
+                    padding: '0.75rem 1.5rem',
+                    border: 'none',
+                    borderRadius: '4px',
+                    cursor: deleteLoading ? 'not-allowed' : 'pointer',
+                    fontWeight: 'bold'
+                  }}
+                >
+                  {deleteLoading ? '🗑️ Deleting...' : '🗑️ Delete Forever'}
                 </button>
               </div>
             </div>

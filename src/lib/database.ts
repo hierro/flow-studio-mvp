@@ -1,7 +1,6 @@
 // Database utilities for FLOW.STUDIO MVP
 // Supabase integration with enhanced 5-phase workflow schema
 
-import { createClient } from '@supabase/supabase-js'
 import type { 
   Project, 
   ProjectPhase, 
@@ -13,11 +12,7 @@ import type {
   ItalianCampaignMetadata,
   GlobalStyle
 } from '../types/project'
-
-const supabase = createClient(
-  import.meta.env.VITE_SUPABASE_URL!,
-  import.meta.env.VITE_SUPABASE_ANON_KEY!
-)
+import { supabase } from './supabase'
 
 // Italian campaign template data
 const ITALIAN_CAMPAIGN_TEMPLATE: ItalianCampaignMetadata = {
@@ -55,6 +50,26 @@ const PHASE_CONFIG: Array<{
 ]
 
 // PROJECT OPERATIONS
+
+export async function deleteProject(projectId: string): Promise<boolean> {
+  try {
+    // Delete project (cascade will handle phases, versions, etc.)
+    const { error } = await supabase
+      .from('projects')
+      .delete()
+      .eq('id', projectId)
+
+    if (error) {
+      console.error('Error deleting project:', error)
+      return false
+    }
+
+    return true
+  } catch (error) {
+    console.error('Error in deleteProject:', error)
+    return false
+  }
+}
 
 export async function createProject(name: string, userId: string): Promise<{ project: Project; phases: ProjectPhase[] } | null> {
   try {
@@ -375,6 +390,49 @@ export async function updateN8NJobStatus(
   }
 }
 
+// VERSION HISTORY OPERATIONS
+
+export async function getPhaseVersions(phaseId: string): Promise<PhaseVersion[]> {
+  try {
+    const { data, error } = await supabase
+      .from('phase_versions')
+      .select('*')
+      .eq('phase_id', phaseId)
+      .order('version_number', { ascending: false })
+
+    if (error || !data) {
+      console.error('Error fetching phase versions:', error)
+      return []
+    }
+
+    return data
+  } catch (error) {
+    console.error('Error in getPhaseVersions:', error)
+    return []
+  }
+}
+
+export async function getPhaseVersion(phaseId: string, versionNumber: number): Promise<PhaseVersion | null> {
+  try {
+    const { data, error } = await supabase
+      .from('phase_versions')
+      .select('*')
+      .eq('phase_id', phaseId)
+      .eq('version_number', versionNumber)
+      .single()
+
+    if (error || !data) {
+      console.error('Error fetching phase version:', error)
+      return null
+    }
+
+    return data
+  } catch (error) {
+    console.error('Error in getPhaseVersion:', error)
+    return null
+  }
+}
+
 // UTILITY FUNCTIONS
 
 export function getPhaseDisplayName(phaseName: PhaseName): string {
@@ -387,5 +445,3 @@ export function getNextPhaseName(currentPhase: PhaseName): PhaseName | null {
   const nextPhase = PHASE_CONFIG[currentIndex + 1]
   return nextPhase?.phase_name || null
 }
-
-export { supabase }

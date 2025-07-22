@@ -1,7 +1,7 @@
 FLOW STUDIO MVP - Complete Development Context
 ================================================
 
-Generated: 2025-07-22T11:56:06.259Z
+Generated: 2025-07-22T18:39:24.321Z
 Purpose: Transfer complete understanding to Claude web interface
 
 PROJECT STATUS: Phase 1 Authentication COMPLETE - Ready for Phase 2 Database
@@ -149,19 +149,14 @@ PURPOSE: TypeScript strict mode configuration with path mapping
     "moduleResolution": "bundler",
     "resolveJsonModule": true,
     "isolatedModules": true,
-    "jsx": "preserve",
+    "jsx": "react-jsx",
     "incremental": true,
-    "plugins": [
-      {
-        "name": "next"
-      }
-    ],
     "paths": {
       "@/*": ["./src/*"]
     }
   },
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
-  "exclude": ["node_modules"]
+  "include": ["src", "**/*.ts", "**/*.tsx"],
+  "exclude": ["node_modules", "dist"]
 }
 
 ============================================================
@@ -191,6 +186,21 @@ export default [
     },
   },
 ];
+
+============================================================
+
+FILE: src\lib\supabase.ts
+PURPOSE: Essential project file
+------------------------------------------------------------
+
+// Centralized Supabase client to avoid multiple instances
+import { createClient } from '@supabase/supabase-js'
+
+// Create single instance
+export const supabase = createClient(
+  import.meta.env.VITE_SUPABASE_URL!,
+  import.meta.env.VITE_SUPABASE_ANON_KEY!
+)
 
 ============================================================
 

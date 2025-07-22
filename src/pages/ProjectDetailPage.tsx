@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { getProject, getProjectPhases } from '../lib/database'
 import type { Project, ProjectPhase, PhaseName } from '../types/project'
+import ScriptInterpretationModule from '../components/ScriptInterpretationModule'
 
 interface ProjectDetailPageProps {
   user: any
@@ -92,8 +93,21 @@ export default function ProjectDetailPage({ user }: ProjectDetailPageProps) {
 
   const renderPhaseContent = () => {
     const selectedPhaseData = phases.find(p => p.phase_name === selectedPhase)
-    if (!selectedPhaseData) return null
+    if (!selectedPhaseData || !project) return null
 
+    // Render specific phase modules
+    if (selectedPhase === 'script_interpretation') {
+      return (
+        <ScriptInterpretationModule
+          phase={selectedPhaseData}
+          projectId={project.id}
+          projectName={project.name}
+          onContentChange={loadProject}
+        />
+      )
+    }
+
+    // Placeholder for other phases
     return (
       <div style={{ flex: 1, padding: '2rem' }}>
         <div style={{

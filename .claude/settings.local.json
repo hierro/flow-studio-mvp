@@ -5,7 +5,9 @@
       "Bash(ls:*)",
       "Bash(npm run dev:*)",
       "Bash(rm:*)",
-      "mcp__ide__getDiagnostics"
+      "mcp__ide__getDiagnostics",
+      "Bash(curl:*)",
+      "Bash(npm run build:*)"
     ],
     "deny": []
   }
