@@ -1,22 +1,6 @@
-#!/usr/bin/env node
-
-import fs from 'fs';
-import path from 'path';
-
-// CLAUDE WEB PROJECT SCANNER - COMPLETE WORKING PATTERNS
-// ======================================================
-// PURPOSE: Show actual working code for proper planning & suggestions
-// GOAL: Claude Web understands HOW things work, not just WHAT exists
-
-function generateCompleteProjectContext() {
-  console.log('🎯 Generating COMPLETE Project Context with Working Code');
-  console.log('Strategy: Essential structure + actual working patterns');
-  
-  let content = '';
-  
-  content += `FLOW STUDIO MVP - COMPLETE WORKING PATTERNS FOR CLAUDE WEB
+FLOW STUDIO MVP - COMPLETE WORKING PATTERNS FOR CLAUDE WEB
 =========================================================
-Generated: ${new Date().toISOString()}
+Generated: 2025-07-22T19:07:05.773Z
 Purpose: Show actual working code for proper development planning and suggestions
 
 ## CURRENT STATUS & CRITICAL INSIGHT
@@ -38,7 +22,7 @@ Build: 2.56s production build, 121 modules, instant HMR
 ## PROJECT STRUCTURE WITH KEY CODE PATTERNS
 
 ### 1. APP ENTRY & ROUTING (src/App.tsx) - WORKING ✅
-\`\`\`typescript
+```typescript
 import { Routes, Route, Navigate } from 'react-router-dom'
 import { useEffect, useState } from 'react'
 import LoginPage from './pages/LoginPage'
@@ -103,10 +87,10 @@ export default function App() {
     </Routes>
   )
 }
-\`\`\`
+```
 
 ### 2. AUTHENTICATION IMPLEMENTATION (src/pages/LoginPage.tsx) - WORKING ✅
-\`\`\`typescript
+```typescript
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { supabase } from '../lib/supabase'
@@ -266,10 +250,10 @@ export default function LoginPage() {
     </div>
   )
 }
-\`\`\`
+```
 
 ### 3. DATABASE OPERATIONS (src/lib/database.ts) - KEY FUNCTIONS ✅
-\`\`\`typescript
+```typescript
 import type { 
   Project, 
   ProjectPhase, 
@@ -455,10 +439,10 @@ export async function savePhaseAndUnlockNext(phaseId: string): Promise<boolean> 
     return false
   }
 }
-\`\`\`
+```
 
 ### 4. TYPESCRIPT INTERFACES (src/types/project.ts) - COMPLETE SYSTEM ✅
-\`\`\`typescript
+```typescript
 // Phase-specific content types (flexible polymorphism)
 export type PhaseName = 'script_interpretation' | 'element_images' | 'scene_generation' | 'scene_videos' | 'final_assembly';
 
@@ -569,10 +553,10 @@ export interface ItalianCampaignScenes {
     elements_present: string[];
   };
 }
-\`\`\`
+```
 
 ### 5. PHASE 1 IMPLEMENTATION (src/components/ScriptInterpretationModule.tsx) - FOUNDATION ✅
-\`\`\`typescript
+```typescript
 import { useState, useEffect } from 'react'
 import { updatePhaseContent, savePhaseAndUnlockNext, getPhase, getPhaseVersions, getPhaseVersion } from '../lib/database'
 import type { ProjectPhase, ScriptInterpretationContent, PhaseVersion } from '../types/project'
@@ -638,7 +622,7 @@ export default function ScriptInterpretationModule({
     })
 
     if (!response.ok) {
-      throw new Error(\`Webhook failed: \${response.status} \${response.statusText}\`)
+      throw new Error(`Webhook failed: ${response.status} ${response.statusText}`)
     }
 
     return response.json()
@@ -694,7 +678,7 @@ export default function ScriptInterpretationModule({
           timestamp: new Date().toISOString(),
           image_engine: parsedContent.image_engine || 'FLUX DEV',
           model_endpoint: parsedContent.model_endpoint || 'fal-ai/flux/dev',
-          project_dest_folder: parsedContent.project_dest_folder || \`\${projectName}_\${Date.now()}\`
+          project_dest_folder: parsedContent.project_dest_folder || `${projectName}_${Date.now()}`
         }
       }
 
@@ -740,10 +724,10 @@ export default function ScriptInterpretationModule({
     </div>
   )
 }
-\`\`\`
+```
 
 ## DATABASE SCHEMA (DEPLOYED & WORKING)
-\`\`\`sql
+```sql
 -- Projects with automatic 5-phase initialization
 CREATE TABLE projects (
   id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
@@ -799,12 +783,12 @@ CREATE TABLE n8n_jobs (
   error_message TEXT,
   created_at TIMESTAMP DEFAULT NOW()
 );
-\`\`\`
+```
 
 ## n8n INTEGRATION (PRODUCTION READY)
 Webhook: https://azoriusdrake.app.n8n.cloud/webhook/4b4638e1-47de-406f-8ef7-136d49bc9bc1
 Request Format:
-\`\`\`json
+```json
 {
   "phase": "script_interpretation",
   "operation": "generate_all", 
@@ -818,7 +802,7 @@ Request Format:
     "timestamp": "2025-01-22T..."
   }
 }
-\`\`\`
+```
 
 Response: Raw JSON matching Italian campaign structure
 Integration: Professional loading modal, error handling, status tracking
@@ -848,7 +832,7 @@ n8n generates raw JSON → structured parser → category-based editor →
 user edits via forms → validation → clean JSON output → Phase 2 cascade
 
 ## STYLING PATTERNS (PERFORMANCE-OPTIMIZED)
-\`\`\`typescript
+```typescript
 // Inline styling pattern used throughout
 const cardStyle = {
   background: '#1a1a1a',
@@ -882,7 +866,7 @@ const modalOverlay = {
   justifyContent: 'center',
   zIndex: 1000
 }
-\`\`\`
+```
 
 ## SUCCESS METRICS ACHIEVED
 ✅ 2.56s production build (121 modules optimized)
@@ -909,40 +893,3 @@ Processing: 12-18 minutes for complete animatic generation
 Structure: project_metadata, global_style, elements, scenes with hierarchical data
 
 Ready for holistic development planning with complete working code context.
-`;
-
-  // Write complete output
-  const outputFile = 'project-context.md';
-  fs.writeFileSync(outputFile, content);
-  
-  const finalSize = fs.statSync(outputFile).size;
-  
-  console.log('');
-  console.log('✅ COMPLETE project context with working code created!');
-  console.log(`📄 File: ${outputFile}`);
-  console.log(`📊 Size: ${(finalSize / 1024).toFixed(1)}KB`);
-  console.log('🎯 Format: Complete working patterns for proper planning');
-  console.log('✅ Claude Web can now give excellent suggestions and planning!');
-  
-  console.log('');
-  console.log('📋 Complete working code includes:');
-  console.log('   ✅ Full App.tsx authentication routing logic');
-  console.log('   ✅ Complete LoginPage.tsx auth implementation');  
-  console.log('   ✅ Key database.ts functions with error handling');
-  console.log('   ✅ Complete TypeScript interface system');
-  console.log('   ✅ Phase 1 foundation with n8n integration');
-  console.log('   ✅ Database schema with all relationships');
-  console.log('   ✅ Styling patterns and success metrics');
-  
-  return outputFile;
-}
-
-// Run the complete scanner
-try {
-  generateCompleteProjectContext();
-} catch (error) {
-  console.error('Error:', error.message);
-  process.exit(1);
-}
-
-export { generateCompleteProjectContext };

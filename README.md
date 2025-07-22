@@ -1,6 +1,8 @@
 # FLOW.STUDIO MVP 🎬
 **Professional Web Interface for AI-Powered Animatic Generation**
 
+> **📝 CRITICAL FOR CLAUDE WEB**: This README serves as primary bridge document between Claude CLI (VS Code) and Claude Web (browser). Contains complete architectural context, evolution timeline, and proven working patterns for seamless development handoff.
+
 [![Vite](https://img.shields.io/badge/Vite-5.4.19-646cff?logo=vite)](https://vitejs.dev)
 [![React](https://img.shields.io/badge/React-19.1.0-61dafb?logo=react)](https://react.dev)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.0-blue?logo=typescript)](https://www.typescriptlang.org)
@@ -179,4 +181,29 @@ N8N_WEBHOOK_SECRET=your_random_secret
 
 Run `node project-scanner.js` before development sessions for complete project context.
 
-**Next Session Focus**: Build proper Phase 1 structured editor with categories and tree view for clean data cascade - foundation for error-free Phase 2-5 processing.
+---
+
+## 🔗 **Bridge Documents for Claude Web Interface**
+
+### 📚 **Complete Context Transfer Files**:
+1. **flow-studio-comprehensive-knowledge.txt** (234KB) - Complete project evolution, working code patterns, architectural decisions
+2. **CLAUDE.md** - Detailed development guide with all patterns and anti-patterns
+3. **docs/flow_studio_wireframe_prompts.md** - Enhanced schema and architectural requirements
+4. **SESSION-COMPLETE.md** - Latest session summary with critical insights
+
+### 🎯 **Next Session Handoff**:
+**IMMEDIATE FOCUS**: Implement proper Phase 1 structured JSON editor  
+**FOUNDATION**: All systems working (auth, database, versioning, n8n integration)  
+**ARCHITECTURE**: Transform raw JSON textarea into professional structured editor  
+**GOAL**: Clean data entry for error-free cascade throughout Phase 2-5 workflow  
+
+### 🔄 **Development Session Handoff**:
+```bash
+# Generate comprehensive context for Claude Web
+node project-scanner.js  # Creates 234KB knowledge base with complete patterns
+
+# Verify system integrity
+npm run build           # TypeScript compilation (2.56s, 121 modules)
+```
+
+**Claude Web Development Ready**: All bridge documents updated with complete architectural context, working patterns, and critical next steps for seamless development continuation.
