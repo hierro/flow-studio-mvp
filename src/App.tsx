@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react'
 import { createClient } from '@supabase/supabase-js'
 import LoginPage from './pages/LoginPage'
 import DashboardPage from './pages/DashboardPage'
+import ProjectDetailPage from './pages/ProjectDetailPage'
 
 // Simple auth context
 const supabase = createClient(
@@ -55,6 +56,10 @@ export default function App() {
       <Route
         path="/dashboard"
         element={user ? <DashboardPage user={user} /> : <Navigate to="/login" replace />}
+      />
+      <Route
+        path="/project/:id"
+        element={user ? <ProjectDetailPage user={user} /> : <Navigate to="/login" replace />}
       />
       <Route
         path="/"
