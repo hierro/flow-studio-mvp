@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { updatePhaseContent, savePhaseAndUnlockNext, getPhase, getPhaseVersions, getPhaseVersion } from '../lib/database'
 import type { ProjectPhase, ScriptInterpretationContent, PhaseVersion } from '../types/project'
+import DirectorsTimeline from './timeline/DirectorsTimeline'
 
 // Webhook configuration (test vs production)
 const WEBHOOK_CONFIG = {
@@ -37,6 +38,7 @@ export default function ScriptInterpretationModule({
   const [showVersionHistory, setShowVersionHistory] = useState(false)
   const [versionHistory, setVersionHistory] = useState<PhaseVersion[]>([])
   const [loadingVersions, setLoadingVersions] = useState(false)
+  const [viewMode, setViewMode] = useState<'json' | 'timeline'>('timeline')
 
   // Load existing content and database status on mount
   useEffect(() => {
@@ -234,9 +236,41 @@ export default function ScriptInterpretationModule({
       flexDirection: 'column',
       padding: '2rem',
       background: '#000',
-      overflow: 'hidden'
+      overflow: viewMode === 'timeline' ? 'auto' : 'hidden'  // Allow scrolling in timeline mode
     }}>
-      {/* Header with controls */}
+      {/* Project Header - Context Information */}
+      <div style={{
+        display: 'flex',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        marginBottom: '1rem',
+        padding: '1rem',
+        background: '#1a1a1a',
+        borderRadius: '4px',
+        color: '#999',
+        fontSize: '0.85rem',
+        flexShrink: 0
+      }}>
+        <div>
+          Project: <strong style={{ color: '#fff' }}>{projectName}</strong>
+        </div>
+        <div>
+          Phase: <strong style={{ color: '#0066cc' }}>1/5</strong> • 
+          Status: <strong style={{ color: phase.user_saved ? '#00cc00' : '#cccc00' }}>
+            {phase.user_saved ? 'Completed' : 'In Progress'}
+          </strong> •
+          DB Version: <strong style={{ color: databaseStatus.loaded ? '#00cc00' : '#cc0000' }}>
+            {databaseStatus.loaded ? databaseStatus.version : 'Error'}
+          </strong>
+        </div>
+        <div>
+          Webhook: <strong style={{ color: useProduction ? '#00cc00' : '#cc00cc' }}>
+            {useProduction ? 'Production' : 'Test'}
+          </strong>
+        </div>
+      </div>
+
+      {/* Module Title and Controls */}
       <div style={{
         display: 'flex',
         justifyContent: 'space-between',
@@ -259,6 +293,48 @@ export default function ScriptInterpretationModule({
         </div>
 
         <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+          {/* View Mode Toggle */}
+          <div style={{ 
+            display: 'flex',
+            backgroundColor: '#333',
+            borderRadius: '6px',
+            padding: '2px'
+          }}>
+            <button
+              onClick={() => setViewMode('json')}
+              style={{
+                padding: '8px 16px',
+                borderRadius: '4px',
+                border: 'none',
+                backgroundColor: viewMode === 'json' ? '#0066cc' : 'transparent',
+                color: viewMode === 'json' ? 'white' : '#ccc',
+                fontSize: '14px',
+                fontWeight: '500',
+                cursor: 'pointer',
+                transition: 'all 0.2s ease'
+              }}
+            >
+              📝 JSON Editor
+            </button>
+            <button
+              onClick={() => setViewMode('timeline')}
+              disabled={!databaseStatus.loaded || !jsonContent}
+              style={{
+                padding: '8px 16px',
+                borderRadius: '4px',
+                border: 'none',
+                backgroundColor: viewMode === 'timeline' ? '#0066cc' : 'transparent',
+                color: viewMode === 'timeline' ? 'white' : (!databaseStatus.loaded || !jsonContent) ? '#666' : '#ccc',
+                fontSize: '14px',
+                fontWeight: '500',
+                cursor: (!databaseStatus.loaded || !jsonContent) ? 'not-allowed' : 'pointer',
+                transition: 'all 0.2s ease'
+              }}
+            >
+              📊 Timeline View
+            </button>
+          </div>
+
           {/* Webhook environment toggle */}
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
             <label style={{ color: '#ccc', fontSize: '0.9rem' }}>
@@ -458,109 +534,100 @@ export default function ScriptInterpretationModule({
         </div>
       )}
 
-      {/* Full-screen JSON editor */}
+      {/* Content Area - JSON Editor or Timeline View */}
       <div style={{ 
         flex: 1, 
         display: 'flex', 
         flexDirection: 'column',
-        background: '#1a1a1a',
+        background: viewMode === 'timeline' ? '#000' : '#1a1a1a',
         borderRadius: '8px',
         border: '1px solid #333',
-        overflow: 'hidden',
-        minHeight: 0  // Important for flex child to shrink
+        overflow: viewMode === 'timeline' ? 'visible' : 'hidden',
+        minHeight: viewMode === 'timeline' ? '600px' : 0  // Ensure minimum height for timeline
       }}>
-        <div style={{
-          background: '#333',
-          padding: '0.75rem 1rem',
-          borderBottom: '1px solid #444',
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-          flexShrink: 0
-        }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-            <span style={{ color: '#fff', fontWeight: 'bold' }}>
-              JSON Content {databaseStatus.version > 0 && `(Database Version ${databaseStatus.version})`}
-              {hasUnsavedChanges && <span style={{ color: '#ffcc00' }}> • Modified</span>}
-            </span>
-            {databaseStatus.version > 0 && (
-              <button
-                onClick={() => {
-                  setShowVersionHistory(true)
-                  loadVersionHistory()
-                }}
-                style={{
-                  background: 'transparent',
-                  color: '#66ccff',
-                  border: '1px solid #66ccff',
-                  borderRadius: '3px',
-                  padding: '0.25rem 0.5rem',
-                  cursor: 'pointer',
-                  fontSize: '0.75rem'
-                }}
-              >
-                📋 History
-              </button>
-            )}
-          </div>
-          <div style={{ color: '#ccc', fontSize: '0.85rem' }}>
-            {jsonContent ? `${jsonContent.split('\n').length} lines` : 'No content'}
-          </div>
-        </div>
+        {viewMode === 'json' ? (
+          // JSON Editor View
+          <>
+            <div style={{
+              background: '#333',
+              padding: '0.75rem 1rem',
+              borderBottom: '1px solid #444',
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              flexShrink: 0
+            }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                <span style={{ color: '#fff', fontWeight: 'bold' }}>
+                  JSON Content {databaseStatus.version > 0 && `(Database Version ${databaseStatus.version})`}
+                  {hasUnsavedChanges && <span style={{ color: '#ffcc00' }}> • Modified</span>}
+                </span>
+                {databaseStatus.version > 0 && (
+                  <button
+                    onClick={() => {
+                      setShowVersionHistory(true)
+                      loadVersionHistory()
+                    }}
+                    style={{
+                      background: 'transparent',
+                      color: '#66ccff',
+                      border: '1px solid #66ccff',
+                      borderRadius: '3px',
+                      padding: '0.25rem 0.5rem',
+                      cursor: 'pointer',
+                      fontSize: '0.75rem'
+                    }}
+                  >
+                    📋 History
+                  </button>
+                )}
+              </div>
+              <div style={{ color: '#ccc', fontSize: '0.85rem' }}>
+                {jsonContent ? `${jsonContent.split('\n').length} lines` : 'No content'}
+              </div>
+            </div>
 
-        <textarea
-          value={jsonContent}
-          onChange={(e) => handleJsonChange(e.target.value)}
-          placeholder={isGenerating ? 'Generating content...' : 'JSON content will appear here after generation. You can edit it before saving.'}
-          disabled={isGenerating}
-          style={{
-            flex: 1,
-            background: '#000',
-            color: '#fff',
-            border: 'none',
-            padding: '1.5rem',
-            fontSize: '0.9rem',
-            fontFamily: 'Monaco, "Lucida Console", monospace',
-            lineHeight: '1.5',
-            resize: 'none',
-            outline: 'none',
-            whiteSpace: 'pre',
-            minHeight: 0,  // Important for flex child
-            height: '100%'
-          }}
-        />
-      </div>
-
-      {/* Footer info */}
-      <div style={{
-        display: 'flex',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        marginTop: '1rem',
-        padding: '1rem',
-        background: '#1a1a1a',
-        borderRadius: '4px',
-        color: '#999',
-        fontSize: '0.85rem',
-        flexShrink: 0
-      }}>
-        <div>
-          Project: <strong style={{ color: '#fff' }}>{projectName}</strong>
-        </div>
-        <div>
-          Phase: <strong style={{ color: '#0066cc' }}>1/5</strong> • 
-          Status: <strong style={{ color: phase.user_saved ? '#00cc00' : '#cccc00' }}>
-            {phase.user_saved ? 'Completed' : 'In Progress'}
-          </strong> •
-          DB Version: <strong style={{ color: databaseStatus.loaded ? '#00cc00' : '#cc0000' }}>
-            {databaseStatus.loaded ? databaseStatus.version : 'Error'}
-          </strong>
-        </div>
-        <div>
-          Webhook: <strong style={{ color: useProduction ? '#00cc00' : '#cc00cc' }}>
-            {useProduction ? 'Production' : 'Test'}
-          </strong>
-        </div>
+            <textarea
+              value={jsonContent}
+              onChange={(e) => handleJsonChange(e.target.value)}
+              placeholder={isGenerating ? 'Generating content...' : 'JSON content will appear here after generation. You can edit it before saving.'}
+              disabled={isGenerating}
+              style={{
+                flex: 1,
+                background: '#000',
+                color: '#fff',
+                border: 'none',
+                padding: '1.5rem',
+                fontSize: '0.9rem',
+                fontFamily: 'Monaco, "Lucida Console", monospace',
+                lineHeight: '1.5',
+                resize: 'none',
+                outline: 'none',
+                whiteSpace: 'pre',
+                minHeight: 0,  // Important for flex child
+                height: '100%'
+              }}
+            />
+          </>
+        ) : (
+          // Timeline View
+          <DirectorsTimeline 
+            content={(() => {
+              if (!jsonContent) return null;
+              try {
+                return JSON.parse(jsonContent);
+              } catch (error) {
+                return null;
+              }
+            })()}
+            projectId={projectId}
+            projectName={projectName}
+            onContentUpdate={(updatedContent) => {
+              setJsonContent(JSON.stringify(updatedContent, null, 2))
+              setHasUnsavedChanges(true)
+            }}
+          />
+        )}
       </div>
 
       {/* Regenerate Confirmation Modal */}

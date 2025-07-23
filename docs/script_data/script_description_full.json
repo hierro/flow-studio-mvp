@@ -1,0 +1,980 @@
+[
+  {
+    "timestamp": "07_23_2025_19_45",
+    "image_engine": "FLUX DEV",
+    "max_prompt_length": 800,
+    "aspect_ratio": "16:9",
+    "model_endpoint": "fal-ai/flux/dev",
+    "base_url": "https://queue.fal.run",
+    "project_dest_folder": "UN CONSIGLIO STELLARE_07_23_2025_19_45",
+    "project_metadata": {
+      "title": "UN CONSIGLIO STELLARE",
+      "client": "Ministero della Salute",
+      "extraction_date": "2025-01-23",
+      "schema_version": "1.0",
+      "production_workflow": "animatic_to_video_scalable"
+    },
+    "global_style": {
+      "color_palette": {
+        "primary": "Deep blue backgrounds (library, tech elements)",
+        "secondary": "Warm amber/golden lighting",
+        "accent": "Bright cyan/blue (holograms, tech effects)",
+        "character_tones": "Natural skin tones, blue uniforms"
+      },
+      "rendering_style": {
+        "level": "simplified illustration transitioning to cinematic realism",
+        "line_work": "clean vector-style outlines",
+        "shading": "minimal, flat color zones with depth",
+        "detail_level": "stylized but scalable to photorealistic"
+      },
+      "composition": {
+        "framing": "cinematic storyboard frames",
+        "depth": "clear foreground/background separation",
+        "camera_style": "traditional film language (wide/medium/close-up)",
+        "aspect_ratio": "16:9"
+      },
+      "mood_style": {
+        "overall_mood": "educational, inspiring, warm",
+        "lighting_description": "soft, natural library lighting with holographic tech elements",
+        "atmosphere": "technological wonder, protective, educational",
+        "tone": "professional, accessible, reassuring"
+      }
+    },
+    "elements": {
+      "samantha": {
+        "element_type": "character",
+        "element_subtype": "primary",
+        "frequency": 10,
+        "scenes_present": [1, 2, 3, 5, 6, 7, 8, 9, 10, 12],
+        "base_description": "Samantha Cristoforetti, 47 years old, short brown hair, confident expression, blue ESA astronaut uniform with patches",
+        "consistency_rules": [
+          "Identical facial features and hair across all scenes",
+          "Blue ESA uniform must be consistent in color and design",
+          "Confident, authoritative expression maintained",
+          "Professional astronaut posture and demeanor"
+        ],
+        "variants_by_scene": {
+          "scene_1": {
+            "action": "standing confidently at entrance, welcoming gesture toward children",
+            "position": "foreground center, facing children group",
+            "expression": "warm, welcoming, confident",
+            "props_interaction": "none",
+            "dialogue_state": "introducing, setting context"
+          },
+          "scene_2": {
+            "action": "pointing at space imagery, explaining with gestures",
+            "position": "beside display area, angled toward children",
+            "expression": "focused, educational, protective",
+            "props_interaction": "gesturing toward space_imagery_displays",
+            "dialogue_state": "teaching, explaining dangers"
+          },
+          "scene_3": {
+            "action": "interacting with astronaut hologram, demonstrating",
+            "position": "at library table, engaging with hologram",
+            "expression": "knowledgeable, demonstrative",
+            "props_interaction": "activating/pointing to astronaut_hologram",
+            "dialogue_state": "demonstrating, showing equipment"
+          },
+          "scene_5": {
+            "action": "guiding children along circular walkway",
+            "position": "leading group on circular balcony",
+            "expression": "engaging, storytelling",
+            "props_interaction": "gesturing toward earth_hologram",
+            "dialogue_state": "narrative continuation"
+          },
+          "scene_6": {
+            "action": "explaining Earth hologram with pointing gestures",
+            "position": "beside Earth hologram, facing children",
+            "expression": "educational, protective",
+            "props_interaction": "demonstrating earth_hologram features",
+            "dialogue_state": "explaining Earth protection"
+          },
+          "scene_7": {
+            "action": "determined guidance, reassuring children",
+            "position": "with children, facing hologram displays",
+            "expression": "determined, reassuring",
+            "props_interaction": "guiding attention to red indicators",
+            "dialogue_state": "responding to children's curiosity"
+          },
+          "scene_8": {
+            "action": "explaining disease threats and protection",
+            "position": "pointing at Italy map with red indicators",
+            "expression": "serious, educational, protective",
+            "props_interaction": "demonstrating earth_hologram Italy focus",
+            "dialogue_state": "explaining vaccine protection"
+          },
+          "scene_9": {
+            "action": "listening to children's questions",
+            "position": "attentive pose facing children",
+            "expression": "listening, thoughtful",
+            "props_interaction": "none",
+            "dialogue_state": "receiving children's questions"
+          },
+          "scene_10": {
+            "action": "providing clear, simple explanation",
+            "position": "educational stance, addressing children",
+            "expression": "clear, reassuring, knowledgeable",
+            "props_interaction": "none",
+            "dialogue_state": "explaining vaccine analogy"
+          },
+          "scene_12": {
+            "action": "direct camera address, final message",
+            "position": "facing camera, confident stance",
+            "expression": "reassuring, authoritative, trustworthy",
+            "props_interaction": "none",
+            "dialogue_state": "delivering final message"
+          }
+        }
+      },
+      "children_group": {
+        "element_type": "character",
+        "element_subtype": "group",
+        "frequency": 8,
+        "scenes_present": [1, 2, 4, 5, 7, 9, 11, 12],
+        "base_description": "5 diverse children aged 6-7, small stature, mixed gender, curious expressions, casual school clothes",
+        "consistency_rules": [
+          "Same 5 children throughout (consistent faces and diversity)",
+          "Age range 6-7 maintained across all scenes",
+          "Casual school clothing consistent per child",
+          "Curious, engaged expressions as baseline"
+        ],
+        "variants_by_scene": {
+          "scene_1": {
+            "action": "grouped together, looking around with wonder",
+            "position": "clustered near entrance, facing library interior",
+            "expression": "wonder, anticipation, slight awe",
+            "props_interaction": "carrying children_backpacks",
+            "dialogue_state": "listening, absorbing introduction"
+          },
+          "scene_2": {
+            "action": "attentively watching Samantha's explanation",
+            "position": "semicircle facing Samantha and displays",
+            "expression": "focused attention, learning engagement",
+            "props_interaction": "some still holding children_backpacks",
+            "dialogue_state": "engaged learning, processing information"
+          },
+          "scene_4": {
+            "action": "watching space imagery with amazement",
+            "position": "gathered around viewing area",
+            "expression": "eyes full of wonder, amazed",
+            "props_interaction": "some with children_backpacks set aside",
+            "dialogue_state": "absorbing space content"
+          },
+          "scene_5": {
+            "action": "following Samantha along circular walkway",
+            "position": "walking behind Samantha on balcony",
+            "expression": "increasingly fascinated",
+            "props_interaction": "carrying children_backpacks",
+            "dialogue_state": "engaged in Samantha's story"
+          },
+          "scene_7": {
+            "action": "looking with curious but fearful expressions",
+            "position": "clustered together, observing displays",
+            "expression": "curious but slightly apprehensive",
+            "props_interaction": "holding children_backpacks closer",
+            "dialogue_state": "questioning, seeking understanding"
+          },
+          "scene_9": {
+            "action": "asking questions, seeking more understanding",
+            "position": "engaged group facing Samantha",
+            "expression": "inquisitive, learning-focused",
+            "props_interaction": "children_backpacks at sides",
+            "dialogue_state": "actively questioning"
+          },
+          "scene_11": {
+            "action": "appearing in final campaign message",
+            "position": "arranged with Samantha for group shot",
+            "expression": "confident, understanding achieved",
+            "props_interaction": "none",
+            "dialogue_state": "part of collective message"
+          },
+          "scene_12": {
+            "action": "standing with Samantha in unity",
+            "position": "beside Samantha, showing solidarity",
+            "expression": "reassured, confident, protected",
+            "props_interaction": "none",
+            "dialogue_state": "united in health message"
+          }
+        }
+      },
+      "circular_library": {
+        "element_type": "location",
+        "element_subtype": "primary",
+        "frequency": 13,
+        "scenes_present": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13],
+        "base_description": "magnificent circular library with multiple levels, warm ambient lighting, wood and modern architectural elements, balcony overlooks",
+        "consistency_rules": [
+          "Circular architecture always prominent",
+          "Warm ambient lighting consistent throughout",
+          "Wood and modern elements balance maintained",
+          "Multi-level structure visible when relevant"
+        ],
+        "variants_by_scene": {
+          "scene_1": {
+            "view_angle": "wide establishing shot from entrance",
+            "focus_area": "full architectural magnificence, circular grandeur",
+            "lighting_state": "welcoming warm entrance lighting",
+            "architectural_details": "entrance perspective, full space visibility",
+            "camera_position": "entrance level, looking into main space"
+          },
+          "scene_2": {
+            "view_angle": "medium shot focusing on display area",
+            "focus_area": "educational zone with space imagery capability",
+            "lighting_state": "focused lighting on display area",
+            "architectural_details": "space imagery integration, teaching zone",
+            "camera_position": "interior, focusing on interaction area"
+          },
+          "scene_3": {
+            "view_angle": "close-up on library table area",
+            "focus_area": "table with holographic projection capability",
+            "lighting_state": "tech-enhanced lighting, hologram ambiance",
+            "architectural_details": "holographic technology integration",
+            "camera_position": "table level, intimate technology focus"
+          },
+          "scene_4": {
+            "view_angle": "wide view showing space imagery displays",
+            "focus_area": "large projection area with space content",
+            "lighting_state": "dramatic lighting for space imagery",
+            "architectural_details": "technology integration, display capabilities",
+            "camera_position": "optimized for space content viewing"
+          },
+          "scene_5": {
+            "view_angle": "circular walkway perspective",
+            "focus_area": "balcony overlooking central hologram area",
+            "lighting_state": "ambient walkway lighting",
+            "architectural_details": "circular balcony, multi-level architecture",
+            "camera_position": "balcony level, showing circulation"
+          },
+          "scene_6": {
+            "view_angle": "central space focusing on Earth hologram",
+            "focus_area": "main floor with Earth hologram prominence",
+            "lighting_state": "hologram-enhanced lighting, blue glow",
+            "architectural_details": "central projection capabilities",
+            "camera_position": "central space, hologram-focused"
+          },
+          "scene_7": {
+            "view_angle": "close view of group with hologram",
+            "focus_area": "intimate space around Earth display",
+            "lighting_state": "focused lighting on group and hologram",
+            "architectural_details": "technology integration seamless",
+            "camera_position": "close to group and display"
+          },
+          "scene_8": {
+            "view_angle": "close-up on Italy hologram display",
+            "focus_area": "detailed Earth projection with Italy focus",
+            "lighting_state": "intense hologram lighting, red indicators",
+            "architectural_details": "advanced projection technology",
+            "camera_position": "optimal for Italy map detail"
+          },
+          "scene_9": {
+            "view_angle": "medium shot of group interaction",
+            "focus_area": "conversation area within library",
+            "lighting_state": "warm conversational lighting",
+            "architectural_details": "library setting supporting dialogue",
+            "camera_position": "conversational distance"
+          },
+          "scene_10": {
+            "view_angle": "close shot for explanation scene",
+            "focus_area": "intimate educational setting",
+            "lighting_state": "focused lighting on Samantha",
+            "architectural_details": "library background supporting explanation",
+            "camera_position": "close for clear explanation delivery"
+          },
+          "scene_11": {
+            "view_angle": "neutral background for campaign message",
+            "focus_area": "clean background for text overlay",
+            "lighting_state": "even lighting for text readability",
+            "architectural_details": "minimal library elements visible",
+            "camera_position": "optimized for text and message"
+          },
+          "scene_12": {
+            "view_angle": "group shot within library setting",
+            "focus_area": "Samantha and children in library environment",
+            "lighting_state": "warm, inclusive lighting",
+            "architectural_details": "library setting supporting unity message",
+            "camera_position": "group shot positioning"
+          },
+          "scene_13": {
+            "view_angle": "neutral institutional background",
+            "focus_area": "clean background for institutional logo",
+            "lighting_state": "professional lighting for branding",
+            "architectural_details": "minimal, supporting institutional message",
+            "camera_position": "optimal for logo presentation"
+          }
+        }
+      },
+      "space_imagery_displays": {
+        "element_type": "prop",
+        "element_subtype": "technological",
+        "frequency": 2,
+        "scenes_present": [2, 4],
+        "base_description": "educational space imagery and astronomical displays showing space operations, astronauts, and cosmic scenes",
+        "consistency_rules": [
+          "Educational content focus maintained",
+          "Professional space imagery quality",
+          "Integrated into library technology seamlessly",
+          "Blue-dominant color scheme for space content"
+        ],
+        "variants_by_scene": {
+          "scene_2": {
+            "state": "active, displaying space dangers and beauty",
+            "interaction_mode": "samantha pointing and explaining",
+            "visibility": "clearly visible, prominent in scene",
+            "technical_specs": "wall-mounted displays, clear resolution",
+            "position_relative": "background to teaching moment, supporting"
+          },
+          "scene_4": {
+            "state": "showing astronauts and space operations",
+            "interaction_mode": "children_group watching with wonder",
+            "visibility": "prominent, central to scene",
+            "technical_specs": "large displays, detailed space content",
+            "position_relative": "focal point for children's amazement"
+          }
+        }
+      },
+      "earth_hologram": {
+        "element_type": "prop",
+        "element_subtype": "holographic",
+        "frequency": 4,
+        "scenes_present": [5, 6, 7, 8],
+        "base_description": "realistic Earth hologram with glowing red indicator points concentrated on Italy, interactive and detailed",
+        "consistency_rules": [
+          "Realistic Earth appearance maintained",
+          "Red indicator points specifically on Italy",
+          "Holographic blue glow effect consistent",
+          "Interactive capability demonstrated"
+        ],
+        "variants_by_scene": {
+          "scene_5": {
+            "state": "approaching activation, becoming visible",
+            "interaction_mode": "children_group approaching with fascination",
+            "visibility": "emerging prominence, drawing attention",
+            "technical_specs": "holographic projection system activating",
+            "position_relative": "central space, becoming focal point"
+          },
+          "scene_6": {
+            "state": "fully active, Italy focus clearly visible",
+            "interaction_mode": "samantha explaining and pointing",
+            "visibility": "primary focus, red points on Italy prominent",
+            "technical_specs": "full holographic detail, interactive capability",
+            "position_relative": "central display, primary educational tool"
+          },
+          "scene_7": {
+            "state": "showing red indicators clearly",
+            "interaction_mode": "children_group observing with concern",
+            "visibility": "prominent, concerning indicators visible",
+            "technical_specs": "detailed Italia mapping with red points",
+            "position_relative": "central focus, generating questions"
+          },
+          "scene_8": {
+            "state": "zoomed on Italy with disease indicators",
+            "interaction_mode": "samantha demonstrating threat points",
+            "visibility": "maximum detail, red points with emoji symbols",
+            "technical_specs": "close-up projection, detailed mapping",
+            "position_relative": "primary educational tool showing threats"
+          }
+        }
+      },
+      "astronaut_hologram": {
+        "element_type": "prop",
+        "element_subtype": "holographic",
+        "frequency": 1,
+        "scenes_present": [3],
+        "base_description": "full-body astronaut in complete spacesuit, holographic projection, realistic detail showing space protection equipment",
+        "consistency_rules": [
+          "Complete spacesuit with all details",
+          "Holographic blue glow effect",
+          "Realistic proportions and appearance"
+        ],
+        "variants_by_scene": {
+          "scene_3": {
+            "state": "fully active, demonstration mode",
+            "interaction_mode": "samantha demonstrating and explaining",
+            "visibility": "prominent, clear detail of spacesuit",
+            "technical_specs": "full holographic projection, interactive demonstration",
+            "position_relative": "library table, central demonstration focus"
+          }
+        }
+      },
+      "children_backpacks": {
+        "element_type": "prop",
+        "element_subtype": "physical",
+        "frequency": 7,
+        "scenes_present": [1, 2, 4, 5, 7, 9, 12],
+        "base_description": "casual school backpacks and books carried by children, age-appropriate school equipment",
+        "consistency_rules": [
+          "Age-appropriate school equipment",
+          "Casual, not uniform appearance",
+          "Proportional to children's size"
+        ],
+        "variants_by_scene": {
+          "scene_1": {
+            "state": "carried and held, arrival configuration",
+            "interaction_mode": "children_group naturally carrying",
+            "visibility": "clearly visible, establishing school context",
+            "technical_specs": "standard school backpacks and books",
+            "position_relative": "with children_group, natural school appearance"
+          },
+          "scene_2": {
+            "state": "mixed - some set aside, some still carried",
+            "interaction_mode": "transitioning to learning mode",
+            "visibility": "partially visible, learning focus emerging",
+            "technical_specs": "standard school equipment",
+            "position_relative": "secondary to learning interaction"
+          },
+          "scene_4": {
+            "state": "some set aside for better viewing",
+            "interaction_mode": "children_group focusing on displays",
+            "visibility": "partially visible, not distracting",
+            "technical_specs": "standard school equipment",
+            "position_relative": "secondary to space imagery focus"
+          },
+          "scene_5": {
+            "state": "carried during walkway tour",
+            "interaction_mode": "children_group maintaining school context",
+            "visibility": "visible, maintaining student identity",
+            "technical_specs": "standard school backpacks",
+            "position_relative": "with children during movement"
+          },
+          "scene_7": {
+            "state": "held closer due to apprehension",
+            "interaction_mode": "children_group seeking comfort",
+            "visibility": "more prominent due to emotional state",
+            "technical_specs": "standard school equipment",
+            "position_relative": "closer to children, comfort objects"
+          },
+          "scene_9": {
+            "state": "set aside for focused conversation",
+            "interaction_mode": "children_group in learning dialogue",
+            "visibility": "minimally visible, not distracting",
+            "technical_specs": "standard school equipment",
+            "position_relative": "secondary to educational conversation"
+          },
+          "scene_12": {
+            "state": "not present, formal message delivery",
+            "interaction_mode": "none",
+            "visibility": "not visible, clean final message",
+            "technical_specs": "not applicable",
+            "position_relative": "not present for formal conclusion"
+          }
+        }
+      },
+      "warm_library_lighting": {
+        "element_type": "atmosphere",
+        "element_subtype": "lighting",
+        "frequency": 13,
+        "scenes_present": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13],
+        "base_description": "soft, warm ambient lighting creating educational and welcoming atmosphere throughout library",
+        "consistency_rules": [
+          "Warm color temperature maintained",
+          "Soft, diffused quality consistent",
+          "Educational ambiance preserved"
+        ],
+        "variants_by_scene": {
+          "scene_1": {
+            "intensity": "welcoming, establishing mood",
+            "color_temperature": "warm amber, inviting",
+            "mood_contribution": "wonder and anticipation",
+            "effect_type": "ambient, architectural enhancement",
+            "coverage_area": "full library space, entrance emphasis"
+          },
+          "scene_2": {
+            "intensity": "focused on educational interaction",
+            "color_temperature": "warm amber with display enhancement",
+            "mood_contribution": "educational, protective",
+            "effect_type": "focused ambient with display lighting",
+            "coverage_area": "display area emphasis"
+          },
+          "scene_3": {
+            "intensity": "enhanced for technology demonstration",
+            "color_temperature": "warm amber with holographic blue accents",
+            "mood_contribution": "technological wonder",
+            "effect_type": "ambient with tech enhancement",
+            "coverage_area": "table area, hologram enhancement"
+          },
+          "scene_4": {
+            "intensity": "dramatic for space imagery",
+            "color_temperature": "warm with cooler space display lighting",
+            "mood_contribution": "wonder and amazement",
+            "effect_type": "ambient with display enhancement",
+            "coverage_area": "space imagery viewing area"
+          },
+          "scene_5": {
+            "intensity": "gentle walkway lighting",
+            "color_temperature": "warm amber, circulation-friendly",
+            "mood_contribution": "engaging narrative flow",
+            "effect_type": "ambient circulation lighting",
+            "coverage_area": "circular walkway and central space"
+          },
+          "scene_6": {
+            "intensity": "enhanced for Earth hologram",
+            "color_temperature": "warm amber with blue holographic accents",
+            "mood_contribution": "educational wonder",
+            "effect_type": "ambient with hologram enhancement",
+            "coverage_area": "central space, Earth hologram focus"
+          },
+          "scene_7": {
+            "intensity": "focused on group and hologram",
+            "color_temperature": "warm amber with concern undertones",
+            "mood_contribution": "curious apprehension",
+            "effect_type": "focused ambient with hologram",
+            "coverage_area": "group area with Earth display"
+          },
+          "scene_8": {
+            "intensity": "enhanced for detailed mapping",
+            "color_temperature": "warm amber with red indicator accents",
+            "mood_contribution": "serious educational concern",
+            "effect_type": "ambient with detailed projection lighting",
+            "coverage_area": "Italy mapping detail area"
+          },
+          "scene_9": {
+            "intensity": "conversational, supportive",
+            "color_temperature": "warm amber, encouraging",
+            "mood_contribution": "supportive learning dialogue",
+            "effect_type": "ambient conversational lighting",
+            "coverage_area": "conversation area"
+          },
+          "scene_10": {
+            "intensity": "focused on explanation delivery",
+            "color_temperature": "warm amber, clear and reassuring",
+            "mood_contribution": "clarity and reassurance",
+            "effect_type": "focused ambient for explanation",
+            "coverage_area": "Samantha-focused with background"
+          },
+          "scene_11": {
+            "intensity": "even for text presentation",
+            "color_temperature": "neutral warm for text readability",
+            "mood_contribution": "professional campaign message",
+            "effect_type": "even ambient for text overlay",
+            "coverage_area": "full frame for text presentation"
+          },
+          "scene_12": {
+            "intensity": "warm, inclusive for group message",
+            "color_temperature": "warm amber, unifying",
+            "mood_contribution": "unity and reassurance",
+            "effect_type": "ambient group lighting",
+            "coverage_area": "group area for final message"
+          },
+          "scene_13": {
+            "intensity": "professional for institutional branding",
+            "color_temperature": "neutral professional",
+            "mood_contribution": "official, trustworthy",
+            "effect_type": "professional institutional lighting",
+            "coverage_area": "institutional logo presentation"
+          }
+        }
+      }
+    },
+    "scenes": {
+      "scene_1": {
+        "scene_id": 1,
+        "duration": "3 seconds",
+        "camera_type": "wide establishing shot",
+        "mood": "wonder and anticipation",
+        "natural_description": "The spot opens in a magnificent circular environment: it's the hall of the great library of the Monte Porzio Catone Astronomical Observatory. We immediately notice a group of children with a very special guide...",
+        "dialogue": "LO SPAZIO È UN LUOGO INOSPITALE E PERICOLOSO...",
+        "action_summary": "Introduction of the setting and characters",
+        "elements_present": [
+          "samantha",
+          "children_group",
+          "circular_library",
+          "children_backpacks",
+          "warm_library_lighting"
+        ],
+        "element_interactions": [
+          {
+            "primary_element": "samantha",
+            "secondary_element": "children_group",
+            "interaction_type": "welcoming_introduction",
+            "description": "Samantha welcomes children to library space"
+          },
+          {
+            "primary_element": "children_group",
+            "secondary_element": "circular_library",
+            "interaction_type": "discovery_wonder",
+            "description": "Children discovering magnificent library architecture"
+          },
+          {
+            "primary_element": "warm_library_lighting",
+            "secondary_element": "circular_library",
+            "interaction_type": "atmosphere_enhancement",
+            "description": "Lighting enhances architectural grandeur"
+          }
+        ],
+        "primary_focus": "establishing magnificent circular library architecture with character introduction",
+        "lighting_approach": "warm welcoming library lighting, architectural grandeur emphasis",
+        "composition_approach": "wide shot showing full space, character positioning for introduction"
+      },
+      "scene_2": {
+        "scene_id": 2,
+        "duration": "3 seconds",
+        "camera_type": "medium shot",
+        "mood": "educational, protective",
+        "natural_description": "Samantha, in the company of some small guests, shows them the beauty of space while explaining at the same time that it is a dangerous environment: it must be faced with the right protections.",
+        "dialogue": "MA C'È LA SCIENZA CHE PENSA A NOI.",
+        "action_summary": "Samantha explains space dangers and protection needs",
+        "elements_present": [
+          "samantha",
+          "children_group",
+          "circular_library",
+          "space_imagery_displays",
+          "children_backpacks",
+          "warm_library_lighting"
+        ],
+        "element_interactions": [
+          {
+            "primary_element": "samantha",
+            "secondary_element": "space_imagery_displays",
+            "interaction_type": "educational_demonstration",
+            "description": "Samantha pointing to and explaining space imagery"
+          },
+          {
+            "primary_element": "children_group",
+            "secondary_element": "space_imagery_displays",
+            "interaction_type": "focused_observation",
+            "description": "Children attentively watching space imagery"
+          },
+          {
+            "primary_element": "samantha",
+            "secondary_element": "children_group",
+            "interaction_type": "teaching_protection",
+            "description": "Samantha educating children about space dangers"
+          }
+        ],
+        "primary_focus": "Samantha teaching children about space dangers using imagery displays",
+        "lighting_approach": "focused lighting on display area, educational ambiance",
+        "composition_approach": "medium shot emphasizing teaching interaction and space displays"
+      },
+      "scene_3": {
+        "scene_id": 3,
+        "duration": "1.5 seconds",
+        "camera_type": "close-up on hologram interaction",
+        "mood": "technological wonder",
+        "natural_description": "Samantha interacts with the hologram of an astronaut, in his typical suit, which she knows very well.",
+        "dialogue": "VEDETE LE NOSTRE TUTE?",
+        "action_summary": "Holographic demonstration of space protection equipment",
+        "elements_present": [
+          "samantha",
+          "circular_library",
+          "astronaut_hologram",
+          "warm_library_lighting"
+        ],
+        "element_interactions": [
+          {
+            "primary_element": "samantha",
+            "secondary_element": "astronaut_hologram",
+            "interaction_type": "technology_demonstration",
+            "description": "Samantha demonstrating and explaining holographic astronaut equipment"
+          },
+          {
+            "primary_element": "astronaut_hologram",
+            "secondary_element": "circular_library",
+            "interaction_type": "technology_integration",
+            "description": "Hologram seamlessly integrated into library environment"
+          }
+        ],
+        "primary_focus": "close-up interaction between Samantha and astronaut hologram demonstration",
+        "lighting_approach": "tech-enhanced lighting, hologram blue glow effects",
+        "composition_approach": "close-up framing, technological demonstration focus",
+        "special_notes": "children not present in this scene, focus on technology demonstration"
+      },
+      "scene_4": {
+        "scene_id": 4,
+        "duration": "2 seconds",
+        "camera_type": "wide shot",
+        "mood": "wonder and amazement",
+        "natural_description": "Children look at space images with eyes full of wonder: astronauts and space operations follow one another. At the same time on the large table in the library we see a projection of an astronaut on a mission.",
+        "dialogue": "CI TENGONO AL SICURO.",
+        "action_summary": "Children amazed by space imagery and astronaut projections",
+        "elements_present": [
+          "children_group",
+          "circular_library",
+          "space_imagery_displays",
+          "children_backpacks",
+          "warm_library_lighting"
+        ],
+        "element_interactions": [
+          {
+            "primary_element": "children_group",
+            "secondary_element": "space_imagery_displays",
+            "interaction_type": "wonder_observation",
+            "description": "Children watching space operations with amazement"
+          },
+          {
+            "primary_element": "space_imagery_displays",
+            "secondary_element": "circular_library",
+            "interaction_type": "content_integration",
+            "description": "Space imagery seamlessly integrated into library environment"
+          }
+        ],
+        "primary_focus": "children's wonder at space imagery and astronaut operations",
+        "lighting_approach": "dramatic lighting for space imagery, wonder enhancement",
+        "composition_approach": "wide shot capturing children's amazement and space content"
+      },
+      "scene_5": {
+        "scene_id": 5,
+        "duration": "2 seconds",
+        "camera_type": "medium shot",
+        "mood": "engaging narrative flow",
+        "natural_description": "Children follow Samantha's story with increasing fascination. Walking along the circular walkway, they arrive very close to the large hologram of Earth in the central space...",
+        "dialogue": "LA SCIENZA...",
+        "action_summary": "Children following Samantha's narrative along circular walkway",
+        "elements_present": [
+          "samantha",
+          "children_group",
+          "circular_library",
+          "earth_hologram",
+          "children_backpacks",
+          "warm_library_lighting"
+        ],
+        "element_interactions": [
+          {
+            "primary_element": "children_group",
+            "secondary_element": "samantha",
+            "interaction_type": "narrative_following",
+            "description": "Children increasingly fascinated by Samantha's story"
+          },
+          {
+            "primary_element": "children_group",
+            "secondary_element": "earth_hologram",
+            "interaction_type": "approaching_discovery",
+            "description": "Children approaching large Earth hologram with fascination"
+          },
+          {
+            "primary_element": "samantha",
+            "secondary_element": "earth_hologram",
+            "interaction_type": "narrative_guidance",
+            "description": "Samantha guiding attention toward Earth hologram"
+          }
+        ],
+        "primary_focus": "narrative progression as group approaches Earth hologram",
+        "lighting_approach": "gentle walkway lighting, Earth hologram becoming prominent",
+        "composition_approach": "medium shot showing movement and hologram approach"
+      },
+      "scene_6": {
+        "scene_id": 6,
+        "duration": "3 seconds",
+        "camera_type": "close-up on Earth hologram",
+        "mood": "educational majesty",
+        "natural_description": "...It's majestic. While Samantha continues her explanation, we see red dots particularly dense on our nation.",
+        "dialogue": "...CI PROTEGGE ANCHE QUI SULLA TERRA.",
+        "action_summary": "Earth hologram reveals red indicators concentrated on Italy",
+        "elements_present": [
+          "samantha",
+          "circular_library",
+          "earth_hologram",
+          "warm_library_lighting"
+        ],
+        "element_interactions": [
+          {
+            "primary_element": "samantha",
+            "secondary_element": "earth_hologram",
+            "interaction_type": "explanation_demonstration",
+            "description": "Samantha explaining Earth protection while pointing to hologram"
+          },
+          {
+            "primary_element": "earth_hologram",
+            "secondary_element": "circular_library",
+            "interaction_type": "focal_display",
+            "description": "Earth hologram as central educational focus"
+          }
+        ],
+        "primary_focus": "majestic Earth hologram with red indicators on Italy",
+        "lighting_approach": "hologram-enhanced lighting, blue glow with red indicators",
+        "composition_approach": "close-up framing emphasizing Earth detail and Italy focus"
+      },
+      "scene_7": {
+        "scene_id": 7,
+        "duration": "1.5 seconds",
+        "camera_type": "medium shot",
+        "mood": "curious apprehension",
+        "natural_description": "Children look with curious but fearful air: what is it about? Samantha, determined, accompanies them to discover it...",
+        "dialogue": "- (bambino) DA COSA, SAMANTHA?",
+        "action_summary": "Children showing concern while Samantha prepares to explain",
+        "elements_present": [
+          "samantha",
+          "children_group",
+          "circular_library",
+          "earth_hologram",
+          "children_backpacks",
+          "warm_library_lighting"
+        ],
+        "element_interactions": [
+          {
+            "primary_element": "children_group",
+            "secondary_element": "earth_hologram",
+            "interaction_type": "concerned_observation",
+            "description": "Children observing red indicators with curiosity and apprehension"
+          },
+          {
+            "primary_element": "samantha",
+            "secondary_element": "children_group",
+            "interaction_type": "reassuring_guidance",
+            "description": "Samantha providing determined, reassuring guidance"
+          }
+        ],
+        "primary_focus": "children's concerned curiosity and Samantha's reassuring presence",
+        "lighting_approach": "focused lighting on group with hologram, concern undertones",
+        "composition_approach": "medium shot capturing emotional interaction and hologram context"
+      },
+      "scene_8": {
+        "scene_id": 8,
+        "duration": "4 seconds",
+        "camera_type": "close-up on Italy mapping",
+        "mood": "serious educational concern",
+        "natural_description": "The camera quickly approaches Europe, we recognize Italy. The camera gets even closer and we see some red dots flashing on the territory of our country. Inside we see a sort of emoji representing a sick person.",
+        "dialogue": "DA MALATTIE PERICOLOSE, COME IL MORBILLO. CI PROTEGGE GRAZIE AI VACCINI.",
+        "action_summary": "Detailed view of Italy showing disease threat indicators",
+        "elements_present": [
+          "samantha",
+          "circular_library",
+          "earth_hologram",
+          "warm_library_lighting"
+        ],
+        "element_interactions": [
+          {
+            "primary_element": "samantha",
+            "secondary_element": "earth_hologram",
+            "interaction_type": "threat_explanation",
+            "description": "Samantha explaining disease threats shown on Italy mapping"
+          },
+          {
+            "primary_element": "earth_hologram",
+            "secondary_element": "circular_library",
+            "interaction_type": "detailed_mapping",
+            "description": "Earth hologram showing detailed Italy mapping with threat indicators"
+          }
+        ],
+        "primary_focus": "detailed Italy mapping with red indicators showing disease threats",
+        "lighting_approach": "enhanced lighting for detailed mapping with red indicator accents",
+        "composition_approach": "close-up framing for maximum Italy detail and threat visualization"
+      },
+      "scene_9": {
+        "scene_id": 9,
+        "duration": "2 seconds",
+        "camera_type": "medium shot",
+        "mood": "inquisitive learning",
+        "natural_description": "The small visitors try to understand more, making use of what has already been explained by their guide.",
+        "dialogue": "- (bambino) COME LA TUA TUTA DA ASTRONAUTA?",
+        "action_summary": "Children asking questions to understand vaccine protection analogy",
+        "elements_present": [
+          "samantha",
+          "children_group",
+          "circular_library",
+          "children_backpacks",
+          "warm_library_lighting"
+        ],
+        "element_interactions": [
+          {
+            "primary_element": "children_group",
+            "secondary_element": "samantha",
+            "interaction_type": "inquisitive_questioning",
+            "description": "Children asking questions to understand protection analogy"
+          },
+          {
+            "primary_element": "samantha",
+            "secondary_element": "children_group",
+            "interaction_type": "receptive_listening",
+            "description": "Samantha listening attentively to children's questions"
+          }
+        ],
+        "primary_focus": "children's learning process and question formation",
+        "lighting_approach": "supportive conversational lighting, encouraging dialogue",
+        "composition_approach": "medium shot capturing interactive learning dialogue"
+      },
+      "scene_10": {
+        "scene_id": 10,
+        "duration": "2 seconds",
+        "camera_type": "close-up on Samantha",
+        "mood": "clear explanation",
+        "natural_description": "... Samantha, once again, manages to explain in a simple and clear way what science makes available to us.",
+        "dialogue": "ESATTO, COME LA MIA TUTA.",
+        "action_summary": "Samantha providing clear vaccine analogy explanation",
+        "elements_present": [
+          "samantha",
+          "circular_library",
+          "warm_library_lighting"
+        ],
+        "element_interactions": [
+          {
+            "primary_element": "samantha",
+            "secondary_element": "circular_library",
+            "interaction_type": "clear_explanation",
+            "description": "Samantha delivering clear, simple explanation in library setting"
+          }
+        ],
+        "primary_focus": "Samantha's clear and reassuring explanation delivery",
+        "lighting_approach": "focused lighting on Samantha for clear explanation delivery",
+        "composition_approach": "close-up framing emphasizing explanation clarity and reassurance"
+      },
+      "scene_11": {
+        "scene_id": 11,
+        "duration": "2 seconds",
+        "camera_type": "full screen text overlay",
+        "mood": "campaign message",
+        "natural_description": "Sign: Let's team up for our health #ivaccinifunzionano",
+        "dialogue": "",
+        "action_summary": "Campaign message presentation with hashtag",
+        "elements_present": [
+          "children_group",
+          "circular_library",
+          "warm_library_lighting"
+        ],
+        "element_interactions": [],
+        "primary_focus": "campaign message and hashtag presentation",
+        "lighting_approach": "even lighting for optimal text readability",
+        "composition_approach": "full screen text overlay with clean background"
+      },
+      "scene_12": {
+        "scene_id": 12,
+        "duration": "2 seconds",
+        "camera_type": "medium shot group",
+        "mood": "unity and reassurance",
+        "natural_description": "Samantha looks towards the camera, reassuring, to give us her message:",
+        "dialogue": "I VACCINI FUNZIONANO.",
+        "action_summary": "Final message delivery with group unity",
+        "elements_present": [
+          "samantha",
+          "children_group",
+          "circular_library",
+          "children_backpacks",
+          "warm_library_lighting"
+        ],
+        "element_interactions": [
+          {
+            "primary_element": "samantha",
+            "secondary_element": "children_group",
+            "interaction_type": "unified_message",
+            "description": "Samantha and children presenting unified health message"
+          },
+          {
+            "primary_element": "samantha",
+            "secondary_element": "circular_library",
+            "interaction_type": "authoritative_delivery",
+            "description": "Samantha delivering authoritative message in educational setting"
+          }
+        ],
+        "primary_focus": "unified final message with Samantha's authoritative reassurance",
+        "lighting_approach": "warm, inclusive lighting for group unity message",
+        "composition_approach": "medium group shot emphasizing unity and final message delivery"
+      },
+      "scene_13": {
+        "scene_id": 13,
+        "duration": "2 seconds",
+        "camera_type": "full screen institutional",
+        "mood": "official institutional",
+        "natural_description": "Institutional sign",
+        "dialogue": "INFO SU SALUTE.GOV.IT",
+        "action_summary": "Institutional branding and information presentation",
+        "elements_present": [
+          "circular_library",
+          "warm_library_lighting"
+        ],
+        "element_interactions": [],
+        "primary_focus": "Ministero della Salute institutional branding",
+        "lighting_approach": "professional institutional lighting for branding",
+        "composition_approach": "full screen institutional logo and information presentation"
+      }
+    }
+  }
+]
