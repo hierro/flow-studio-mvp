@@ -74,8 +74,7 @@ export default function SceneCard({
     collapsed: { height: 0, opacity: 0 },
     expanded: { 
       height: 'auto', 
-      opacity: 1,
-      transition: { duration: 0.3, ease: 'easeInOut' }
+      opacity: 1
     }
   };
 
@@ -89,144 +88,66 @@ export default function SceneCard({
         'timeline-scene-card',
         'rounded-lg border overflow-hidden cursor-pointer'
       )}
-      style={{
-        minWidth: '300px',
-        backgroundColor: '#1a1a1a',
-        border: '1px solid #333'
-      }}
       onClick={() => onSelect(scene.scene_id)}
     >
       {/* Scene Header */}
-      <div style={{ padding: '16px' }}>
-        <div style={{ 
-          display: 'flex', 
-          justifyContent: 'space-between', 
-          alignItems: 'center',
-          marginBottom: '12px'
-        }}>
-          <span style={{ 
-            fontSize: '14px', 
-            fontWeight: '600', 
-            color: '#3b82f6',
-            backgroundColor: '#eff6ff',
-            padding: '4px 8px',
-            borderRadius: '4px'
-          }}>
+      <div className="scene-card-content">
+        <div className="scene-card-header">
+          <span className="scene-badge">
             Scene {scene.scene_id}
           </span>
-          <span style={{ 
-            fontSize: '12px', 
-            color: '#ccc',
-            backgroundColor: '#333',
-            padding: '4px 8px',
-            borderRadius: '4px',
-            fontWeight: '500'
-          }}>
+          <span className="scene-duration">
             {scene.duration}
           </span>
         </div>
 
         {/* Action Summary (Main Title) */}
-        <h3 style={{ 
-          fontSize: '16px', 
-          fontWeight: '700', 
-          color: '#fff',
-          marginBottom: '12px',
-          lineHeight: '1.3'
-        }}>
+        <h3 className="scene-title">
           {scene.action_summary || scene.title}
         </h3>
 
         {/* Camera Type & Mood - Two Rows */}
-        <div style={{ 
-          display: 'flex', 
-          flexDirection: 'column',
-          gap: '6px',
-          marginBottom: '12px'
-        }}>
-          <div style={{ fontSize: '12px', color: '#ccc' }}>
-            Camera: <span style={{ color: '#10b981', fontWeight: '500' }}>{scene.camera_type}</span>
+        <div className="scene-meta">
+          <div className="scene-meta-item">
+            Camera: <span className="scene-camera">{scene.camera_type}</span>
           </div>
-          <div style={{ fontSize: '12px', color: '#ccc' }}>
-            Mood: <span style={{ color: '#8b5cf6', fontWeight: '500' }}>{scene.mood}</span>
+          <div className="scene-meta-item">
+            Mood: <span className="scene-mood">{scene.mood}</span>
           </div>
         </div>
 
         {/* Dialogue Section */}
         {scene.dialogue && (
-          <div style={{ 
-            backgroundColor: '#0f0f0f',
-            border: '1px solid #333',
-            borderRadius: '6px',
-            padding: '10px',
-            marginBottom: '12px'
-          }}>
-            <p style={{ 
-              fontSize: '12px',
-              color: '#ccc',
-              fontStyle: 'italic',
-              lineHeight: '1.4',
-              margin: 0
-            }}>
+          <div className="scene-dialogue">
+            <p className="scene-dialogue-text">
               "{scene.dialogue.length > 80 ? `${scene.dialogue.substring(0, 80)}...` : scene.dialogue}"
             </p>
           </div>
         )}
 
         {/* Elements Section */}
-        <div style={{ 
-          border: '1px solid #333',
-          borderRadius: '6px',
-          padding: '10px',
-          marginBottom: '12px'
-        }}>
-          <div style={{ 
-            fontSize: '11px', 
-            fontWeight: '600', 
-            color: '#f59e0b',
-            marginBottom: '8px'
-          }}>
+        <div className="scene-elements">
+          <div className="scene-elements-title">
             Elements ({sceneElements.length})
           </div>
-          <div style={{ 
-            display: 'flex', 
-            flexDirection: 'column',
-            gap: '6px'
-          }}>
+          <div className="scene-elements-list">
             {Object.entries(groupedElements).map(([type, typeElements]) => (
-              <div key={type} style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                <span style={{ 
-                  fontSize: '10px',
-                  fontWeight: '600',
-                  color: '#999',
-                  minWidth: '50px',
-                  textTransform: 'capitalize'
-                }}>
+              <div key={type} className="scene-element-group">
+                <span className="scene-element-type">
                   {type}:
                 </span>
-                <div style={{ 
-                  display: 'flex', 
-                  flexWrap: 'wrap', 
-                  gap: '4px'
-                }}>
+                <div className="scene-element-tags">
                   {typeElements.map(element => (
                     <motion.div
                       key={element.id}
                       whileHover={{ scale: 1.05 }}
                       onMouseEnter={() => onElementHover(element.id)}
                       onMouseLeave={() => onElementHover(null)}
+                      className="scene-element-tag"
                       style={{
-                        display: 'flex',
-                        alignItems: 'center',
                         backgroundColor: hoveredElement === element.id ? element.color : `${element.color}20`,
                         color: hoveredElement === element.id ? 'white' : element.color,
-                        border: `1px solid ${element.color}`,
-                        borderRadius: '10px',
-                        padding: '2px 6px',
-                        fontSize: '10px',
-                        fontWeight: '500',
-                        cursor: 'pointer',
-                        transition: 'all 0.2s ease'
+                        borderColor: element.color
                       }}
                     >
                       {element.name}
@@ -239,7 +160,7 @@ export default function SceneCard({
         </div>
 
         {/* Individual Expandable Sections */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+        <div className="scene-expandable-sections">
           {/* Primary Focus Button & Content */}
           <div>
             <button
@@ -247,21 +168,7 @@ export default function SceneCard({
                 e.stopPropagation();
                 setExpandedSections(prev => ({ ...prev, primaryFocus: !prev.primaryFocus }));
               }}
-              style={{
-                width: '100%',
-                padding: '6px 12px',
-                backgroundColor: expandedSections.primaryFocus ? '#0066cc' : '#333',
-                border: '1px solid #555',
-                borderRadius: '4px',
-                fontSize: '11px',
-                color: expandedSections.primaryFocus ? 'white' : '#ccc',
-                cursor: 'pointer',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'space-between',
-                fontWeight: '500',
-                transition: 'all 0.2s ease'
-              }}
+              className={`scene-expand-button ${expandedSections.primaryFocus ? 'expanded' : ''}`}
             >
               <span>🎯 Primary Focus</span>
               <span>{expandedSections.primaryFocus ? '▼' : '▶'}</span>
@@ -273,21 +180,10 @@ export default function SceneCard({
                   initial="collapsed"
                   animate="expanded"
                   exit="collapsed"
-                  style={{ overflow: 'hidden' }}
+                  className="scene-expand-content"
                 >
-                  <div style={{ 
-                    padding: '8px 12px', 
-                    backgroundColor: '#0f0f0f',
-                    border: '1px solid #333',
-                    borderTop: 'none',
-                    borderRadius: '0 0 4px 4px'
-                  }}>
-                    <p style={{ 
-                      fontSize: '12px',
-                      color: '#ccc',
-                      lineHeight: '1.4',
-                      margin: 0
-                    }}>
+                  <div className="scene-expand-inner">
+                    <p className="scene-expand-text">
                       {scene.primary_focus || 'No specific focus defined'}
                     </p>
                   </div>
@@ -303,21 +199,7 @@ export default function SceneCard({
                 e.stopPropagation();
                 setExpandedSections(prev => ({ ...prev, composition: !prev.composition }));
               }}
-              style={{
-                width: '100%',
-                padding: '6px 12px',
-                backgroundColor: expandedSections.composition ? '#0066cc' : '#333',
-                border: '1px solid #555',
-                borderRadius: '4px',
-                fontSize: '11px',
-                color: expandedSections.composition ? 'white' : '#ccc',
-                cursor: 'pointer',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'space-between',
-                fontWeight: '500',
-                transition: 'all 0.2s ease'
-              }}
+              className={`scene-expand-button ${expandedSections.composition ? 'expanded' : ''}`}
             >
               <span>📐 Composition</span>
               <span>{expandedSections.composition ? '▼' : '▶'}</span>
@@ -329,21 +211,10 @@ export default function SceneCard({
                   initial="collapsed"
                   animate="expanded"
                   exit="collapsed"
-                  style={{ overflow: 'hidden' }}
+                  className="scene-expand-content"
                 >
-                  <div style={{ 
-                    padding: '8px 12px', 
-                    backgroundColor: '#0f0f0f',
-                    border: '1px solid #333',
-                    borderTop: 'none',
-                    borderRadius: '0 0 4px 4px'
-                  }}>
-                    <p style={{ 
-                      fontSize: '12px',
-                      color: '#ccc',
-                      lineHeight: '1.4',
-                      margin: 0
-                    }}>
+                  <div className="scene-expand-inner">
+                    <p className="scene-expand-text">
                       {scene.composition_approach || 'Standard composition'}
                     </p>
                   </div>
@@ -359,21 +230,7 @@ export default function SceneCard({
                 e.stopPropagation();
                 setExpandedSections(prev => ({ ...prev, description: !prev.description }));
               }}
-              style={{
-                width: '100%',
-                padding: '6px 12px',
-                backgroundColor: expandedSections.description ? '#0066cc' : '#333',
-                border: '1px solid #555',
-                borderRadius: '4px',
-                fontSize: '11px',
-                color: expandedSections.description ? 'white' : '#ccc',
-                cursor: 'pointer',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'space-between',
-                fontWeight: '500',
-                transition: 'all 0.2s ease'
-              }}
+              className={`scene-expand-button ${expandedSections.description ? 'expanded' : ''}`}
             >
               <span>📝 Description</span>
               <span>{expandedSections.description ? '▼' : '▶'}</span>
@@ -385,21 +242,10 @@ export default function SceneCard({
                   initial="collapsed"
                   animate="expanded"
                   exit="collapsed"
-                  style={{ overflow: 'hidden' }}
+                  className="scene-expand-content"
                 >
-                  <div style={{ 
-                    padding: '8px 12px', 
-                    backgroundColor: '#0f0f0f',
-                    border: '1px solid #333',
-                    borderTop: 'none',
-                    borderRadius: '0 0 4px 4px'
-                  }}>
-                    <p style={{ 
-                      fontSize: '11px',
-                      color: '#999',
-                      lineHeight: '1.4',
-                      margin: 0
-                    }}>
+                  <div className="scene-expand-inner">
+                    <p className="scene-expand-text description">
                       {scene.natural_description}
                     </p>
                   </div>

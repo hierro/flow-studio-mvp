@@ -28,14 +28,7 @@ export default function App() {
 
   if (loading) {
     return (
-      <div style={{
-        minHeight: '100vh',
-        background: '#000',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        color: '#fff'
-      }}>
+      <div className="app-loading">
         Loading...
       </div>
     )

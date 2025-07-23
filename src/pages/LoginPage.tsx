@@ -47,43 +47,17 @@ export default function LoginPage() {
   }
 
   return (
-    <div style={{
-      minHeight: '100vh',
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-      background: '#000'
-    }}>
-      <div style={{
-        background: '#1a1a1a',
-        padding: '2rem',
-        borderRadius: '8px',
-        width: '400px',
-        maxWidth: '90vw'
-      }}>
-        <h1 style={{
-          fontSize: '1.5rem',
-          fontWeight: 'bold',
-          color: '#fff',
-          marginBottom: '1.5rem',
-          textAlign: 'center'
-        }}>Login</h1>
+    <div className="login-container">
+      <div className="login-card">
+        <h1 className="login-title">Login</h1>
         
-        <form onSubmit={handleLogin} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+        <form onSubmit={handleLogin} className="login-form">
           <input
             type="email"
             placeholder="Email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            style={{
-              width: '100%',
-              padding: '0.75rem',
-              background: '#333',
-              color: '#fff',
-              border: '1px solid #555',
-              borderRadius: '4px',
-              fontSize: '1rem'
-            }}
+            className="form-input"
             required
           />
           
@@ -92,32 +66,14 @@ export default function LoginPage() {
             placeholder="Password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            style={{
-              width: '100%',
-              padding: '0.75rem',
-              background: '#333',
-              color: '#fff',
-              border: '1px solid #555',
-              borderRadius: '4px',
-              fontSize: '1rem'
-            }}
+            className="form-input"
             required
           />
           
           <button
             type="submit"
             disabled={loading}
-            style={{
-              width: '100%',
-              background: loading ? '#555' : '#0066cc',
-              color: '#fff',
-              padding: '0.75rem',
-              border: 'none',
-              borderRadius: '4px',
-              cursor: loading ? 'not-allowed' : 'pointer',
-              fontSize: '1rem',
-              opacity: loading ? 0.5 : 1
-            }}
+            className="login-button"
           >
             {loading ? 'Loading...' : 'Sign In'}
           </button>
@@ -126,30 +82,13 @@ export default function LoginPage() {
         <button
           onClick={handleSignUp}
           disabled={loading}
-          style={{
-            width: '100%',
-            marginTop: '1rem',
-            background: '#555',
-            color: '#fff',
-            padding: '0.75rem',
-            border: 'none',
-            borderRadius: '4px',
-            cursor: 'pointer',
-            fontSize: '1rem'
-          }}
+          className="signup-button"
         >
           Create Account
         </button>
         
         {error && (
-          <div style={{
-            marginTop: '1rem',
-            padding: '0.75rem',
-            background: '#330000',
-            color: '#ff9999',
-            borderRadius: '4px',
-            fontSize: '0.9rem'
-          }}>
+          <div className="login-error">
             {error}
           </div>
         )}

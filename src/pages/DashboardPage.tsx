@@ -87,39 +87,20 @@ export default function DashboardPage({ user }: DashboardPageProps) {
   }
 
   return (
-    <div style={{ minHeight: '100vh', background: '#000', padding: '2rem' }}>
-      <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
-        <div style={{
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-          marginBottom: '2rem'
-        }}>
-          <h1 style={{ fontSize: '2rem', fontWeight: 'bold', color: '#fff' }}>Projects</h1>
-          <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
+    <div className="min-h-screen bg-primary p-2xl">
+      <div className="dashboard-container">
+        <div className="flex justify-between items-center mb-2xl">
+          <h1 className="text-3xl font-bold text-primary">Projects</h1>
+          <div className="flex gap-xl items-center">
             <button
               onClick={() => setShowCreateModal(true)}
-              style={{
-                background: '#0066cc',
-                color: '#fff',
-                padding: '0.5rem 1rem',
-                border: 'none',
-                borderRadius: '4px',
-                cursor: 'pointer'
-              }}
+              className="btn btn-primary"
             >
               New Project
             </button>
             <button
               onClick={handleLogout}
-              style={{
-                background: '#cc0000',
-                color: '#fff',
-                padding: '0.5rem 1rem',
-                border: 'none',
-                borderRadius: '4px',
-                cursor: 'pointer'
-              }}
+              className="btn btn-logout"
             >
               Logout
             </button>
@@ -127,141 +108,71 @@ export default function DashboardPage({ user }: DashboardPageProps) {
         </div>
 
         {loading ? (
-          <div style={{ textAlign: 'center', color: '#ccc', padding: '2rem' }}>
+          <div className="text-center text-secondary p-2xl">
             Loading projects...
           </div>
         ) : projects.length === 0 ? (
-          <div style={{
-            background: '#1a1a1a',
-            padding: '3rem',
-            borderRadius: '8px',
-            textAlign: 'center'
-          }}>
-            <h2 style={{ color: '#fff', marginBottom: '1rem' }}>No projects yet</h2>
-            <p style={{ color: '#ccc', marginBottom: '2rem' }}>
+          <div className="bg-secondary p-4xl rounded-lg text-center">
+            <h2 className="text-primary mb-xl">No projects yet</h2>
+            <p className="text-secondary mb-2xl">
               Create your first FLOW.STUDIO project to get started with AI-powered animatic generation
             </p>
             <button
               onClick={() => setShowCreateModal(true)}
-              style={{
-                background: '#0066cc',
-                color: '#fff',
-                padding: '0.75rem 1.5rem',
-                border: 'none',
-                borderRadius: '4px',
-                cursor: 'pointer',
-                fontSize: '1rem'
-              }}
+              className="btn btn-primary"
             >
               Create Your First Project
             </button>
           </div>
         ) : (
-          <div style={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))',
-            gap: '1.5rem'
-          }}>
+          <div className="grid grid-auto-fit gap-2xl">
             {projects.map(project => (
               <div
                 key={project.id}
                 onClick={() => handleProjectClick(project.id)}
-                style={{
-                  background: '#1a1a1a',
-                  padding: '1.5rem',
-                  borderRadius: '8px',
-                  cursor: 'pointer',
-                  border: '1px solid #333',
-                  transition: 'border-color 0.2s'
-                }}
-                onMouseEnter={e => e.currentTarget.style.borderColor = '#555'}
-                onMouseLeave={e => e.currentTarget.style.borderColor = '#333'}
+                className="project-card cursor-pointer"
               >
-                <div style={{
-                  display: 'flex',
-                  justifyContent: 'space-between',
-                  alignItems: 'flex-start',
-                  marginBottom: '1rem'
-                }}>
-                  <h3 style={{
-                    color: '#fff',
-                    fontSize: '1.25rem',
-                    margin: 0,
-                    flex: 1
-                  }}>
+                <div className="flex justify-between items-start mb-xl">
+                  <h3 className="text-primary text-xl flex-1 mb-0">
                     {project.name}
                   </h3>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                  <div className="flex items-center gap-md">
                     <button
                       onClick={(e) => {
                         e.stopPropagation()
                         setShowDeleteConfirm(project.id)
                       }}
-                      style={{
-                        background: '#cc0000',
-                        color: '#fff',
-                        border: 'none',
-                        borderRadius: '4px',
-                        padding: '0.25rem 0.5rem',
-                        cursor: 'pointer',
-                        fontSize: '0.7rem',
-                        opacity: 0.8
-                      }}
-                      onMouseEnter={e => e.currentTarget.style.opacity = '1'}
-                      onMouseLeave={e => e.currentTarget.style.opacity = '0.8'}
+                      className="btn-delete"
                     >
                       🗑️
                     </button>
-                    <span style={{
-                      background: getStatusColor(project.status),
-                      color: '#fff',
-                      padding: '0.25rem 0.5rem',
-                      borderRadius: '12px',
-                      fontSize: '0.75rem',
-                      textTransform: 'uppercase',
-                      fontWeight: 'bold'
+                    <span className="status-badge" style={{
+                      background: getStatusColor(project.status)
                     }}>
                       {project.status}
                     </span>
                   </div>
                 </div>
 
-                <div style={{ marginBottom: '1rem' }}>
-                  <div style={{
-                    display: 'flex',
-                    justifyContent: 'space-between',
-                    color: '#ccc',
-                    fontSize: '0.9rem',
-                    marginBottom: '0.5rem'
-                  }}>
+                <div className="project-progress">
+                  <div className="flex justify-between text-secondary text-sm mb-sm">
                     <span>Progress</span>
                     <span>{project.phase_progress.completed_phases}/5 phases</span>
                   </div>
-                  <div style={{
-                    background: '#333',
-                    height: '8px',
-                    borderRadius: '4px',
-                    overflow: 'hidden'
-                  }}>
-                    <div style={{
-                      background: '#0066cc',
-                      height: '100%',
-                      width: `${(project.phase_progress.completed_phases / 5) * 100}%`,
-                      transition: 'width 0.3s'
-                    }} />
+                  <div className="progress-bar">
+                    <div 
+                      className="progress-fill"
+                      style={{
+                        width: `${(project.phase_progress.completed_phases / 5) * 100}%`
+                      }}
+                    />
                   </div>
                 </div>
 
-                <div style={{
-                  display: 'flex',
-                  justifyContent: 'space-between',
-                  alignItems: 'center',
-                  color: '#999',
-                  fontSize: '0.85rem'
-                }}>
+                <div className="project-info">
                   <span>Created {formatDate(project.created_at)}</span>
                   {project.phase_progress.current_phase && (
-                    <span style={{ color: '#00cc00' }}>
+                    <span className="current-phase">
                       Active: {project.phase_progress.current_phase.replace('_', ' ')}
                     </span>
                   )}
@@ -273,39 +184,14 @@ export default function DashboardPage({ user }: DashboardPageProps) {
 
         {/* Create Project Modal */}
         {showCreateModal && (
-          <div style={{
-            position: 'fixed',
-            top: 0,
-            left: 0,
-            right: 0,
-            bottom: 0,
-            background: 'rgba(0, 0, 0, 0.8)',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            zIndex: 1000
-          }}>
-            <div style={{
-              background: '#1a1a1a',
-              padding: '2rem',
-              borderRadius: '8px',
-              width: '400px',
-              maxWidth: '90vw'
-            }}>
-              <h2 style={{
-                color: '#fff',
-                marginBottom: '1.5rem',
-                fontSize: '1.5rem'
-              }}>
+          <div className="modal-overlay">
+            <div className="modal-content modal-width-400">
+              <h2 className="modal-header">
                 Create New Project
               </h2>
               
-              <div style={{ marginBottom: '1.5rem' }}>
-                <label style={{
-                  display: 'block',
-                  color: '#ccc',
-                  marginBottom: '0.5rem'
-                }}>
+              <div className="mb-xl">
+                <label className="form-label">
                   Project Name
                 </label>
                 <input
@@ -313,66 +199,35 @@ export default function DashboardPage({ user }: DashboardPageProps) {
                   value={newProjectName}
                   onChange={(e) => setNewProjectName(e.target.value)}
                   placeholder="e.g. UN CONSIGLIO STELLARE"
-                  style={{
-                    width: '100%',
-                    padding: '0.75rem',
-                    background: '#333',
-                    color: '#fff',
-                    border: '1px solid #555',
-                    borderRadius: '4px',
-                    fontSize: '1rem'
-                  }}
+                  className="form-input"
                   onKeyPress={(e) => e.key === 'Enter' && handleCreateProject()}
                   autoFocus
                 />
               </div>
 
-              <div style={{
-                background: '#333',
-                padding: '1rem',
-                borderRadius: '4px',
-                marginBottom: '1.5rem'
-              }}>
-                <p style={{ color: '#ccc', fontSize: '0.9rem', margin: 0 }}>
+              <div className="modal-info">
+                <p>
                   This will create a new project with 5 phases: Script Interpretation, 
                   Element Images, Scene Generation, Scene Videos, and Final Assembly.
                   Based on the Italian campaign template.
                 </p>
               </div>
 
-              <div style={{
-                display: 'flex',
-                gap: '1rem',
-                justifyContent: 'flex-end'
-              }}>
+              <div className="modal-actions">
                 <button
                   onClick={() => {
                     setShowCreateModal(false)
                     setNewProjectName('')
                   }}
                   disabled={createLoading}
-                  style={{
-                    background: '#666',
-                    color: '#fff',
-                    padding: '0.5rem 1rem',
-                    border: 'none',
-                    borderRadius: '4px',
-                    cursor: createLoading ? 'not-allowed' : 'pointer'
-                  }}
+                  className="btn btn-secondary"
                 >
                   Cancel
                 </button>
                 <button
                   onClick={handleCreateProject}
                   disabled={!newProjectName.trim() || createLoading}
-                  style={{
-                    background: !newProjectName.trim() || createLoading ? '#555' : '#0066cc',
-                    color: '#fff',
-                    padding: '0.5rem 1rem',
-                    border: 'none',
-                    borderRadius: '4px',
-                    cursor: !newProjectName.trim() || createLoading ? 'not-allowed' : 'pointer'
-                  }}
+                  className="btn btn-primary"
                 >
                   {createLoading ? 'Creating...' : 'Create Project'}
                 </button>
@@ -383,88 +238,38 @@ export default function DashboardPage({ user }: DashboardPageProps) {
 
         {/* Delete Project Confirmation Modal */}
         {showDeleteConfirm && (
-          <div style={{
-            position: 'fixed',
-            top: 0,
-            left: 0,
-            right: 0,
-            bottom: 0,
-            background: 'rgba(0, 0, 0, 0.8)',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            zIndex: 1000
-          }}>
-            <div style={{
-              background: '#1a1a1a',
-              padding: '2rem',
-              borderRadius: '8px',
-              width: '400px',
-              maxWidth: '90vw',
-              border: '1px solid #cc0000'
-            }}>
-              <h2 style={{
-                color: '#ff9999',
-                marginBottom: '1rem',
-                fontSize: '1.5rem',
-                display: 'flex',
-                alignItems: 'center',
-                gap: '0.5rem'
-              }}>
+          <div className="modal-overlay">
+            <div className="modal-content delete-modal modal-width-400">
+              <h2 className="delete-header">
                 ⚠️ Delete Project?
               </h2>
               
-              <div style={{
-                background: '#330000',
-                border: '1px solid #cc0000',
-                padding: '1rem',
-                borderRadius: '4px',
-                marginBottom: '1.5rem'
-              }}>
-                <p style={{ color: '#ff9999', margin: 0, marginBottom: '0.5rem' }}>
+              <div className="delete-warning">
+                <p>
                   This will permanently delete:
                 </p>
-                <ul style={{ color: '#ffcccc', margin: 0, paddingLeft: '1.5rem' }}>
+                <ul>
                   <li>All project data and phases</li>
                   <li>All generated content and versions</li>
                   <li>All n8n job history</li>
                 </ul>
-                <p style={{ color: '#ff6666', margin: 0, marginTop: '0.5rem', fontWeight: 'bold' }}>
+                <p className="warning-final">
                   This action cannot be undone!
                 </p>
               </div>
 
-              <div style={{
-                display: 'flex',
-                gap: '1rem',
-                justifyContent: 'flex-end'
-              }}>
+              <div className="modal-actions">
                 <button
                   onClick={() => setShowDeleteConfirm(null)}
                   disabled={deleteLoading}
-                  style={{
-                    background: '#666',
-                    color: '#fff',
-                    padding: '0.75rem 1.5rem',
-                    border: 'none',
-                    borderRadius: '4px',
-                    cursor: deleteLoading ? 'not-allowed' : 'pointer'
-                  }}
+                  className="btn btn-secondary btn-padding-lg"
                 >
                   Cancel
                 </button>
                 <button
                   onClick={() => handleDeleteProject(showDeleteConfirm)}
                   disabled={deleteLoading}
-                  style={{
-                    background: deleteLoading ? '#880000' : '#cc0000',
-                    color: '#fff',
-                    padding: '0.75rem 1.5rem',
-                    border: 'none',
-                    borderRadius: '4px',
-                    cursor: deleteLoading ? 'not-allowed' : 'pointer',
-                    fontWeight: 'bold'
-                  }}
+                  className="btn btn-danger btn-padding-lg"
                 >
                   {deleteLoading ? '🗑️ Deleting...' : '🗑️ Delete Forever'}
                 </button>

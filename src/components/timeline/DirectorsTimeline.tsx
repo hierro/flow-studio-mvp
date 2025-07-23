@@ -29,7 +29,6 @@ export default function DirectorsTimeline({
 }: DirectorsTimelineProps) {
   const [selectedScene, setSelectedScene] = useState<number | null>(null);
   const [hoveredElement, setHoveredElement] = useState<string | null>(null);
-  const [viewMode, setViewMode] = useState<'scenes' | 'elements'>('scenes'); // Timeline is default, elements for future
 
   // Parse content into timeline data
   const timelineData: TimelineData = useMemo(() => {
@@ -86,14 +85,10 @@ export default function DirectorsTimeline({
 
   if (!content) {
     return (
-      <div style={{ 
-        padding: '32px', 
-        textAlign: 'center',
-        color: '#6b7280'
-      }}>
-        <div style={{ marginBottom: '16px' }}>📊</div>
+      <div className="timeline-empty-state">
+        <div className="timeline-empty-icon">📊</div>
         <p>No content available for timeline visualization</p>
-        <p style={{ fontSize: '14px', marginTop: '8px' }}>
+        <p className="timeline-empty-description">
           Generate Phase 1 content first to see the timeline
         </p>
       </div>
@@ -101,26 +96,12 @@ export default function DirectorsTimeline({
   }
 
   return (
-    <div className="directors-timeline" style={{ height: '100%', display: 'flex', flexDirection: 'column', backgroundColor: '#000' }}>
+    <div className="directors-timeline">
       {/* Compact Project Header */}
-      <div style={{ 
-        padding: '16px 20px',
-        borderBottom: '1px solid #333',
-        backgroundColor: '#1a1a1a'
-      }}>
-        <div style={{ 
-          display: 'flex', 
-          justifyContent: 'space-between', 
-          alignItems: 'center',
-          marginBottom: '12px'
-        }}>
-          <div style={{ flex: 1 }}>
-            <h2 style={{ 
-              fontSize: '20px', 
-              fontWeight: '700', 
-              color: '#fff',
-              marginBottom: '2px'
-            }}>
+      <div className="timeline-header-section">
+        <div className="timeline-header-content mb-lg">
+          <div className="timeline-header-info">
+            <h2 className="timeline-project-title" style={{ fontSize: '1.25rem', marginBottom: '2px' }}>
               {projectName}
             </h2>
             <div style={{ 
@@ -141,89 +122,25 @@ export default function DirectorsTimeline({
             </div>
           </div>
 
-          {/* View Mode Toggle */}
-          <div style={{ 
-            display: 'flex',
-            backgroundColor: '#333',
-            borderRadius: '6px',
-            padding: '2px'
-          }}>
-            <button
-              onClick={() => setViewMode('scenes')}
-              style={{
-                padding: '6px 12px',
-                borderRadius: '4px',
-                border: 'none',
-                backgroundColor: viewMode === 'scenes' ? '#0066cc' : 'transparent',
-                color: viewMode === 'scenes' ? 'white' : '#ccc',
-                fontSize: '13px',
-                fontWeight: '500',
-                cursor: 'pointer',
-                transition: 'all 0.2s ease'
-              }}
-            >
-              📊 Timeline
-            </button>
-            <button
-              onClick={() => setViewMode('elements')}
-              style={{
-                padding: '6px 12px',
-                borderRadius: '4px',
-                border: 'none',
-                backgroundColor: viewMode === 'elements' ? '#0066cc' : 'transparent',
-                color: viewMode === 'elements' ? 'white' : '#ccc',
-                fontSize: '13px',
-                fontWeight: '500',
-                cursor: 'pointer',
-                transition: 'all 0.2s ease'
-              }}
-            >
-              🎭 Elements
-            </button>
-          </div>
         </div>
       </div>
 
       {/* Timeline Content */}
-      <div style={{ flex: 1, overflow: 'visible', minHeight: '500px' }}>
-        {viewMode === 'scenes' ? (
-          // Scenes View
-          <div style={{ minHeight: '600px', display: 'flex', flexDirection: 'column' }}>
+      <div className="timeline-main-content">
+        {/* Scenes View */}
+          <div className="timeline-scenes-wrapper">
             {/* Element Overview Bar */}
-            <div style={{ 
-              padding: '16px 20px',
-              backgroundColor: '#1a1a1a',
-              borderBottom: '1px solid #333'
-            }}>
-              <div style={{ 
-                fontSize: '14px', 
-                fontWeight: '600', 
-                color: '#fff',
-                marginBottom: '8px'
-              }}>
+            <div className="timeline-legend-container">
+              <div className="timeline-legend-header">
                 Element Overview ({timelineData.elements.length} total)
               </div>
-              <div style={{ 
-                display: 'flex', 
-                flexDirection: 'column',
-                gap: '8px'
-              }}>
+              <div className="flex flex-col gap-md">
                 {Object.entries(elementsWithStats).map(([type, elements]) => (
-                  <div key={type} style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                    <span style={{ 
-                      fontSize: '12px',
-                      fontWeight: '600',
-                      color: '#999',
-                      minWidth: '70px',
-                      textTransform: 'capitalize'
-                    }}>
+                  <div key={type} className="timeline-legend-group">
+                    <span className="timeline-legend-text" style={{ minWidth: '4.375rem' }}>
                       {type}:
                     </span>
-                    <div style={{ 
-                      display: 'flex', 
-                      flexWrap: 'wrap', 
-                      gap: '6px'
-                    }}>
+                    <div className="flex flex-wrap gap-sm">
                       {elements.map(element => (
                         <motion.div
                           key={element.id}
@@ -245,19 +162,14 @@ export default function DirectorsTimeline({
                           }}
                         >
                           {element.name}
-                          <span style={{ 
-                            marginLeft: '6px',
-                            fontSize: '9px',
-                            backgroundColor: hoveredElement === element.id ? 'rgba(255,255,255,0.2)' : `${element.color}20`,
-                            padding: '1px 4px',
-                            borderRadius: '6px'
-                          }}>
+                          <span 
+                            className="timeline-element-percentage"
+                            style={{ 
+                              backgroundColor: hoveredElement === element.id ? 'rgba(255,255,255,0.2)' : `${element.color}20`
+                            }}>
                             {element.usage_percentage}%
                           </span>
-                          <span style={{ 
-                            marginLeft: '3px',
-                            fontSize: '9px'
-                          }}>
+                          <span className="timeline-element-consistency">
                             {element.consistency_score === 'excellent' ? '✅' : 
                              element.consistency_score === 'good' ? '👍' : '⚠️'}
                           </span>
@@ -270,19 +182,8 @@ export default function DirectorsTimeline({
             </div>
 
             {/* Scene Grid Timeline */}
-            <div style={{ 
-              flex: 1,
-              padding: '20px',
-              overflowY: 'auto',
-              backgroundColor: '#000',
-              minHeight: '500px'
-            }}>
-              <div style={{ 
-                display: 'grid',
-                gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))',
-                gap: '16px',
-                paddingBottom: '20px'
-              }}>
+            <div className="timeline-scenes-main">
+              <div className="timeline-scenes-responsive-grid" style={{ paddingBottom: '1.25rem' }}>
                 {timelineData.scenes.map((scene) => (
                   <SceneCard
                     key={scene.scene_id}
@@ -297,21 +198,6 @@ export default function DirectorsTimeline({
               </div>
             </div>
           </div>
-        ) : (
-          // Elements View (Future Enhancement)
-          <div style={{ 
-            padding: '32px', 
-            textAlign: 'center',
-            color: '#ccc',
-            backgroundColor: '#000'
-          }}>
-            <div style={{ marginBottom: '16px' }}>🎭</div>
-            <p style={{ color: '#fff' }}>Elements view coming soon!</p>
-            <p style={{ fontSize: '14px', marginTop: '8px', color: '#ccc' }}>
-              This will show element-centric visualization with cross-scene relationships
-            </p>
-          </div>
-        )}
       </div>
     </div>
   );

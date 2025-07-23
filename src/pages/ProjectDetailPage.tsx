@@ -1,8 +1,10 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
-import { getProject, getProjectPhases } from '../lib/database'
-import type { Project, ProjectPhase, PhaseName } from '../types/project'
+import { getProject, getProjectPhases, updatePhaseContent, savePhaseAndUnlockNext, getPhase, getPhaseVersions, getPhaseVersion } from '../lib/database'
+import type { Project, ProjectPhase, PhaseName, ScriptInterpretationContent, PhaseVersion } from '../types/project'
 import ScriptInterpretationModule from '../components/ScriptInterpretationModule'
+import ProjectViewNavigation from '../components/ProjectViewNavigation'
+import DirectorsTimeline from '../components/timeline/DirectorsTimeline'
 
 interface ProjectDetailPageProps {
   user: any
@@ -14,7 +16,25 @@ export default function ProjectDetailPage({ user }: ProjectDetailPageProps) {
   const [project, setProject] = useState<Project | null>(null)
   const [phases, setPhases] = useState<ProjectPhase[]>([])
   const [selectedPhase, setSelectedPhase] = useState<PhaseName | null>(null)
+  const [selectedView, setSelectedView] = useState<'json' | 'timeline' | 'elements' | 'style'>('timeline')
   const [loading, setLoading] = useState(true)
+  
+  // Additional content management state
+  const [showVersionHistory, setShowVersionHistory] = useState(false)
+  const [versionHistory, setVersionHistory] = useState<PhaseVersion[]>([])
+  const [loadingVersions, setLoadingVersions] = useState(false)
+
+  // Content management state (moved from ScriptInterpretationModule)
+  const [jsonContent, setJsonContent] = useState('')
+  const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false)
+  const [isSaving, setIsSaving] = useState(false)
+  const [error, setError] = useState('')
+  const [databaseStatus, setDatabaseStatus] = useState<{
+    loaded: boolean;
+    version: number;
+    lastSaved?: string;
+    error?: string;
+  }>({ loaded: false, version: 0 })
 
   useEffect(() => {
     if (!projectId) {
@@ -41,10 +61,12 @@ export default function ProjectDetailPage({ user }: ProjectDetailPageProps) {
     setProject(projectData)
     setPhases(phasesData)
     
-    // Select first available phase
+    // Select first available phase and load its content
     const firstAvailablePhase = phasesData.find(p => p.can_proceed)
     if (firstAvailablePhase) {
       setSelectedPhase(firstAvailablePhase.phase_name)
+      // Load content after state is set, use setTimeout to ensure state is updated
+      setTimeout(() => loadPhaseContent(firstAvailablePhase.id), 0)
     }
     
     setLoading(false)
@@ -89,6 +111,245 @@ export default function ProjectDetailPage({ user }: ProjectDetailPageProps) {
   const handlePhaseClick = (phase: ProjectPhase) => {
     if (!phase.can_proceed && !phase.user_saved) return
     setSelectedPhase(phase.phase_name)
+    // Reset content management state when switching phases
+    setJsonContent('')
+    setHasUnsavedChanges(false)
+    setError('')
+    setDatabaseStatus({ loaded: false, version: 0 })
+    // Load content for the new phase
+    loadPhaseContent(phase.id)
+  }
+
+  // Load existing content and database status for a phase
+  const loadPhaseContent = useCallback(async (phaseId: string) => {
+    setDatabaseStatus({ loaded: false, version: 0 })
+    
+    try {
+      // Refresh phase data from database to get latest version
+      const currentPhase = await getPhase(phaseId)
+      if (currentPhase) {
+        setDatabaseStatus({
+          loaded: true,
+          version: currentPhase.current_version,
+          lastSaved: currentPhase.last_modified_at || currentPhase.created_at
+        })
+        
+        // Linear workflow: All phases need script_interpretation as base content
+        let scriptContent = null;
+        
+        if (currentPhase.phase_name === 'script_interpretation') {
+          // Phase 1: Load its own script interpretation content
+          scriptContent = currentPhase.content_data?.script_interpretation;
+        } else {
+          // Phase 2+: Find Phase 1 and load its script interpretation content
+          const phase1 = phases.find(p => p.phase_name === 'script_interpretation');
+          if (phase1?.content_data?.script_interpretation) {
+            scriptContent = phase1.content_data.script_interpretation;
+          }
+        }
+        
+        if (scriptContent) {
+          setJsonContent(JSON.stringify(scriptContent, null, 2))
+          setHasUnsavedChanges(false)
+        } else {
+          // No script interpretation content available - Phase 1 not completed yet
+          setJsonContent('')
+          setHasUnsavedChanges(false)
+        }
+      } else {
+        setDatabaseStatus({ 
+          loaded: false, 
+          version: 0, 
+          error: 'Could not load phase from database' 
+        })
+      }
+    } catch (error) {
+      console.error('Error loading phase status:', error)
+      setDatabaseStatus({ 
+        loaded: false, 
+        version: 0, 
+        error: 'Database connection error' 
+      })
+    }
+  }, [phases])
+
+  const loadVersionHistory = useCallback(async (phaseId: string) => {
+    setLoadingVersions(true)
+    const versions = await getPhaseVersions(phaseId)
+    setVersionHistory(versions)
+    setLoadingVersions(false)
+  }, [])
+
+  const loadVersionContent = useCallback(async (phaseId: string, versionNumber: number) => {
+    const version = await getPhaseVersion(phaseId, versionNumber)
+    if (version && version.content_data) {
+      // Find the current phase to determine which content type to load
+      const currentPhase = phases.find(p => p.id === phaseId)
+      if (currentPhase) {
+        let content = null;
+        
+        switch (currentPhase.phase_name) {
+          case 'script_interpretation':
+            content = version.content_data.script_interpretation;
+            break;
+          case 'element_images':
+            content = version.content_data.element_images;
+            break;
+          case 'scene_generation':
+            content = version.content_data.scene_generation;
+            break;
+          case 'scene_videos':
+            content = version.content_data.scene_videos;
+            break;
+          case 'final_assembly':
+            content = version.content_data.final_assembly;
+            break;
+        }
+        
+        if (content) {
+          setJsonContent(JSON.stringify(content, null, 2))
+          setHasUnsavedChanges(true) // Mark as modified since we loaded different content
+          setShowVersionHistory(false)
+        }
+      }
+    }
+  }, [phases])
+
+  const handleJsonChange = useCallback((value: string) => {
+    setJsonContent(value)
+    setHasUnsavedChanges(true)
+  }, [])
+
+  const handleSavePhase = useCallback(async () => {
+    const selectedPhaseData = phases.find(p => p.phase_name === selectedPhase)
+    if (!selectedPhaseData || !jsonContent.trim()) {
+      setError('No content to save')
+      return
+    }
+
+    setIsSaving(true)
+    setError('')
+
+    try {
+      // Parse JSON to validate it
+      const parsedContent = JSON.parse(jsonContent)
+      
+      // Create script interpretation content structure
+      const scriptContent: ScriptInterpretationContent = {
+        elements: parsedContent.elements || {},
+        scenes: parsedContent.scenes || {},
+        extraction_metadata: {
+          timestamp: new Date().toISOString(),
+          image_engine: parsedContent.image_engine || 'FLUX DEV',
+          model_endpoint: parsedContent.model_endpoint || 'fal-ai/flux/dev',
+          project_dest_folder: parsedContent.project_dest_folder || `${project?.name}_${Date.now()}`
+        }
+      }
+
+      // Save content to database
+      const success = await updatePhaseContent(
+        selectedPhaseData.id,
+        { script_interpretation: scriptContent },
+        'Script interpretation generated and saved'
+      )
+
+      if (success) {
+        // Save and unlock next phase
+        await savePhaseAndUnlockNext(selectedPhaseData.id)
+        setHasUnsavedChanges(false)
+        
+        // Refresh database status to show updated version
+        await loadPhaseContent(selectedPhaseData.id)
+        await loadProject() // Refresh parent component
+      } else {
+        setError('Failed to save content to database')
+      }
+
+    } catch (parseError) {
+      setError('Invalid JSON format. Please check the content.')
+      console.error('JSON parse error:', parseError)
+    } finally {
+      setIsSaving(false)
+    }
+  }, [selectedPhase, phases, jsonContent, project])
+
+  const renderViewContent = () => {
+    const selectedPhaseData = phases.find(p => p.phase_name === selectedPhase)
+    if (!selectedPhaseData || !project) return null
+
+    // BASIC FOUNDATION: ALL phases show Phase 1 script content for JSON and Timeline
+    const getFoundationContent = () => {
+      const phase1 = phases.find(p => p.phase_name === 'script_interpretation');
+      return phase1?.content_data?.script_interpretation || null;
+    };
+    
+    const foundationContent = getFoundationContent();
+
+    switch (selectedView) {
+      case 'json':
+        return (
+          <div className="view-content-container">
+            <div className="view-content-header">
+              <span className="view-content-title">
+                {selectedPhase === 'script_interpretation' 
+                  ? `JSON Content (Phase ${selectedPhaseData.phase_index})`
+                  : `Base Script Content (From Phase 1 → Phase ${selectedPhaseData.phase_index})`
+                }
+              </span>
+              <span className="view-content-subtitle">
+                {jsonContent || foundationContent ? 'Foundation content loaded' : 'No content - Complete Phase 1 first'}
+              </span>
+            </div>
+            <div className="json-editor">
+              {jsonContent || (foundationContent ? JSON.stringify(foundationContent, null, 2) : 'No script interpretation content available - Please complete Phase 1 first to proceed with subsequent phases.')}
+            </div>
+          </div>
+        )
+
+      case 'timeline':
+        if (foundationContent) {
+          return (
+            <DirectorsTimeline 
+              content={foundationContent}
+              projectId={project.id}
+              projectName={project.name}
+              onContentUpdate={() => {
+                // Reload project data when timeline content updates
+                loadProject()
+              }}
+            />
+          )
+        }
+        return (
+          <div className="view-placeholder">
+            <div className="view-placeholder-icon">📊</div>
+            <h3 className="view-placeholder-title">Timeline View</h3>
+            <p>Story foundation for {selectedPhaseData.phase_name.replace('_', ' ')}</p>
+            <p><em>Complete Phase 1 first to see the timeline foundation</em></p>
+          </div>
+        )
+
+      case 'elements':
+        return (
+          <div className="view-placeholder">
+            <div className="view-placeholder-icon">🎭</div>
+            <h3 className="view-placeholder-title">Elements View</h3>
+            <p>Cross-scene element management (Phase 2+)</p>
+          </div>
+        )
+
+      case 'style':
+        return (
+          <div className="view-placeholder">
+            <div className="view-placeholder-icon">🎨</div>
+            <h3 className="view-placeholder-title">Style Control</h3>
+            <p>Global style configuration coming soon</p>
+          </div>
+        )
+
+      default:
+        return null
+    }
   }
 
   const renderPhaseContent = () => {
@@ -103,43 +364,38 @@ export default function ProjectDetailPage({ user }: ProjectDetailPageProps) {
           projectId={project.id}
           projectName={project.name}
           onContentChange={loadProject}
+          // Content management props
+          jsonContent={jsonContent}
+          hasUnsavedChanges={hasUnsavedChanges}
+          isSaving={isSaving}
+          error={error}
+          databaseStatus={databaseStatus}
+          showVersionHistory={showVersionHistory}
+          versionHistory={versionHistory}
+          loadingVersions={loadingVersions}
+          // Content management functions
+          onJsonChange={handleJsonChange}
+          onSavePhase={handleSavePhase}
+          onLoadPhaseContent={loadPhaseContent}
+          onLoadVersionHistory={loadVersionHistory}
+          onLoadVersionContent={loadVersionContent}
+          onShowVersionHistory={setShowVersionHistory}
         />
       )
     }
 
     // Placeholder for other phases
     return (
-      <div style={{ flex: 1, padding: '2rem' }}>
-        <div style={{
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-          marginBottom: '2rem'
-        }}>
+      <div className="phase-content-container">
+        <div className="phase-content-header">
           <div>
-            <h2 style={{
-              color: '#fff',
-              fontSize: '1.75rem',
-              margin: 0,
-              marginBottom: '0.5rem'
-            }}>
+            <h2 className="phase-content-title">
               {getPhaseIcon(selectedPhaseData.phase_name)} {getPhaseDisplayName(selectedPhaseData.phase_name)}
             </h2>
-            <div style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: '1rem',
-              color: '#ccc'
-            }}>
+            <div className="phase-content-meta">
               <span>Phase {selectedPhaseData.phase_index} of 5</span>
-              <span style={{
-                background: getPhaseStatusColor(selectedPhaseData),
-                color: '#fff',
-                padding: '0.25rem 0.5rem',
-                borderRadius: '12px',
-                fontSize: '0.75rem',
-                textTransform: 'uppercase',
-                fontWeight: 'bold'
+              <span className="phase-status" style={{
+                background: getPhaseStatusColor(selectedPhaseData)
               }}>
                 {getPhaseStatusText(selectedPhaseData)}
               </span>
@@ -147,38 +403,21 @@ export default function ProjectDetailPage({ user }: ProjectDetailPageProps) {
           </div>
         </div>
 
-        <div style={{
-          background: '#1a1a1a',
-          borderRadius: '8px',
-          minHeight: '400px',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center'
-        }}>
-          <div style={{ textAlign: 'center', color: '#666' }}>
-            <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>
+        <div className="phase-placeholder">
+          <div className="phase-placeholder-content">
+            <div className="phase-placeholder-icon">
               {getPhaseIcon(selectedPhaseData.phase_name)}
             </div>
-            <h3 style={{ color: '#ccc', marginBottom: '1rem' }}>
+            <h3 className="phase-placeholder-title">
               {getPhaseDisplayName(selectedPhaseData.phase_name)} Module
             </h3>
-            <p style={{ maxWidth: '400px', lineHeight: '1.6' }}>
+            <p className="phase-placeholder-description">
               This phase module will be implemented next. It will handle the {selectedPhaseData.phase_name.replace('_', ' ')} 
               workflow including n8n integration, content generation, and user approval interface.
             </p>
             {selectedPhaseData.can_proceed && !selectedPhaseData.user_saved && (
-              <div style={{ marginTop: '2rem' }}>
-                <button
-                  style={{
-                    background: '#0066cc',
-                    color: '#fff',
-                    padding: '0.75rem 1.5rem',
-                    border: 'none',
-                    borderRadius: '4px',
-                    cursor: 'pointer',
-                    fontSize: '1rem'
-                  }}
-                >
+              <div>
+                <button className="phase-start-button">
                   Start {getPhaseDisplayName(selectedPhaseData.phase_name)}
                 </button>
               </div>
@@ -191,14 +430,7 @@ export default function ProjectDetailPage({ user }: ProjectDetailPageProps) {
 
   if (loading) {
     return (
-      <div style={{
-        minHeight: '100vh',
-        background: '#000',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        color: '#fff'
-      }}>
+      <div className="loading-container">
         Loading project...
       </div>
     )
@@ -206,147 +438,68 @@ export default function ProjectDetailPage({ user }: ProjectDetailPageProps) {
 
   if (!project || !projectId) {
     return (
-      <div style={{
-        minHeight: '100vh',
-        background: '#000',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        color: '#fff'
-      }}>
+      <div className="loading-container">
         Project not found
       </div>
     )
   }
 
   return (
-    <div style={{ minHeight: '100vh', background: '#000', display: 'flex' }}>
+    <div className="project-detail-container">
       {/* Sidebar with phase navigation */}
-      <div style={{
-        width: '320px',
-        background: '#1a1a1a',
-        padding: '2rem',
-        borderRight: '1px solid #333'
-      }}>
-        <div style={{ marginBottom: '2rem' }}>
+      <div className="project-detail-sidebar">
+        <div className="phase-placeholder-section">
           <button
             onClick={() => navigate('/dashboard')}
-            style={{
-              background: 'none',
-              border: 'none',
-              color: '#ccc',
-              cursor: 'pointer',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '0.5rem',
-              marginBottom: '1rem',
-              padding: '0.5rem',
-              borderRadius: '4px',
-              transition: 'background 0.2s'
-            }}
-            onMouseEnter={e => e.currentTarget.style.background = '#333'}
-            onMouseLeave={e => e.currentTarget.style.background = 'none'}
+            className="back-button"
           >
             ← Back to Projects
           </button>
           
-          <h1 style={{
-            color: '#fff',
-            fontSize: '1.25rem',
-            margin: 0,
-            marginBottom: '0.5rem'
-          }}>
+          <h1 className="project-title">
             {project.name}
           </h1>
-          <p style={{
-            color: '#ccc',
-            fontSize: '0.9rem',
-            margin: 0
-          }}>
+          <p className="project-client">
             {project.project_metadata.client}
           </p>
         </div>
 
-        <div style={{ marginBottom: '2rem' }}>
-          <h3 style={{
-            color: '#fff',
-            fontSize: '1rem',
-            marginBottom: '1rem',
-            textTransform: 'uppercase',
-            letterSpacing: '0.05em'
-          }}>
+        <div className="phase-placeholder-section">
+          <h3 className="phases-section-title">
             Project Phases
           </h3>
           
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+          <div className="phases-list">
             {phases.map((phase) => (
               <button
                 key={phase.id}
                 onClick={() => handlePhaseClick(phase)}
                 disabled={!phase.can_proceed && !phase.user_saved}
-                style={{
-                  background: selectedPhase === phase.phase_name ? '#333' : 'transparent',
-                  border: `1px solid ${selectedPhase === phase.phase_name ? '#555' : '#333'}`,
-                  borderRadius: '8px',
-                  padding: '1rem',
-                  textAlign: 'left',
-                  cursor: (phase.can_proceed || phase.user_saved) ? 'pointer' : 'not-allowed',
-                  opacity: (!phase.can_proceed && !phase.user_saved) ? 0.5 : 1,
-                  transition: 'all 0.2s'
-                }}
-                onMouseEnter={e => {
-                  if (phase.can_proceed || phase.user_saved) {
-                    e.currentTarget.style.background = selectedPhase === phase.phase_name ? '#444' : '#2a2a2a'
-                  }
-                }}
-                onMouseLeave={e => {
-                  e.currentTarget.style.background = selectedPhase === phase.phase_name ? '#333' : 'transparent'
-                }}
+                className={`phase-button-container ${selectedPhase === phase.phase_name ? 'active' : ''}`}
               >
-                <div style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'space-between',
-                  marginBottom: '0.5rem'
-                }}>
-                  <div style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '0.5rem'
-                  }}>
-                    <span style={{ fontSize: '1.2rem' }}>
+                <div className="phase-button-header">
+                  <div className="phase-button-left">
+                    <span className="phase-icon">
                       {getPhaseIcon(phase.phase_name)}
                     </span>
-                    <span style={{
-                      color: '#fff',
-                      fontWeight: 'bold',
-                      fontSize: '0.9rem'
-                    }}>
+                    <span className="phase-number">
                       {phase.phase_index}
                     </span>
                   </div>
                   
-                  <div style={{
-                    width: '8px',
-                    height: '8px',
-                    borderRadius: '50%',
-                    background: getPhaseStatusColor(phase)
-                  }} />
+                  <div 
+                    className="phase-status-dot"
+                    style={{
+                      background: getPhaseStatusColor(phase)
+                    }}
+                  />
                 </div>
                 
-                <div style={{
-                  color: '#fff',
-                  fontSize: '0.9rem',
-                  fontWeight: '500',
-                  marginBottom: '0.25rem'
-                }}>
+                <div className="phase-name">
                   {getPhaseDisplayName(phase.phase_name)}
                 </div>
                 
-                <div style={{
-                  color: '#999',
-                  fontSize: '0.75rem'
-                }}>
+                <div className="phase-status-text">
                   {getPhaseStatusText(phase)}
                   {phase.current_version > 0 && ` (v${phase.current_version})`}
                 </div>
@@ -355,20 +508,43 @@ export default function ProjectDetailPage({ user }: ProjectDetailPageProps) {
           </div>
         </div>
 
-        <div style={{
-          padding: '1rem',
-          background: '#333',
-          borderRadius: '4px',
-          fontSize: '0.85rem',
-          color: '#ccc'
-        }}>
-          <strong style={{ color: '#fff' }}>Progress:</strong>{' '}
+        <div className="progress-summary">
+          <strong>Progress:</strong>{' '}
           {phases.filter(p => p.user_saved).length} of 5 phases completed
         </div>
       </div>
 
       {/* Main content area */}
-      {renderPhaseContent()}
+      <div className="project-main-content">
+        
+        {/* AREA 1: GLOBAL PROJECT NAVIGATION */}
+        <div className="project-area project-area-1">
+          <div className="project-area-header area-header-1">
+            🧭 AREA 1: GLOBAL NAVIGATION (4 TABS)
+          </div>
+          <ProjectViewNavigation 
+            activeView={selectedView} 
+            onViewChange={setSelectedView} 
+          />
+        </div>
+
+        {/* AREA 2: PHASE-SPECIFIC CONTENT */}
+        <div className="project-area project-area-2">
+          <div className="project-area-header area-header-2">
+            🔧 AREA 2: PHASE-SPECIFIC CONTROLS & STATUS
+          </div>
+          {renderPhaseContent()}
+        </div>
+
+        {/* AREA 3: VIEW CONTENT */}
+        <div className="project-area project-area-3">
+          <div className="project-area-header area-header-3">
+            📄 AREA 3: VIEW CONTENT (JSON | TIMELINE | ELEMENTS | STYLE)
+          </div>
+          {renderViewContent()}
+        </div>
+
+      </div>
     </div>
   )
 }
