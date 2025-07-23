@@ -7,7 +7,11 @@
       "Bash(rm:*)",
       "mcp__ide__getDiagnostics",
       "Bash(curl:*)",
-      "Bash(npm run build:*)"
+      "Bash(npm run build:*)",
+      "Bash(mv:*)",
+      "Bash(find:*)",
+      "Bash(wc:*)",
+      "Bash(npm install:*)"
     ],
     "deny": []
   }

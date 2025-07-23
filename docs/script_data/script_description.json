@@ -1,0 +1,480 @@
+[
+  {
+    "timestamp": "07_22_2025_17_43",
+    "image_engine": "FLUX DEV",
+    "max_prompt_length": 800,
+    "aspect_ratio": "16:9",
+    "model_endpoint": "fal-ai/flux/dev",
+    "base_url": "https://queue.fal.run",
+    "project_dest_folder": "UN CONSIGLIO STELLARE_07_22_2025_17_43",
+    "project_metadata": {
+      "title": "UN CONSIGLIO STELLARE",
+      "client": "Ministero della Salute",
+      "extraction_date": "2025-01-28",
+      "schema_version": "1.0",
+      "production_workflow": "animatic_to_video_scalable"
+    },
+    "global_style": {
+      "color_palette": {
+        "primary": "Deep blue backgrounds (library, tech elements)",
+        "secondary": "Warm amber/golden lighting",
+        "accent": "Bright cyan/blue (holograms, tech effects)",
+        "character_tones": "Natural skin tones, blue uniforms"
+      },
+      "rendering_style": {
+        "level": "simplified illustration transitioning to cinematic realism",
+        "line_work": "clean vector-style outlines",
+        "shading": "minimal, flat color zones with depth",
+        "detail_level": "stylized but scalable to photorealistic"
+      },
+      "composition": {
+        "framing": "cinematic storyboard frames",
+        "depth": "clear foreground/background separation",
+        "camera_style": "traditional film language (wide/medium/close-up)",
+        "aspect_ratio": "16:9"
+      },
+      "mood_style": {
+        "overall_mood": "educational, inspiring, warm",
+        "lighting_description": "soft, natural library lighting with holographic tech elements",
+        "atmosphere": "technological wonder, protective, educational",
+        "tone": "professional, accessible, reassuring"
+      }
+    },
+    "elements": {
+      "samantha": {
+        "element_type": "character",
+        "element_subtype": "primary",
+        "frequency": 10,
+        "scenes_present": [
+          1,
+          2,
+          3,
+          5,
+          6,
+          7,
+          9,
+          10,
+          11,
+          12
+        ],
+        "base_description": "Samantha Cristoforetti, 47 years old, short brown hair, confident expression, blue ESA astronaut uniform with patches",
+        "consistency_rules": [
+          "Identical facial features and hair across all scenes",
+          "Blue ESA uniform must be consistent in color and design",
+          "Confident, authoritative expression maintained",
+          "Professional astronaut posture and demeanor"
+        ],
+        "variants_by_scene": {
+          "scene_1": {
+            "action": "standing confidently at entrance, welcoming gesture toward children",
+            "position": "foreground center, facing children group",
+            "expression": "warm, welcoming, confident",
+            "props_interaction": "none",
+            "dialogue_state": "introducing, setting context"
+          },
+          "scene_2": {
+            "action": "pointing at space imagery, explaining with gestures",
+            "position": "beside display area, angled toward children",
+            "expression": "focused, educational, protective",
+            "props_interaction": "gesturing toward space_imagery_displays",
+            "dialogue_state": "teaching, explaining dangers"
+          },
+          "scene_3": {
+            "action": "interacting with astronaut hologram, demonstrating",
+            "position": "at library table, engaging with hologram",
+            "expression": "knowledgeable, demonstrative",
+            "props_interaction": "activating/pointing to astronaut_hologram",
+            "dialogue_state": "demonstrating, showing equipment"
+          }
+        }
+      },
+      "children_group": {
+        "element_type": "character",
+        "element_subtype": "group",
+        "frequency": 7,
+        "scenes_present": [
+          1,
+          2,
+          4,
+          5,
+          7,
+          9,
+          12
+        ],
+        "base_description": "5 diverse children aged 6-7, small stature, mixed gender, curious expressions, casual school clothes",
+        "consistency_rules": [
+          "Same 5 children throughout (consistent faces and diversity)",
+          "Age range 6-7 maintained across all scenes",
+          "Casual school clothing consistent per child",
+          "Curious, engaged expressions as baseline"
+        ],
+        "variants_by_scene": {
+          "scene_1": {
+            "action": "grouped together, looking around with wonder",
+            "position": "clustered near entrance, facing library interior",
+            "expression": "wonder, anticipation, slight awe",
+            "props_interaction": "carrying children_backpacks",
+            "dialogue_state": "listening, absorbing introduction"
+          },
+          "scene_2": {
+            "action": "attentively watching Samantha's explanation",
+            "position": "semicircle facing Samantha and displays",
+            "expression": "focused attention, learning engagement",
+            "props_interaction": "some still holding children_backpacks",
+            "dialogue_state": "engaged learning, processing information"
+          }
+        }
+      },
+      "circular_library": {
+        "element_type": "location",
+        "element_subtype": "primary",
+        "frequency": 10,
+        "scenes_present": [
+          1,
+          2,
+          3,
+          5,
+          6,
+          7,
+          9,
+          10,
+          11,
+          12
+        ],
+        "base_description": "magnificent circular library with multiple levels, warm ambient lighting, wood and modern architectural elements, balcony overlooks",
+        "consistency_rules": [
+          "Circular architecture always prominent",
+          "Warm ambient lighting consistent throughout",
+          "Wood and modern elements balance maintained",
+          "Multi-level structure visible when relevant"
+        ],
+        "variants_by_scene": {
+          "scene_1": {
+            "view_angle": "wide establishing shot from entrance",
+            "focus_area": "full architectural magnificence, circular grandeur",
+            "lighting_state": "welcoming warm entrance lighting",
+            "architectural_details": "entrance perspective, full space visibility",
+            "camera_position": "entrance level, looking into main space"
+          },
+          "scene_2": {
+            "view_angle": "medium shot focusing on display area",
+            "focus_area": "educational zone with space imagery capability",
+            "lighting_state": "focused lighting on display area",
+            "architectural_details": "space imagery integration, teaching zone",
+            "camera_position": "interior, focusing on interaction area"
+          },
+          "scene_3": {
+            "view_angle": "close-up on library table area",
+            "focus_area": "table with holographic projection capability",
+            "lighting_state": "tech-enhanced lighting, hologram ambiance",
+            "architectural_details": "holographic technology integration",
+            "camera_position": "table level, intimate technology focus"
+          }
+        }
+      },
+      "space_imagery_displays": {
+        "element_type": "prop",
+        "element_subtype": "technological",
+        "frequency": 4,
+        "scenes_present": [
+          2,
+          4,
+          6,
+          8
+        ],
+        "base_description": "educational space imagery and astronomical displays showing space operations, astronauts, and cosmic scenes",
+        "consistency_rules": [
+          "Educational content focus maintained",
+          "Professional space imagery quality",
+          "Integrated into library technology seamlessly",
+          "Blue-dominant color scheme for space content"
+        ],
+        "variants_by_scene": {
+          "scene_2": {
+            "state": "active, displaying space dangers and beauty",
+            "interaction_mode": "samantha pointing and explaining",
+            "visibility": "clearly visible, prominent in scene",
+            "technical_specs": "wall-mounted displays, clear resolution",
+            "position_relative": "background to teaching moment, supporting"
+          }
+        }
+      },
+      "earth_hologram": {
+        "element_type": "prop",
+        "element_subtype": "holographic",
+        "frequency": 3,
+        "scenes_present": [
+          5,
+          6,
+          8
+        ],
+        "base_description": "realistic Earth hologram with glowing red indicator points concentrated on Italy, interactive and detailed",
+        "consistency_rules": [
+          "Realistic Earth appearance maintained",
+          "Red indicator points specifically on Italy",
+          "Holographic blue glow effect consistent",
+          "Interactive capability demonstrated"
+        ],
+        "variants_by_scene": {
+          "scene_5": {
+            "state": "approaching activation, becoming visible",
+            "interaction_mode": "children_group approaching with fascination",
+            "visibility": "emerging prominence, drawing attention",
+            "technical_specs": "holographic projection system activating",
+            "position_relative": "central space, becoming focal point"
+          },
+          "scene_6": {
+            "state": "fully active, Italy focus clearly visible",
+            "interaction_mode": "samantha explaining and pointing",
+            "visibility": "primary focus, red points on Italy prominent",
+            "technical_specs": "full holographic detail, interactive capability",
+            "position_relative": "central display, primary educational tool"
+          }
+        }
+      },
+      "astronaut_hologram": {
+        "element_type": "prop",
+        "element_subtype": "holographic",
+        "frequency": 1,
+        "scenes_present": [
+          3
+        ],
+        "base_description": "full-body astronaut in complete spacesuit, holographic projection, realistic detail showing space protection equipment",
+        "consistency_rules": [
+          "Complete spacesuit with all details",
+          "Holographic blue glow effect",
+          "Realistic proportions and appearance"
+        ],
+        "variants_by_scene": {
+          "scene_3": {
+            "state": "fully active, demonstration mode",
+            "interaction_mode": "samantha demonstrating and explaining",
+            "visibility": "prominent, clear detail of spacesuit",
+            "technical_specs": "full holographic projection, interactive demonstration",
+            "position_relative": "library table, central demonstration focus"
+          }
+        }
+      },
+      "children_backpacks": {
+        "element_type": "prop",
+        "element_subtype": "physical",
+        "frequency": 7,
+        "scenes_present": [
+          1,
+          2,
+          4,
+          5,
+          7,
+          9,
+          12
+        ],
+        "base_description": "casual school backpacks and books carried by children, age-appropriate school equipment",
+        "consistency_rules": [
+          "Age-appropriate school equipment",
+          "Casual, not uniform appearance",
+          "Proportional to children's size"
+        ],
+        "variants_by_scene": {
+          "scene_1": {
+            "state": "carried and held, arrival configuration",
+            "interaction_mode": "children_group naturally carrying",
+            "visibility": "clearly visible, establishing school context",
+            "technical_specs": "standard school backpacks and books",
+            "position_relative": "with children_group, natural school appearance"
+          },
+          "scene_2": {
+            "state": "mixed - some set aside, some still carried",
+            "interaction_mode": "transitioning to learning mode",
+            "visibility": "partially visible, learning focus emerging",
+            "technical_specs": "standard school equipment",
+            "position_relative": "secondary to learning interaction"
+          }
+        }
+      },
+      "library_entrance": {
+        "element_type": "location",
+        "element_subtype": "specific",
+        "frequency": 1,
+        "scenes_present": [
+          1
+        ],
+        "base_description": "grand entrance portal to circular library, establishing architectural context and welcoming atmosphere",
+        "consistency_rules": [
+          "Architectural grandeur maintained",
+          "Welcoming portal appearance",
+          "Consistent with circular_library design"
+        ],
+        "variants_by_scene": {
+          "scene_1": {
+            "view_angle": "through entrance, looking into library",
+            "focus_area": "entrance portal framing library interior",
+            "lighting_state": "welcoming transition lighting",
+            "architectural_details": "grand entrance portal, threshold emphasis",
+            "camera_position": "entrance threshold, establishing perspective"
+          }
+        }
+      },
+      "warm_library_lighting": {
+        "element_type": "atmosphere",
+        "element_subtype": "lighting",
+        "frequency": 10,
+        "scenes_present": [
+          1,
+          2,
+          3,
+          5,
+          6,
+          7,
+          9,
+          10,
+          11,
+          12
+        ],
+        "base_description": "soft, warm ambient lighting creating educational and welcoming atmosphere throughout library",
+        "consistency_rules": [
+          "Warm color temperature maintained",
+          "Soft, diffused quality consistent",
+          "Educational ambiance preserved"
+        ],
+        "variants_by_scene": {
+          "scene_1": {
+            "intensity": "welcoming, establishing mood",
+            "color_temperature": "warm amber, inviting",
+            "mood_contribution": "wonder and anticipation",
+            "effect_type": "ambient, architectural enhancement",
+            "coverage_area": "full library space, entrance emphasis"
+          },
+          "scene_2": {
+            "intensity": "focused on educational interaction",
+            "color_temperature": "warm amber with display enhancement",
+            "mood_contribution": "educational, protective",
+            "effect_type": "focused ambient with display lighting",
+            "coverage_area": "display area emphasis"
+          },
+          "scene_3": {
+            "intensity": "enhanced for technology demonstration",
+            "color_temperature": "warm amber with holographic blue accents",
+            "mood_contribution": "technological wonder",
+            "effect_type": "ambient with tech enhancement",
+            "coverage_area": "table area, hologram enhancement"
+          }
+        }
+      }
+    },
+    "scenes": {
+      "scene_1": {
+        "scene_id": 1,
+        "duration": "3 seconds",
+        "camera_type": "wide establishing shot",
+        "mood": "wonder and anticipation",
+        "natural_description": "The spot opens in a magnificent circular environment: it's the hall of the great library of the Monte Porzio Catone Astronomical Observatory. We immediately notice a group of children with a very special guide...",
+        "dialogue": "LO SPAZIO È UN LUOGO INOSPITALE E PERICOLOSO...",
+        "action_summary": "Introduction of the setting and characters",
+        "elements_present": [
+          "samantha",
+          "children_group",
+          "circular_library",
+          "children_backpacks",
+          "library_entrance",
+          "warm_library_lighting"
+        ],
+        "element_interactions": [
+          {
+            "primary_element": "samantha",
+            "secondary_element": "children_group",
+            "interaction_type": "welcoming_introduction",
+            "description": "Samantha welcomes children to library space"
+          },
+          {
+            "primary_element": "children_group",
+            "secondary_element": "circular_library",
+            "interaction_type": "discovery_wonder",
+            "description": "Children discovering magnificent library architecture"
+          },
+          {
+            "primary_element": "warm_library_lighting",
+            "secondary_element": "circular_library",
+            "interaction_type": "atmosphere_enhancement",
+            "description": "Lighting enhances architectural grandeur"
+          }
+        ],
+        "primary_focus": "establishing magnificent circular library architecture with character introduction",
+        "lighting_approach": "warm welcoming library lighting, architectural grandeur emphasis",
+        "composition_approach": "wide shot showing full space, character positioning for introduction"
+      },
+      "scene_2": {
+        "scene_id": 2,
+        "duration": "3 seconds",
+        "camera_type": "medium shot",
+        "mood": "educational, protective",
+        "natural_description": "Samantha, in the company of some small guests, shows them the beauty of space while explaining at the same time that it is a dangerous environment: it must be faced with the right protections.",
+        "dialogue": "MA C'È LA SCIENZA CHE PENSA A NOI.",
+        "action_summary": "Samantha explains space dangers and protection needs",
+        "elements_present": [
+          "samantha",
+          "children_group",
+          "circular_library",
+          "space_imagery_displays",
+          "children_backpacks",
+          "warm_library_lighting"
+        ],
+        "element_interactions": [
+          {
+            "primary_element": "samantha",
+            "secondary_element": "space_imagery_displays",
+            "interaction_type": "educational_demonstration",
+            "description": "Samantha pointing to and explaining space imagery"
+          },
+          {
+            "primary_element": "children_group",
+            "secondary_element": "space_imagery_displays",
+            "interaction_type": "focused_observation",
+            "description": "Children attentively watching space imagery"
+          },
+          {
+            "primary_element": "samantha",
+            "secondary_element": "children_group",
+            "interaction_type": "teaching_protection",
+            "description": "Samantha educating children about space dangers"
+          }
+        ],
+        "primary_focus": "Samantha teaching children about space dangers using imagery displays",
+        "lighting_approach": "focused lighting on display area, educational ambiance",
+        "composition_approach": "medium shot emphasizing teaching interaction and space displays"
+      },
+      "scene_3": {
+        "scene_id": 3,
+        "duration": "1.5 seconds",
+        "camera_type": "close-up on hologram interaction",
+        "mood": "technological wonder",
+        "natural_description": "Samantha interacts with the hologram of an astronaut, in his typical suit, which she knows very well.",
+        "dialogue": "VEDETE LE NOSTRE TUTE?",
+        "action_summary": "Holographic demonstration of space protection equipment",
+        "elements_present": [
+          "samantha",
+          "circular_library",
+          "astronaut_hologram",
+          "warm_library_lighting"
+        ],
+        "element_interactions": [
+          {
+            "primary_element": "samantha",
+            "secondary_element": "astronaut_hologram",
+            "interaction_type": "technology_demonstration",
+            "description": "Samantha demonstrating and explaining holographic astronaut equipment"
+          },
+          {
+            "primary_element": "astronaut_hologram",
+            "secondary_element": "circular_library",
+            "interaction_type": "technology_integration",
+            "description": "Hologram seamlessly integrated into library environment"
+          }
+        ],
+        "primary_focus": "close-up interaction between Samantha and astronaut hologram demonstration",
+        "lighting_approach": "tech-enhanced lighting, hologram blue glow effects",
+        "composition_approach": "close-up framing, technological demonstration focus",
+        "special_notes": "children not present in this scene, focus on technology demonstration"
+      }
+    }
+  }
+]
