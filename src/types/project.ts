@@ -1,13 +1,13 @@
 // Core project types for FLOW.STUDIO MVP
-// Based on enhanced database schema and Italian campaign structure
+// Schema v3.0 - Clean master JSON architecture
 
 export interface Project {
   id: string;
   user_id: string;
   name: string;
   status: 'active' | 'completed' | 'archived';
-  project_metadata: ItalianCampaignMetadata;
-  global_style: GlobalStyle;
+  master_json: any; // The complete project JSON
+  current_version: number;
   created_at: string;
   updated_at: string;
 }
@@ -17,22 +17,23 @@ export interface ProjectPhase {
   project_id: string;
   phase_name: PhaseName;
   phase_index: number;
-  status: 'pending' | 'processing' | 'completed' | 'locked';
+  status: 'pending' | 'processing' | 'completed' | 'failed';
   can_proceed: boolean;
-  current_version: number;
-  content_data: PhaseContent | null;
   user_saved: boolean;
-  last_modified_at?: string;
+  execution_settings?: any;
+  progress_percentage: number;
   created_at: string;
-  updated_at: string;
+  started_at?: string;
+  completed_at?: string;
 }
 
-export interface PhaseVersion {
+export interface ProjectVersion {
   id: string;
-  phase_id: string;
+  project_id: string;
   version_number: number;
-  content_data: PhaseContent;
+  master_json: any;
   change_description: string;
+  changed_sections?: string[];
   created_at: string;
   created_by: string;
 }
@@ -64,16 +65,25 @@ export interface PhaseContent {
   final_assembly?: FinalAssemblyContent;
 }
 
-// Phase 1: Script Interpretation (Italian campaign format)
+// Phase 1: Script Interpretation (Complete JSON structure from n8n webhook)
 export interface ScriptInterpretationContent {
-  elements: ItalianCampaignElements;
-  scenes: ItalianCampaignScenes;
-  extraction_metadata: {
+  // Core required fields
+  elements?: ItalianCampaignElements | any;
+  scenes?: ItalianCampaignScenes | any;
+  extraction_metadata?: {
     timestamp: string;
     image_engine: string;
     model_endpoint: string;
     project_dest_folder: string;
+    [key: string]: any; // Allow additional metadata
   };
+  // Allow any additional properties from webhook
+  project_metadata?: {
+    title?: string;
+    client?: string;
+    [key: string]: any;
+  };
+  [key: string]: any; // Flexible structure to preserve complete JSON
 }
 
 // Phase 2: Element Images

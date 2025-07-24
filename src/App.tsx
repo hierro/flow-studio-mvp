@@ -36,22 +36,22 @@ export default function App() {
 
   return (
     <Routes>
-      <Route
-        path="/login"
-        element={user ? <Navigate to="/dashboard" replace /> : <LoginPage />}
-      />
-      <Route
-        path="/dashboard"
-        element={user ? <DashboardPage user={user} /> : <Navigate to="/login" replace />}
-      />
-      <Route
-        path="/project/:id"
-        element={user ? <ProjectDetailPage user={user} /> : <Navigate to="/login" replace />}
-      />
-      <Route
-        path="/"
-        element={<Navigate to={user ? "/dashboard" : "/login"} replace />}
-      />
-    </Routes>
+        <Route
+          path="/login"
+          element={user ? <Navigate to="/dashboard" replace /> : <LoginPage />}
+        />
+        <Route
+          path="/dashboard"
+          element={user ? <DashboardPage user={user} /> : <Navigate to="/login" replace />}
+        />
+        <Route
+          path="/project/:id"
+          element={user ? <ProjectDetailPage user={user} /> : <Navigate to="/login" replace />}
+        />
+        <Route
+          path="/"
+          element={<Navigate to={user ? "/dashboard" : "/login"} replace />}
+        />
+      </Routes>
   )
 }

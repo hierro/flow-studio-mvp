@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import type { ProjectPhase, PhaseVersion } from '../types/project'
+import type { ProjectPhase, ProjectVersion } from '../types/project'
 
 // Webhook configuration (test vs production)
 const WEBHOOK_CONFIG = {
@@ -24,14 +24,14 @@ interface ScriptInterpretationModuleProps {
     error?: string;
   }
   showVersionHistory: boolean
-  versionHistory: PhaseVersion[]
+  versionHistory: ProjectVersion[]
   loadingVersions: boolean
   // Content management functions
   onJsonChange: (value: string) => void
   onSavePhase: () => void
   onLoadPhaseContent: (phaseId: string) => void
-  onLoadVersionHistory: (phaseId: string) => void
-  onLoadVersionContent: (phaseId: string, versionNumber: number) => void
+  onLoadVersionHistory: () => void
+  onLoadVersionContent: (versionNumber: number) => void
   onShowVersionHistory: (show: boolean) => void
   // Webhook configuration
   useProduction: boolean
@@ -237,7 +237,7 @@ export default function ScriptInterpretationModule({
             {databaseStatus.version > 0 && (
               <button
                 onClick={() => {
-                  onLoadVersionHistory(phase.id);
+                  onLoadVersionHistory();
                   onShowVersionHistory(true);
                 }}
                 className="btn text-xs px-md py-xs btn-secondary"
@@ -354,7 +354,7 @@ export default function ScriptInterpretationModule({
                     <div
                       key={version.id}
                       className={`version-item ${version.version_number === databaseStatus.version ? 'current' : ''}`}
-                      onClick={() => onLoadVersionContent(phase.id, version.version_number)}
+                      onClick={() => onLoadVersionContent(version.version_number)}
                     >
                       <div className="version-header">
                         <span className="version-title">

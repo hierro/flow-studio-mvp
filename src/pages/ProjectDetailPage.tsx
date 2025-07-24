@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
-import { getProject, getProjectPhases, updatePhaseContent, savePhaseAndUnlockNext, getPhase, getPhaseVersions, getPhaseVersion } from '../lib/database'
-import type { Project, ProjectPhase, PhaseName, ScriptInterpretationContent, PhaseVersion } from '../types/project'
+import { getProject, getProjectPhases, getMasterJSON, saveMasterJSON, saveMasterJSONFromObject, updateMasterJSON, getProjectVersions, getProjectVersion } from '../lib/database'
+import type { Project, ProjectPhase, PhaseName, ProjectVersion } from '../types/project'
 import ScriptInterpretationModule from '../components/ScriptInterpretationModule'
 import ProjectViewNavigation from '../components/ProjectViewNavigation'
 import DirectorsTimeline from '../components/timeline/DirectorsTimeline'
@@ -19,15 +19,16 @@ export default function ProjectDetailPage({ user }: ProjectDetailPageProps) {
   const [selectedView, setSelectedView] = useState<'json' | 'timeline' | 'elements' | 'style'>('timeline')
   const [loading, setLoading] = useState(true)
   
-  // Additional content management state
+  // Master JSON management state
+  const [masterJSON, setMasterJSON] = useState<any>({})
   const [showVersionHistory, setShowVersionHistory] = useState(false)
-  const [versionHistory, setVersionHistory] = useState<PhaseVersion[]>([])
+  const [versionHistory, setVersionHistory] = useState<ProjectVersion[]>([])
   const [loadingVersions, setLoadingVersions] = useState(false)
 
   // Webhook configuration state (moved from ScriptInterpretationModule)
   const [useProduction, setUseProduction] = useState(true)
 
-  // Content management state (moved from ScriptInterpretationModule)
+  // JSON editing state
   const [jsonContent, setJsonContent] = useState('')
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false)
   const [isSaving, setIsSaving] = useState(false)
@@ -47,6 +48,133 @@ export default function ProjectDetailPage({ user }: ProjectDetailPageProps) {
     loadProject()
   }, [projectId, navigate])
 
+  // Load master JSON for the project
+  const loadMasterJSON = useCallback(async () => {
+    if (!projectId) return
+    
+    setDatabaseStatus({ loaded: false, version: 0 })
+    
+    try {
+      const masterJSONData = await getMasterJSON(projectId)
+      if (masterJSONData) {
+        setMasterJSON(masterJSONData)
+        setJsonContent(JSON.stringify(masterJSONData, null, 2))
+        
+        // Get project info for version and timestamp
+        const projectData = await getProject(projectId)
+        if (projectData) {
+          setDatabaseStatus({
+            loaded: true,
+            version: projectData.current_version,
+            lastSaved: projectData.updated_at
+          })
+        }
+        
+        setHasUnsavedChanges(false)
+      } else {
+        setDatabaseStatus({ 
+          loaded: false, 
+          version: 0, 
+          error: 'Master JSON not found' 
+        })
+      }
+    } catch (error) {
+      console.error('Error loading master JSON:', error)
+      setDatabaseStatus({ 
+        loaded: false, 
+        version: 0, 
+        error: 'Failed to load master JSON' 
+      })
+    }
+  }, [projectId])
+
+  const loadVersionHistory = useCallback(async () => {
+    if (!projectId) return
+    
+    setLoadingVersions(true)
+    const versions = await getProjectVersions(projectId)
+    setVersionHistory(versions)
+    setLoadingVersions(false)
+  }, [projectId])
+
+  const loadVersionContent = useCallback(async (versionNumber: number) => {
+    if (!projectId) return
+    
+    const version = await getProjectVersion(projectId, versionNumber)
+    if (version && version.master_json) {
+      // Load version content into local state only (no database update)
+      setMasterJSON(version.master_json)
+      setJsonContent(JSON.stringify(version.master_json, null, 2))
+      setHasUnsavedChanges(true) // Mark as modified since we loaded different content
+      setShowVersionHistory(false)
+    }
+  }, [projectId])
+
+  const handleSaveJSON = useCallback(async () => {
+    if (!projectId || !jsonContent.trim()) {
+      setError('No content to save')
+      return
+    }
+
+    setIsSaving(true)
+    setError('')
+
+    try {
+      // Parse and validate JSON
+      const parsedJSON = JSON.parse(jsonContent)
+
+      // Save master JSON to database
+      const success = await saveMasterJSONFromObject(
+        projectId,
+        parsedJSON,
+        'Master JSON updated'
+      )
+
+      if (success) {
+        setMasterJSON(parsedJSON)
+        setHasUnsavedChanges(false)
+        
+        // Reload to get the updated data and version info (preserves exact formatting)
+        await loadMasterJSON()
+        // Reload phases - can_proceed will be calculated automatically based on data state
+        const updatedPhasesData = await getProjectPhases(projectId)
+        setPhases(updatedPhasesData)
+        
+        const phase2 = updatedPhasesData.find(p => p.phase_index === 2)
+        const phase3 = updatedPhasesData.find(p => p.phase_index === 3)
+        const hasScenes = parsedJSON.scenes && 
+                         typeof parsedJSON.scenes === 'object' &&
+                         parsedJSON.scenes !== null &&
+                         Object.keys(parsedJSON.scenes).length > 0
+        
+        if (hasScenes && (!phase2?.can_proceed || !phase3?.can_proceed)) {
+          console.warn('Phase unlock validation failed - phases not unlocked as expected')
+          setError('Phases should have unlocked but didn\'t. Please refresh the page.')
+        }
+      } else {
+        setError('Failed to save master JSON to database')
+      }
+
+    } catch (error) {
+      console.error('Error saving master JSON:', error)
+      
+      // IMPROVED ERROR MESSAGES: Give users specific feedback
+      if (error instanceof SyntaxError) {
+        setError('Invalid JSON format. Please check your syntax.')
+      } else if (error.message.includes('database') || error.message.includes('supabase')) {
+        setError('Database connection failed. Please check your internet connection and try again.')
+      } else if (error.message.includes('project not found')) {
+        setError('Project not found. Please refresh the page and try again.')
+      } else if (error.message.includes('reload data')) {
+        setError('Save succeeded but failed to reload. Please refresh the page to see changes.')
+      } else {
+        setError(`Save failed: ${error.message || 'Unknown error occurred'}`)
+      }
+    } finally {
+      setIsSaving(false)
+    }
+  }, [projectId, jsonContent])
+
   const loadProject = async () => {
     if (!projectId) return
 
@@ -64,13 +192,14 @@ export default function ProjectDetailPage({ user }: ProjectDetailPageProps) {
     setProject(projectData)
     setPhases(phasesData)
     
-    // Select first available phase and load its content
+    // Select first available phase and load master JSON
     const firstAvailablePhase = phasesData.find(p => p.can_proceed)
     if (firstAvailablePhase) {
       setSelectedPhase(firstAvailablePhase.phase_name)
-      // Load content after state is set, use setTimeout to ensure state is updated
-      setTimeout(() => loadPhaseContent(firstAvailablePhase.id), 0)
     }
+    
+    // Load master JSON for the project (only once during loadProject)
+    await loadMasterJSON()
     
     setLoading(false)
   }
@@ -98,125 +227,31 @@ export default function ProjectDetailPage({ user }: ProjectDetailPageProps) {
   }
 
   const getPhaseStatusColor = (phase: ProjectPhase): string => {
-    if (phase.user_saved) return '#00cc00' // Completed (green)
+    if (phase.status === 'completed') return '#00cc00' // Completed (green)
     if (phase.status === 'processing') return '#ff9900' // Processing (orange)  
     if (phase.can_proceed) return '#0066cc' // Available (blue)
     return '#666' // Locked (gray)
   }
 
   const getPhaseStatusText = (phase: ProjectPhase): string => {
-    if (phase.user_saved) return 'Completed'
+    if (phase.status === 'completed') return 'Completed'
     if (phase.status === 'processing') return 'Processing'
     if (phase.can_proceed) return 'Available'
     return 'Locked'
   }
 
   const handlePhaseClick = (phase: ProjectPhase) => {
-    if (!phase.can_proceed && !phase.user_saved) return
+    if (!phase.can_proceed && phase.status !== 'completed') return
     setSelectedPhase(phase.phase_name)
-    // Reset content management state when switching phases
-    setJsonContent('')
-    setHasUnsavedChanges(false)
-    setError('')
-    setDatabaseStatus({ loaded: false, version: 0 })
-    // Load content for the new phase
-    loadPhaseContent(phase.id)
+    // Master JSON is already loaded, just switch phase view
   }
 
-  // Load existing content and database status for a phase
+  // DEPRECATED: Phase content loading removed - using master JSON architecture
+  // Master JSON is loaded once in loadMasterJSON() and used for all phases
   const loadPhaseContent = useCallback(async (phaseId: string) => {
-    setDatabaseStatus({ loaded: false, version: 0 })
-    
-    try {
-      // Refresh phase data from database to get latest version
-      const currentPhase = await getPhase(phaseId)
-      if (currentPhase) {
-        setDatabaseStatus({
-          loaded: true,
-          version: currentPhase.current_version,
-          lastSaved: currentPhase.last_modified_at || currentPhase.created_at
-        })
-        
-        // Linear workflow: All phases need script_interpretation as base content
-        let scriptContent = null;
-        
-        if (currentPhase.phase_name === 'script_interpretation') {
-          // Phase 1: Load its own script interpretation content
-          scriptContent = currentPhase.content_data?.script_interpretation;
-        } else {
-          // Phase 2+: Find Phase 1 and load its script interpretation content
-          const phase1 = phases.find(p => p.phase_name === 'script_interpretation');
-          if (phase1?.content_data?.script_interpretation) {
-            scriptContent = phase1.content_data.script_interpretation;
-          }
-        }
-        
-        if (scriptContent) {
-          setJsonContent(JSON.stringify(scriptContent, null, 2))
-          setHasUnsavedChanges(false)
-        } else {
-          // No script interpretation content available - Phase 1 not completed yet
-          setJsonContent('')
-          setHasUnsavedChanges(false)
-        }
-      } else {
-        setDatabaseStatus({ 
-          loaded: false, 
-          version: 0, 
-          error: 'Could not load phase from database' 
-        })
-      }
-    } catch (error) {
-      console.error('Error loading phase status:', error)
-      setDatabaseStatus({ 
-        loaded: false, 
-        version: 0, 
-        error: 'Database connection error' 
-      })
-    }
-  }, [phases])
-
-  const loadVersionHistory = useCallback(async (phaseId: string) => {
-    setLoadingVersions(true)
-    const versions = await getPhaseVersions(phaseId)
-    setVersionHistory(versions)
-    setLoadingVersions(false)
+    // Do nothing - master JSON already loaded
+    console.log('loadPhaseContent called but deprecated - using master JSON')
   }, [])
-
-  const loadVersionContent = useCallback(async (phaseId: string, versionNumber: number) => {
-    const version = await getPhaseVersion(phaseId, versionNumber)
-    if (version && version.content_data) {
-      // Find the current phase to determine which content type to load
-      const currentPhase = phases.find(p => p.id === phaseId)
-      if (currentPhase) {
-        let content = null;
-        
-        switch (currentPhase.phase_name) {
-          case 'script_interpretation':
-            content = version.content_data.script_interpretation;
-            break;
-          case 'element_images':
-            content = version.content_data.element_images;
-            break;
-          case 'scene_generation':
-            content = version.content_data.scene_generation;
-            break;
-          case 'scene_videos':
-            content = version.content_data.scene_videos;
-            break;
-          case 'final_assembly':
-            content = version.content_data.final_assembly;
-            break;
-        }
-        
-        if (content) {
-          setJsonContent(JSON.stringify(content, null, 2))
-          setHasUnsavedChanges(true) // Mark as modified since we loaded different content
-          setShowVersionHistory(false)
-        }
-      }
-    }
-  }, [phases])
 
   const handleJsonChange = useCallback((value: string) => {
     setJsonContent(value)
@@ -224,69 +259,17 @@ export default function ProjectDetailPage({ user }: ProjectDetailPageProps) {
   }, [])
 
   const handleSavePhase = useCallback(async () => {
-    const selectedPhaseData = phases.find(p => p.phase_name === selectedPhase)
-    if (!selectedPhaseData || !jsonContent.trim()) {
-      setError('No content to save')
-      return
-    }
-
-    setIsSaving(true)
-    setError('')
-
-    try {
-      // Parse JSON to validate it
-      const parsedContent = JSON.parse(jsonContent)
-      
-      // Create script interpretation content structure
-      const scriptContent: ScriptInterpretationContent = {
-        elements: parsedContent.elements || {},
-        scenes: parsedContent.scenes || {},
-        extraction_metadata: {
-          timestamp: new Date().toISOString(),
-          image_engine: parsedContent.image_engine || 'FLUX DEV',
-          model_endpoint: parsedContent.model_endpoint || 'fal-ai/flux/dev',
-          project_dest_folder: parsedContent.project_dest_folder || `${project?.name}_${Date.now()}`
-        }
-      }
-
-      // Save content to database
-      const success = await updatePhaseContent(
-        selectedPhaseData.id,
-        { script_interpretation: scriptContent },
-        'Script interpretation generated and saved'
-      )
-
-      if (success) {
-        // Save and unlock next phase
-        await savePhaseAndUnlockNext(selectedPhaseData.id)
-        setHasUnsavedChanges(false)
-        
-        // Refresh database status to show updated version
-        await loadPhaseContent(selectedPhaseData.id)
-        await loadProject() // Refresh parent component
-      } else {
-        setError('Failed to save content to database')
-      }
-
-    } catch (parseError) {
-      setError('Invalid JSON format. Please check the content.')
-      console.error('JSON parse error:', parseError)
-    } finally {
-      setIsSaving(false)
-    }
-  }, [selectedPhase, phases, jsonContent, project])
+    // DEPRECATED: This function should not be used - handleSaveJSON is the correct one
+    // Redirect to the master JSON save function
+    console.warn('handleSavePhase called - redirecting to handleSaveJSON')
+    await handleSaveJSON()
+  }, [handleSaveJSON])
 
   const renderViewContent = () => {
     const selectedPhaseData = phases.find(p => p.phase_name === selectedPhase)
     if (!selectedPhaseData || !project) return null
 
-    // BASIC FOUNDATION: ALL phases show Phase 1 script content for JSON and Timeline
-    const getFoundationContent = () => {
-      const phase1 = phases.find(p => p.phase_name === 'script_interpretation');
-      return phase1?.content_data?.script_interpretation || null;
-    };
-    
-    const foundationContent = getFoundationContent();
+    // Master JSON is already loaded, use it directly
 
     switch (selectedView) {
       case 'json':
@@ -300,25 +283,49 @@ export default function ProjectDetailPage({ user }: ProjectDetailPageProps) {
                 }
               </span>
               <span className="view-content-subtitle">
-                {jsonContent || foundationContent ? 'Foundation content loaded' : 'No content - Complete Phase 1 first'}
+                {jsonContent || masterJSON ? 'Master JSON loaded' : 'No content - Complete Phase 1 first'}
               </span>
             </div>
             <div className="json-editor">
-              {jsonContent || (foundationContent ? JSON.stringify(foundationContent, null, 2) : 'No script interpretation content available - Please complete Phase 1 first to proceed with subsequent phases.')}
+              <textarea
+                value={jsonContent || (masterJSON ? JSON.stringify(masterJSON, null, 2) : '')}
+                onChange={(e) => handleJsonChange(e.target.value)}
+                className="json-textarea"
+                style={{
+                  width: '100%',
+                  minHeight: '500px',
+                  fontFamily: 'Monaco, Menlo, Consolas, monospace',
+                  fontSize: '0.875rem',
+                  padding: '1rem',
+                  border: '1px solid var(--color-border-default)',
+                  borderRadius: '4px',
+                  background: 'var(--color-bg-secondary)',
+                  color: 'var(--color-text-primary)',
+                  resize: 'vertical'
+                }}
+                placeholder="No script interpretation content available - Please complete Phase 1 first to proceed with subsequent phases."
+                disabled={selectedPhase !== 'script_interpretation'}
+              />
             </div>
           </div>
         )
 
       case 'timeline':
-        if (foundationContent) {
+        if (masterJSON && Object.keys(masterJSON).length > 0) {
+          // Use master JSON as foundation content
+          const enhancedContent = masterJSON;
+          
           return (
             <DirectorsTimeline 
-              content={foundationContent}
+              content={enhancedContent}
               projectId={project.id}
               projectName={project.name}
-              onContentUpdate={() => {
-                // Reload project data when timeline content updates
-                loadProject()
+              phaseId={selectedPhaseData.id}
+              onContentUpdate={(updatedContent) => {
+                // Update local state only - NO database save, NO version creation
+                setMasterJSON(updatedContent)
+                setJsonContent(JSON.stringify(updatedContent, null, 2))
+                setHasUnsavedChanges(true) // Mark as having unsaved changes
               }}
             />
           )
@@ -367,7 +374,7 @@ export default function ProjectDetailPage({ user }: ProjectDetailPageProps) {
           Project: <strong className="text-primary">{project.name}</strong>
         </div>
         <div>
-          Client: <strong className="text-accent">{project.project_metadata?.client || 'Unknown Client'}</strong> •
+          Client: <strong className="text-accent">{masterJSON?.project_metadata?.client || 'Unknown Client'}</strong> •
           Progress: <strong className="text-success">{completedPhases}/5 phases completed</strong>
         </div>
         <div>
@@ -403,10 +410,10 @@ export default function ProjectDetailPage({ user }: ProjectDetailPageProps) {
             loadingVersions={loadingVersions}
             // Content management functions
             onJsonChange={handleJsonChange}
-            onSavePhase={handleSavePhase}
-            onLoadPhaseContent={loadPhaseContent}
-            onLoadVersionHistory={loadVersionHistory}
-            onLoadVersionContent={loadVersionContent}
+            onSavePhase={handleSaveJSON}
+            onLoadPhaseContent={() => {}} // Already loaded during loadProject
+            onLoadVersionHistory={() => loadVersionHistory()}
+            onLoadVersionContent={(versionNumber: number) => loadVersionContent(versionNumber)}
             onShowVersionHistory={setShowVersionHistory}
             // Webhook configuration
             useProduction={useProduction}
@@ -490,7 +497,7 @@ export default function ProjectDetailPage({ user }: ProjectDetailPageProps) {
             {project.name}
           </h1>
           <p className="project-client">
-            {project.project_metadata.client}
+            {masterJSON?.project_metadata?.client || 'Unknown Client'}
           </p>
         </div>
 
@@ -531,7 +538,6 @@ export default function ProjectDetailPage({ user }: ProjectDetailPageProps) {
                 
                 <div className="phase-status-text">
                   {getPhaseStatusText(phase)}
-                  {phase.current_version > 0 && ` (v${phase.current_version})`}
                 </div>
               </button>
             ))}

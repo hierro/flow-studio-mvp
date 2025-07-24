@@ -1,6 +1,6 @@
 FLOW STUDIO MVP - COMPLETE WORKING PATTERNS FOR CLAUDE WEB
 =========================================================
-Generated: 2025-07-24T08:20:13.301Z
+Generated: 2025-07-24T21:31:52.590Z
 Purpose: Show actual working code for proper development planning and suggestions
 
 ## CURRENT STATUS & CRITICAL INSIGHT
@@ -55,23 +55,23 @@ export default function App() {
 
   return (
     <Routes>
-      <Route
-        path="/login"
-        element={user ? <Navigate to="/dashboard" replace /> : <LoginPage />}
-      />
-      <Route
-        path="/dashboard"
-        element={user ? <DashboardPage user={user} /> : <Navigate to="/login" replace />}
-      />
-      <Route
-        path="/project/:id"
-        element={user ? <ProjectDetailPage user={user} /> : <Navigate to="/login" replace />}
-      />
-      <Route
-        path="/"
-        element={<Navigate to={user ? "/dashboard" : "/login"} replace />}
-      />
-    </Routes>
+        <Route
+          path="/login"
+          element={user ? <Navigate to="/dashboard" replace /> : <LoginPage />}
+        />
+        <Route
+          path="/dashboard"
+          element={user ? <DashboardPage user={user} /> : <Navigate to="/login" replace />}
+        />
+        <Route
+          path="/project/:id"
+          element={user ? <ProjectDetailPage user={user} /> : <Navigate to="/login" replace />}
+        />
+        <Route
+          path="/"
+          element={<Navigate to={user ? "/dashboard" : "/login"} replace />}
+        />
+      </Routes>
   )
 }
 ```
@@ -161,55 +161,38 @@ export default function LoginPage() {
 ### 3. DATABASE OPERATIONS (src/lib/database.ts) - KEY FUNCTIONS ✅
 ```typescript
 // Database utilities for FLOW.STUDIO MVP
-// Supabase integration with enhanced 5-phase workflow schema
+// Schema v3.0 - Clean master JSON architecture
 
 import type { 
   Project, 
   ProjectPhase, 
-  PhaseVersion, 
+  ProjectVersion, 
   N8NJob, 
-  PhaseName, 
-  PhaseContent,
-  ProjectCardData,
-  ItalianCampaignMetadata,
-  GlobalStyle
+  PhaseName,
+  ProjectCardData
 } from '../types/project'
 import { supabase } from './supabase'
 
-// Italian campaign template data
-const ITALIAN_CAMPAIGN_TEMPLATE: ItalianCampaignMetadata = {
-  title: "UN CONSIGLIO STELLARE",
-  client: "Ministero della Salute",
-  extraction_date: new Date().toISOString().split('T')[0],
-  schema_version: "1.0",
-  production_workflow: "animatic_to_video_scalable"
-}
-
-const DEFAULT_GLOBAL_STYLE: GlobalStyle = {
-  color_palette: {
-    primary: "Deep blue backgrounds (library, tech elements)",
-    secondary: "Warm amber/golden lighting",
-    character_tones: "Natural skin tones, blue uniforms"
-  },
-  rendering_style: {
-    level: "simplified illustration transitioning to cinematic realism",
-    line_work: "clean vector-style outlines",
-    detail_level: "stylized but scalable to photorealistic"
+// Minimal default master JSON - n8n webhook will populate with real data
+const DEFAULT_MASTER_JSON = {
+  scenes: {},
+  elements: {},
+  project_metadata: {
+    title: "New Project",
+    client: "Client Name",
+    schema_version: "3.0",
+    production_workflow: "animatic_to_video_scalable"
   }
 }
 
-// Phase configuration
-const PHASE_CONFIG: Array<{
-  phase_name: PhaseName;
-  phase_index: number;
-  display_name: string;
-}> = [
-  { phase_name: 'script_interpretation', phase_index: 1, display_name: 'Script Interpretation' },
-  { phase_name: 'element_images', phase_index: 2, display_name: 'Element Images' },
-  { phase_name: 'scene_generation', phase_index: 3, display_name: 'Scene Generation' },
-  { phase_name: 'scene_videos', phase_index: 4, display_name: 'Scene Videos' },
-  { phase_name: 'final_assembly', phase_index: 5, display_name: 'Final Assembly' }
-]
+// Phase configuration (phases are auto-created by database trigger)
+const PHASE_DISPLAY_NAMES: Record<PhaseName, string> = {
+  'script_interpretation': 'Script Interpretation',
+  'element_images': 'Element Images', 
+  'scene_generation': 'Scene Generation',
+  'scene_videos': 'Scene Videos',
+  'final_assembly': 'Final Assembly'
+}
 
 // PROJECT OPERATIONS
 
@@ -222,21 +205,49 @@ export async function deleteProject(projectId: string): Promise<boolean> {
       .eq('id', projectId)
 
     if (error) {
- 
+      console.error('Error deleting project:', error)
+      return false
+    }
+
+    return true
+  } catch (error) {
+    console.error('Error in deleteProject:', error)
+    return false
+  }
+}
+
+export async function createProject(name: string, userId: string): Promise<{ project: Project; phases: ProjectPhase[] } | null> {
+  try {
+    // Set initial master JSON with project name
+    const initialMasterJSON = {
+      ...DEFAULT_MASTER_JSON,
+      project_metadata: {
+        ...DEFAULT_MASTER_JSON.project_metadata,
+        title: name
+      }
+    }
+
+    // Create project with master JSON
+    const { data: project, error: projectError } = await supabase
+      .from('projects')
+      .insert({
+        name,
+        user_id: userId,
+      
 ```
 
 ### 4. TYPESCRIPT INTERFACES (src/types/project.ts) - COMPLETE SYSTEM ✅
 ```typescript
 // Core project types for FLOW.STUDIO MVP
-// Based on enhanced database schema and Italian campaign structure
+// Schema v3.0 - Clean master JSON architecture
 
 export interface Project {
   id: string;
   user_id: string;
   name: string;
   status: 'active' | 'completed' | 'archived';
-  project_metadata: ItalianCampaignMetadata;
-  global_style: GlobalStyle;
+  master_json: any; // The complete project JSON
+  current_version: number;
   created_at: string;
   updated_at: string;
 }
@@ -246,22 +257,23 @@ export interface ProjectPhase {
   project_id: string;
   phase_name: PhaseName;
   phase_index: number;
-  status: 'pending' | 'processing' | 'completed' | 'locked';
+  status: 'pending' | 'processing' | 'completed' | 'failed';
   can_proceed: boolean;
-  current_version: number;
-  content_data: PhaseContent | null;
   user_saved: boolean;
-  last_modified_at?: string;
+  execution_settings?: any;
+  progress_percentage: number;
   created_at: string;
-  updated_at: string;
+  started_at?: string;
+  completed_at?: string;
 }
 
-export interface PhaseVersion {
+export interface ProjectVersion {
   id: string;
-  phase_id: string;
+  project_id: string;
   version_number: number;
-  content_data: PhaseContent;
+  master_json: any;
   change_description: string;
+  changed_sections?: string[];
   created_at: string;
   created_by: string;
 }
@@ -293,19 +305,18 @@ export interface PhaseContent {
   final_assembly?: FinalAssemblyContent;
 }
 
-// Phase 1: Script Interpretation (Italian campaign format)
+// Phase 1: Script Interpretation (Complete JSON structure from n8n webhook)
 export interface ScriptInterpretationContent {
-  elements: ItalianCampaignElements;
-  scenes: ItalianCampaignScenes;
-  extraction_metadata: {
-    timestamp: string;
-    image_engin
+  // Core required fields
+  elements?: ItalianCampaignElements | any;
+  scenes?: ItalianCampaignScenes | any;
+  extra
 ```
 
 ### 5. PHASE 1 IMPLEMENTATION (src/components/ScriptInterpretationModule.tsx) - FOUNDATION ✅
 ```typescript
 import { useState, useEffect } from 'react'
-import type { ProjectPhase, PhaseVersion } from '../types/project'
+import type { ProjectPhase, ProjectVersion } from '../types/project'
 
 // Webhook configuration (test vs production)
 const WEBHOOK_CONFIG = {
@@ -330,15 +341,18 @@ interface ScriptInterpretationModuleProps {
     error?: string;
   }
   showVersionHistory: boolean
-  versionHistory: PhaseVersion[]
+  versionHistory: ProjectVersion[]
   loadingVersions: boolean
   // Content management functions
   onJsonChange: (value: string) => void
   onSavePhase: () => void
   onLoadPhaseContent: (phaseId: string) => void
-  onLoadVersionHistory: (phaseId: string) => void
-  onLoadVersionContent: (phaseId: string, versionNumber: number) => void
+  onLoadVersionHistory: () => void
+  onLoadVersionContent: (versionNumber: number) => void
   onShowVersionHistory: (show: boolean) => void
+  // Webhook configuration
+  useProduction: boolean
+  onUseProductionChange: (value: boolean) => void
 }
 
 export default function ScriptInterpretationModule({ 
@@ -361,16 +375,15 @@ export default function ScriptInterpretationModule({
   onLoadPhaseContent,
   onLoadVersionHistory,
   onLoadVersionContent,
-  onShowVersionHistory
+  onShowVersionHistory,
+  // Webhook configuration
+  useProduction,
+  onUseProductionChange
 }: ScriptInterpretationModuleProps) {
   const [isGenerating, setIsGenerating] = useState(false)
-  const [useProduction, setUseProduction] = useState(true)
   const [showRegenerateConfirm, setShowRegenerateConfirm] = useState(false)
 
-  // Load existing content and database status on mount
-  useEffect(() => {
-    onLoadPhaseContent(phase.id)
-  },
+  // Load existing content 
 ```
 
 ## DATABASE SCHEMA (DEPLOYED & WORKING)

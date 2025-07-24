@@ -115,11 +115,11 @@ export class TimelineParser {
   /**
    * Parse Phase 1 content from n8n JSON structure
    */
-  static parsePhase1Content(content: any): TimelineData {
+  static parsePhase1Content(content: any, fallbackTitle?: string): TimelineData {
     const rawData = Array.isArray(content) ? content[0] : content;
     
     return {
-      project_info: this.extractProjectMetadata(rawData),
+      project_info: this.extractProjectMetadata(rawData, fallbackTitle),
       global_style: this.extractGlobalStyle(rawData),
       scenes: this.extractTimelineScenes(rawData),
       elements: this.extractTimelineElements(rawData),
@@ -130,10 +130,19 @@ export class TimelineParser {
   /**
    * Extract project metadata
    */
-  private static extractProjectMetadata(data: any): ProjectMetadata {
+  private static extractProjectMetadata(data: any, fallbackTitle?: string): ProjectMetadata {
+    // Try multiple possible locations for the title
+    const title = data.project_metadata?.title || 
+                  data.title || 
+                  data.project_title ||
+                  data.extraction_metadata?.project_title ||
+                  fallbackTitle ||
+                  'Untitled Project';
+                  
+
     return {
-      title: data.project_metadata?.title || 'Untitled Project',
-      client: data.project_metadata?.client || 'Unknown Client',
+      title,
+      client: data.project_metadata?.client || data.client || 'Unknown Client',
       schema_version: data.project_metadata?.schema_version || '1.0',
       production_workflow: data.project_metadata?.production_workflow || 'animatic_to_video',
       extraction_date: data.project_metadata?.extraction_date
@@ -179,7 +188,7 @@ export class TimelineParser {
     const scenes = data.scenes || {};
     
     return Object.entries(scenes).map(([sceneKey, sceneData]: [string, any]) => ({
-      scene_id: sceneData.scene_id,
+      scene_id: sceneData.scene_id || parseInt(sceneKey.replace('scene_', '')) || 0,
       title: this.generateSceneTitle(sceneData.action_summary, sceneData.scene_id),
       duration: sceneData.duration || '3 seconds',
       camera_type: sceneData.camera_type || 'medium shot',

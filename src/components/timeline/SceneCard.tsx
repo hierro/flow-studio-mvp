@@ -1,19 +1,18 @@
 /**
  * SceneCard - Individual scene visualization for DirectorsTimeline
  * 
- * Shows scene info with expandable content containing rich parsing data
- * equivalent to scenes_description.json structure from n8n workflow.
+ * Simplified display-only component showing scene info with expandable content.
+ * No complex editing system - clean visualization for timeline view.
  */
 
 import { motion, AnimatePresence } from 'framer-motion';
 import { useState } from 'react';
 import { TimelineScene, TimelineElement } from '../../utils/TimelineParser';
-import clsx from 'clsx';
 
 interface SceneCardProps {
   scene: TimelineScene;
   elements: TimelineElement[];
-  onSelect: (sceneId: number) => void;
+  onSelect: () => void;
   isSelected: boolean;
   onElementHover: (elementId: string | null) => void;
   hoveredElement: string | null;
@@ -25,7 +24,7 @@ export default function SceneCard({
   onSelect, 
   isSelected, 
   onElementHover,
-  hoveredElement 
+  hoveredElement
 }: SceneCardProps) {
   const [expandedSections, setExpandedSections] = useState<{
     description: boolean;
@@ -41,8 +40,20 @@ export default function SceneCard({
 
   // Get elements present in this scene, grouped by type
   const sceneElements = elements.filter(el => 
-    scene.elements_present.includes(el.id)
+    scene.elements_present?.includes(el.id)
   );
+
+  // Field with label and value on same row
+  const renderDisplayField = (value: string, label: string) => {
+    return (
+      <div className="scene-field-row">
+        <strong className="scene-field-label">{label}:</strong>
+        <div className="scene-field-value-area">
+          {value || `No ${label.toLowerCase()}`}
+        </div>
+      </div>
+    );
+  };
 
   const groupedElements = sceneElements.reduce((acc, element) => {
     if (!acc[element.type]) {
@@ -86,11 +97,8 @@ export default function SceneCard({
       initial="default"
       whileHover="hover"
       animate={isSelected ? "selected" : "default"}
-      className={clsx(
-        'timeline-scene-card',
-        'rounded-lg border overflow-hidden cursor-pointer'
-      )}
-      onClick={() => onSelect(scene.scene_id)}
+      className="timeline-scene-card rounded-lg border overflow-hidden cursor-pointer"
+      onClick={onSelect}
     >
       {/* Scene Header */}
       <div className="scene-card-content">
@@ -105,40 +113,13 @@ export default function SceneCard({
 
         {/* Action Summary (Main Title) */}
         <h3 className="scene-title">
-          {scene.action_summary || scene.title}
+          {scene.title}
         </h3>
 
-        {/* Camera Section */}
-        <div className="scene-meta-item">
-          <strong style={{ fontSize: '0.8125rem', color: '#999999' }}>Camera:</strong>
-          <div className="scene-dialogue">
-            <p className="scene-dialogue-text">
-              {scene.camera_type}
-            </p>
-          </div>
-        </div>
-
-        {/* Mood Section */}
-        <div className="scene-meta-item">
-          <strong style={{ fontSize: '0.8125rem', color: '#999999' }}>Mood:</strong>
-          <div className="scene-dialogue">
-            <p className="scene-dialogue-text">
-              {scene.mood}
-            </p>
-          </div>
-        </div>
-
-        {/* Dialogue Section */}
-        {scene.dialogue && (
-          <div className="scene-meta-item">
-            <strong style={{ fontSize: '0.8125rem', color: '#999999' }}>Speech:</strong>
-            <div className="scene-dialogue">
-              <p className="scene-dialogue-text">
-                "{scene.dialogue.length > 80 ? `${scene.dialogue.substring(0, 80)}...` : scene.dialogue}"
-              </p>
-            </div>
-          </div>
-        )}
+        {/* Scene Primary Fields - Individual bordered fields */}
+        {renderDisplayField(scene.camera_type || '', 'Camera')}
+        {renderDisplayField(scene.mood || '', 'Mood')}
+        {renderDisplayField(scene.dialogue || '', 'Speech')}
 
         {/* Individual Expandable Sections */}
         <div className="scene-expandable-sections">
@@ -164,9 +145,7 @@ export default function SceneCard({
                   className="scene-expand-content"
                 >
                   <div className="scene-expand-inner">
-                    <p className="scene-expand-text description">
-                      {scene.natural_description}
-                    </p>
+                    {scene.natural_description || 'No description available'}
                   </div>
                 </motion.div>
               )}
@@ -250,9 +229,7 @@ export default function SceneCard({
                   className="scene-expand-content"
                 >
                   <div className="scene-expand-inner">
-                    <p className="scene-expand-text">
-                      {scene.primary_focus || 'No specific focus defined'}
-                    </p>
+                    {scene.primary_focus || 'No primary focus specified'}
                   </div>
                 </motion.div>
               )}
@@ -281,9 +258,7 @@ export default function SceneCard({
                   className="scene-expand-content"
                 >
                   <div className="scene-expand-inner">
-                    <p className="scene-expand-text">
-                      {scene.composition_approach || 'Standard composition'}
-                    </p>
+                    {scene.composition_approach || 'No composition details specified'}
                   </div>
                 </motion.div>
               )}

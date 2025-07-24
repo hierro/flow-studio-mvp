@@ -1,53 +1,36 @@
 // Database utilities for FLOW.STUDIO MVP
-// Supabase integration with enhanced 5-phase workflow schema
+// Schema v3.0 - Clean master JSON architecture
 
 import type { 
   Project, 
   ProjectPhase, 
-  PhaseVersion, 
+  ProjectVersion, 
   N8NJob, 
-  PhaseName, 
-  PhaseContent,
-  ProjectCardData,
-  ItalianCampaignMetadata,
-  GlobalStyle
+  PhaseName,
+  ProjectCardData
 } from '../types/project'
 import { supabase } from './supabase'
 
-// Italian campaign template data
-const ITALIAN_CAMPAIGN_TEMPLATE: ItalianCampaignMetadata = {
-  title: "UN CONSIGLIO STELLARE",
-  client: "Ministero della Salute",
-  extraction_date: new Date().toISOString().split('T')[0],
-  schema_version: "1.0",
-  production_workflow: "animatic_to_video_scalable"
-}
-
-const DEFAULT_GLOBAL_STYLE: GlobalStyle = {
-  color_palette: {
-    primary: "Deep blue backgrounds (library, tech elements)",
-    secondary: "Warm amber/golden lighting",
-    character_tones: "Natural skin tones, blue uniforms"
-  },
-  rendering_style: {
-    level: "simplified illustration transitioning to cinematic realism",
-    line_work: "clean vector-style outlines",
-    detail_level: "stylized but scalable to photorealistic"
+// Minimal default master JSON - n8n webhook will populate with real data
+const DEFAULT_MASTER_JSON = {
+  scenes: {},
+  elements: {},
+  project_metadata: {
+    title: "New Project",
+    client: "Client Name",
+    schema_version: "3.0",
+    production_workflow: "animatic_to_video_scalable"
   }
 }
 
-// Phase configuration
-const PHASE_CONFIG: Array<{
-  phase_name: PhaseName;
-  phase_index: number;
-  display_name: string;
-}> = [
-  { phase_name: 'script_interpretation', phase_index: 1, display_name: 'Script Interpretation' },
-  { phase_name: 'element_images', phase_index: 2, display_name: 'Element Images' },
-  { phase_name: 'scene_generation', phase_index: 3, display_name: 'Scene Generation' },
-  { phase_name: 'scene_videos', phase_index: 4, display_name: 'Scene Videos' },
-  { phase_name: 'final_assembly', phase_index: 5, display_name: 'Final Assembly' }
-]
+// Phase configuration (phases are auto-created by database trigger)
+const PHASE_DISPLAY_NAMES: Record<PhaseName, string> = {
+  'script_interpretation': 'Script Interpretation',
+  'element_images': 'Element Images', 
+  'scene_generation': 'Scene Generation',
+  'scene_videos': 'Scene Videos',
+  'final_assembly': 'Final Assembly'
+}
 
 // PROJECT OPERATIONS
 
@@ -73,15 +56,24 @@ export async function deleteProject(projectId: string): Promise<boolean> {
 
 export async function createProject(name: string, userId: string): Promise<{ project: Project; phases: ProjectPhase[] } | null> {
   try {
-    // Create project
+    // Set initial master JSON with project name
+    const initialMasterJSON = {
+      ...DEFAULT_MASTER_JSON,
+      project_metadata: {
+        ...DEFAULT_MASTER_JSON.project_metadata,
+        title: name
+      }
+    }
+
+    // Create project with master JSON
     const { data: project, error: projectError } = await supabase
       .from('projects')
       .insert({
         name,
         user_id: userId,
         status: 'active',
-        project_metadata: ITALIAN_CAMPAIGN_TEMPLATE,
-        global_style: DEFAULT_GLOBAL_STYLE
+        master_json: initialMasterJSON,
+        current_version: 0
       })
       .select()
       .single()
@@ -91,32 +83,195 @@ export async function createProject(name: string, userId: string): Promise<{ pro
       return null
     }
 
-    // Create all 5 phases
-    const phasesToInsert = PHASE_CONFIG.map((config, index) => ({
-      project_id: project.id,
-      phase_name: config.phase_name,
-      phase_index: config.phase_index,
-      status: 'pending' as const,
-      can_proceed: index === 0, // Only first phase can proceed initially
-      current_version: 0,
-      user_saved: false
-    }))
+    // Don't create initial version - let first user save create version 1
 
+    // Phases are automatically created by database trigger
+    // Get the created phases
     const { data: phases, error: phasesError } = await supabase
       .from('project_phases')
-      .insert(phasesToInsert)
-      .select()
+      .select('*')
+      .eq('project_id', project.id)
+      .order('phase_index')
 
     if (phasesError || !phases) {
-      console.error('Error creating phases:', phasesError)
-      // Cleanup project if phases failed
-      await supabase.from('projects').delete().eq('id', project.id)
-      return null
+      console.error('Error fetching phases:', phasesError)
+      return { project, phases: [] }
     }
 
     return { project, phases }
   } catch (error) {
     console.error('Error in createProject:', error)
+    return null
+  }
+}
+
+// MASTER JSON OPERATIONS
+
+export async function getMasterJSON(projectId: string): Promise<any | null> {
+  try {
+    const { data, error } = await supabase
+      .from('projects')
+      .select('master_json')
+      .eq('id', projectId)
+      .single()
+
+    if (error || !data) {
+      console.error('Error fetching master JSON:', error)
+      return null
+    }
+
+    return data.master_json
+  } catch (error) {
+    console.error('Error in getMasterJSON:', error)
+    return null
+  }
+}
+
+export async function saveMasterJSON(
+  projectId: string, 
+  jsonString: string, 
+  description = 'Master JSON updated'
+): Promise<boolean> {
+  try {
+    // Parse JSON
+    const parsedJSON = JSON.parse(jsonString)
+    
+    // Just update the master JSON - fuck the versioning for now
+    const { error } = await supabase
+      .from('projects')
+      .update({
+        master_json: parsedJSON,
+        updated_at: new Date().toISOString()
+      })
+      .eq('id', projectId)
+
+    if (error) {
+      console.error('Error updating master JSON:', error)
+      console.error('Full error details:', JSON.stringify(error, null, 2))
+      return false
+    }
+
+    return true
+  } catch (error) {
+    console.error('Error in saveMasterJSON:', error)
+    return false
+  }
+}
+
+// Update master JSON without creating version (for editing/n8n webhook)
+export async function updateMasterJSON(
+  projectId: string, 
+  masterJSON: any
+): Promise<boolean> {
+  try {
+    // Update only master_json without incrementing current_version
+    // This will NOT create a version since trigger only fires on version increment
+    const { error: updateError } = await supabase
+      .from('projects')
+      .update({
+        master_json: masterJSON,
+        updated_at: new Date().toISOString()
+      })
+      .eq('id', projectId)
+
+    if (updateError) {
+      console.error('Error updating master JSON (no version):', updateError)
+      return false
+    }
+
+    return true
+  } catch (error) {
+    console.error('Error in updateMasterJSON:', error)
+    return false
+  }
+}
+
+// Save master JSON from object and create new version (for explicit user saves)  
+export async function saveMasterJSONFromObject(
+  projectId: string, 
+  masterJSON: any, 
+  description = 'Master JSON updated'
+): Promise<boolean> {
+  try {
+    // Get current version
+    const { data: project, error: projectError } = await supabase
+      .from('projects')
+      .select('current_version')
+      .eq('id', projectId)
+      .single()
+
+    if (projectError || !project) {
+      console.error('Error fetching project for version:', projectError)
+      return false
+    }
+
+    const newVersion = project.current_version + 1
+
+    // Update master JSON and increment version (this will trigger version creation)
+    const { error: updateError } = await supabase
+      .from('projects')
+      .update({
+        master_json: masterJSON,
+        current_version: newVersion,
+        updated_at: new Date().toISOString()
+      })
+      .eq('id', projectId)
+
+    if (updateError) {
+      console.error('Error updating master JSON:', updateError)
+      return false
+    }
+
+    // Version history is automatically created by database trigger
+    return true
+  } catch (error) {
+    console.error('Error in saveMasterJSONFromObject:', error)
+    return false
+  }
+}
+
+// VERSION HISTORY OPERATIONS
+
+export async function getProjectVersions(projectId: string): Promise<ProjectVersion[]> {
+  try {
+    const { data, error } = await supabase
+      .from('project_versions')
+      .select('*')
+      .eq('project_id', projectId)
+      .order('version_number', { ascending: false })
+
+    if (error || !data) {
+      console.error('Error fetching project versions:', error)
+      return []
+    }
+
+    return data
+  } catch (error) {
+    console.error('Error in getProjectVersions:', error)
+    return []
+  }
+}
+
+export async function getProjectVersion(
+  projectId: string, 
+  versionNumber: number
+): Promise<ProjectVersion | null> {
+  try {
+    const { data, error } = await supabase
+      .from('project_versions')
+      .select('*')
+      .eq('project_id', projectId)
+      .eq('version_number', versionNumber)
+      .single()
+
+    if (error || !data) {
+      console.error('Error fetching project version:', error)
+      return null
+    }
+
+    return data
+  } catch (error) {
+    console.error('Error in getProjectVersion:', error)
     return null
   }
 }
@@ -130,11 +285,12 @@ export async function getUserProjects(userId: string): Promise<ProjectCardData[]
         name,
         status,
         created_at,
-        project_phases!inner(
+        project_phases(
           phase_index,
           status,
-          user_saved,
-          phase_name
+          phase_name,
+          can_proceed,
+          completed_at
         )
       `)
       .eq('user_id', userId)
@@ -147,9 +303,9 @@ export async function getUserProjects(userId: string): Promise<ProjectCardData[]
 
     return projects.map(project => {
       const phases = project.project_phases as ProjectPhase[]
-      const completedPhases = phases.filter(p => p.user_saved).length
+      const completedPhases = phases.filter(p => p.status === 'completed').length
       const currentPhase = phases.find(p => p.status === 'processing')?.phase_name || 
-                          phases.find(p => p.can_proceed && !p.user_saved)?.phase_name ||
+                          phases.find(p => p.can_proceed && p.status === 'pending')?.phase_name ||
                           null
 
       return {
@@ -192,26 +348,157 @@ export async function getProject(projectId: string): Promise<Project | null> {
 
 // PHASE OPERATIONS
 
-export async function getProjectPhases(projectId: string): Promise<ProjectPhase[]> {
+// N8N JOB OPERATIONS
+
+export async function createN8NJob(
+  projectId: string,
+  phaseName: string,
+  payload: any,
+  workflowId: string = 'TESTA_ANIMATIC'
+): Promise<string | null> {
+  try {
+    const jobId = crypto.randomUUID()
+    
+    const { error } = await supabase
+      .from('n8n_jobs')
+      .insert({
+        id: jobId,
+        project_id: projectId,
+        phase_name: phaseName,
+        workflow_id: workflowId,
+        status: 'pending',
+        input_data: payload
+      })
+
+    if (error) {
+      console.error('Error creating n8n job:', error)
+      return null
+    }
+
+    return jobId
+  } catch (error) {
+    console.error('Error in createN8NJob:', error)
+    return null
+  }
+}
+
+export async function updateN8NJob(
+  jobId: string,
+  status: string,
+  resultData?: any,
+  errorMessage?: string
+): Promise<boolean> {
+  try {
+    const updateData: any = {
+      status
+    }
+    
+    if (resultData) updateData.output_data = resultData
+    if (errorMessage) updateData.error_message = errorMessage
+    if (status === 'completed' || status === 'failed') {
+      updateData.completed_at = new Date().toISOString()
+    }
+
+    const { error } = await supabase
+      .from('n8n_jobs')
+      .update(updateData)
+      .eq('id', jobId)
+
+    if (error) {
+      console.error('Error updating n8n job:', error)
+      return false
+    }
+
+    return true
+  } catch (error) {
+    console.error('Error in updateN8NJob:', error)
+    return false
+  }
+}
+
+export async function getN8NJob(jobId: string): Promise<N8NJob | null> {
   try {
     const { data, error } = await supabase
-      .from('project_phases')
+      .from('n8n_jobs')
       .select('*')
-      .eq('project_id', projectId)
-      .order('phase_index', { ascending: true })
+      .eq('id', jobId)
+      .single()
 
     if (error || !data) {
-      console.error('Error fetching phases:', error)
-      return []
+      console.error('Error fetching n8n job:', error)
+      return null
     }
 
     return data
   } catch (error) {
+    console.error('Error in getN8NJob:', error)
+    return null
+  }
+}
+
+export async function getProjectPhases(projectId: string): Promise<ProjectPhase[]> {
+  try {
+    // Get phases and project data together
+    const [phasesResult, projectResult] = await Promise.all([
+      supabase
+        .from('project_phases')
+        .select('*')
+        .eq('project_id', projectId)
+        .order('phase_index', { ascending: true }),
+      supabase
+        .from('projects')
+        .select('master_json')
+        .eq('id', projectId)
+        .single()
+    ])
+
+    if (phasesResult.error || !phasesResult.data) {
+      console.error('Error fetching phases:', phasesResult.error)
+      return []
+    }
+
+    if (projectResult.error || !projectResult.data) {
+      console.error('Error fetching project:', projectResult.error)
+      // Return phases with default can_proceed values if master JSON unavailable
+      return phasesResult.data.map(phase => ({
+        ...phase,
+        can_proceed: phase.phase_index === 1 // Only Phase 1 available without master JSON
+      }))
+    }
+
+    const phases = phasesResult.data
+    const masterJSON = projectResult.data.master_json
+
+    // Calculate can_proceed based on actual data state (not triggers)
+    const phasesWithLogic = phases.map(phase => {
+      let canProceed = false
+
+      if (phase.phase_index === 1) {
+        // Phase 1 always available
+        canProceed = true
+      } else if (phase.phase_index === 2 || phase.phase_index === 3) {
+        // Phase 2 & 3 available if master JSON has valid scene content
+        canProceed = masterJSON && 
+                    masterJSON.scenes && 
+                    Object.keys(masterJSON.scenes).length > 0
+      }
+      // Phase 4 and 5 remain locked for now - will add rules later when needed
+
+      return {
+        ...phase,
+        can_proceed: canProceed
+      }
+    })
+
+    return phasesWithLogic
+  } catch (error) {
     console.error('Error in getProjectPhases:', error)
+    // Return empty array on critical error
     return []
   }
 }
 
+// MISSING FUNCTIONS - Add these to prevent runtime errors
 export async function getPhase(phaseId: string): Promise<ProjectPhase | null> {
   try {
     const { data, error } = await supabase
@@ -232,86 +519,66 @@ export async function getPhase(phaseId: string): Promise<ProjectPhase | null> {
   }
 }
 
+// DEPRECATED: This function should not be used in master JSON architecture
+// Use saveMasterJSON() instead for all content updates
 export async function updatePhaseContent(
   phaseId: string, 
-  content: PhaseContent, 
-  description?: string
+  content: any, 
+  description: string
 ): Promise<boolean> {
-  try {
-    // Get current phase to check version
-    const currentPhase = await getPhase(phaseId)
-    if (!currentPhase) return false
-
-    const newVersion = currentPhase.current_version + 1
-
-    // Start transaction
-    const { error: updateError } = await supabase
-      .from('project_phases')
-      .update({
-        content_data: content,
-        current_version: newVersion,
-        last_modified_at: new Date().toISOString()
-      })
-      .eq('id', phaseId)
-
-    if (updateError) {
-      console.error('Error updating phase:', updateError)
-      return false
-    }
-
-    // Create version record
-    const { error: versionError } = await supabase
-      .from('phase_versions')
-      .insert({
-        phase_id: phaseId,
-        version_number: newVersion,
-        content_data: content,
-        change_description: description || 'Content updated'
-      })
-
-    if (versionError) {
-      console.error('Error creating version:', versionError)
-      // Don't return false here - the main update succeeded
-    }
-
-    return true
-  } catch (error) {
-    console.error('Error in updatePhaseContent:', error)
-    return false
-  }
+  console.error('updatePhaseContent is deprecated - use saveMasterJSON instead')
+  return false
 }
 
 export async function savePhaseAndUnlockNext(phaseId: string): Promise<boolean> {
   try {
-    // Get current phase
-    const phase = await getPhase(phaseId)
-    if (!phase) return false
-
-    // Mark current phase as saved
-    const { error: saveError } = await supabase
+    // Mark current phase as user saved and completed, unlock next phase
+    const { error: updateError } = await supabase
       .from('project_phases')
-      .update({
+      .update({ 
+        status: 'completed',
         user_saved: true,
-        status: 'completed'
+        completed_at: new Date().toISOString()
       })
       .eq('id', phaseId)
 
-    if (saveError) {
-      console.error('Error saving phase:', saveError)
+    if (updateError) {
+      console.error('Error updating phase status:', updateError)
       return false
     }
 
-    // Unlock next phase if it exists
-    const nextPhaseIndex = phase.phase_index + 1
-    if (nextPhaseIndex <= 5) {
+    // Get current phase to find next phase
+    const currentPhase = await getPhase(phaseId)
+    if (!currentPhase) return false
+
+    // Unlock phases based on workflow logic
+    let unlockPhases: number[] = []
+    
+    if (currentPhase.phase_index === 1) {
+      // Phase 1 completion unlocks Phase 2 (optional reference images) and Phase 3 (scene generation)
+      unlockPhases = [2, 3]
+    } else if (currentPhase.phase_index === 2) {
+      // Phase 2 completion doesn't unlock anything new (Phase 3 already unlocked by Phase 1)
+      unlockPhases = []
+    } else if (currentPhase.phase_index === 3) {
+      // Phase 3 completion unlocks Phase 4 (scene videos)
+      unlockPhases = [4]
+    } else if (currentPhase.phase_index === 4) {
+      // Phase 4 completion unlocks Phase 5 (final assembly)
+      unlockPhases = [5]
+    }
+
+    // Update all phases that should be unlocked
+    if (unlockPhases.length > 0) {
       const { error: unlockError } = await supabase
         .from('project_phases')
         .update({ can_proceed: true })
-        .eq('project_id', phase.project_id)
-        .eq('phase_index', nextPhaseIndex)
+        .eq('project_id', currentPhase.project_id)
+        .in('phase_index', unlockPhases)
 
       if (unlockError) {
-        console.error('Error unlocking next phase:', unlockError)
+        console.error('Error unlocking phases:', unlockError)
+        return false
       }
     }
 
@@ -320,128 +587,4 @@ export async function savePhaseAndUnlockNext(phaseId: string): Promise<boolean> 
     console.error('Error in savePhaseAndUnlockNext:', error)
     return false
   }
-}
-
-// N8N JOB OPERATIONS
-
-export async function createN8NJob(
-  projectId: string,
-  phaseName: PhaseName,
-  workflowId: string,
-  inputData: any
-): Promise<N8NJob | null> {
-  try {
-    const { data, error } = await supabase
-      .from('n8n_jobs')
-      .insert({
-        project_id: projectId,
-        phase_name: phaseName,
-        workflow_id: workflowId,
-        input_data: inputData,
-        status: 'pending'
-      })
-      .select()
-      .single()
-
-    if (error || !data) {
-      console.error('Error creating N8N job:', error)
-      return null
-    }
-
-    return data
-  } catch (error) {
-    console.error('Error in createN8NJob:', error)
-    return null
-  }
-}
-
-export async function updateN8NJobStatus(
-  jobId: string,
-  status: N8NJob['status'],
-  outputData?: any,
-  errorMessage?: string
-): Promise<boolean> {
-  try {
-    const updateData: any = { status }
-    
-    if (status === 'running') {
-      updateData.started_at = new Date().toISOString()
-    } else if (status === 'completed' || status === 'failed') {
-      updateData.completed_at = new Date().toISOString()
-    }
-
-    if (outputData) updateData.output_data = outputData
-    if (errorMessage) updateData.error_message = errorMessage
-
-    const { error } = await supabase
-      .from('n8n_jobs')
-      .update(updateData)
-      .eq('id', jobId)
-
-    if (error) {
-      console.error('Error updating N8N job:', error)
-      return false
-    }
-
-    return true
-  } catch (error) {
-    console.error('Error in updateN8NJobStatus:', error)
-    return false
-  }
-}
-
-// VERSION HISTORY OPERATIONS
-
-export async function getPhaseVersions(phaseId: string): Promise<PhaseVersion[]> {
-  try {
-    const { data, error } = await supabase
-      .from('phase_versions')
-      .select('*')
-      .eq('phase_id', phaseId)
-      .order('version_number', { ascending: false })
-
-    if (error || !data) {
-      console.error('Error fetching phase versions:', error)
-      return []
-    }
-
-    return data
-  } catch (error) {
-    console.error('Error in getPhaseVersions:', error)
-    return []
-  }
-}
-
-export async function getPhaseVersion(phaseId: string, versionNumber: number): Promise<PhaseVersion | null> {
-  try {
-    const { data, error } = await supabase
-      .from('phase_versions')
-      .select('*')
-      .eq('phase_id', phaseId)
-      .eq('version_number', versionNumber)
-      .single()
-
-    if (error || !data) {
-      console.error('Error fetching phase version:', error)
-      return null
-    }
-
-    return data
-  } catch (error) {
-    console.error('Error in getPhaseVersion:', error)
-    return null
-  }
-}
-
-// UTILITY FUNCTIONS
-
-export function getPhaseDisplayName(phaseName: PhaseName): string {
-  const config = PHASE_CONFIG.find(p => p.phase_name === phaseName)
-  return config?.display_name || phaseName
-}
-
-export function getNextPhaseName(currentPhase: PhaseName): PhaseName | null {
-  const currentIndex = PHASE_CONFIG.findIndex(p => p.phase_name === currentPhase)
-  const nextPhase = PHASE_CONFIG[currentIndex + 1]
-  return nextPhase?.phase_name || null
 }

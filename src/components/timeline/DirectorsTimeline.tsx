@@ -1,23 +1,23 @@
 /**
- * DirectorsTimeline - Revolutionary timeline interface for Phase 1
+ * DirectorsTimeline - Simplified timeline display for master JSON
  * 
- * Transforms JSON structure into visual story intelligence with:
+ * Shows timeline visualization without complex editing (for now)
  * - Horizontal scene cards with expandable rich content
- * - Element relationship visualization
+ * - Element relationship visualization  
  * - Interactive scene navigation
- * - Character consistency tracking
  */
 
 import { useState, useMemo } from 'react';
 import { motion } from 'framer-motion';
-import { TimelineParser, TimelineData, TimelineElement } from '../../utils/TimelineParser';
+import { TimelineParser, TimelineData } from '../../utils/TimelineParser';
+import { createTextFieldEditor } from '../../utils/JsonFieldEditor';
 import SceneCard from './SceneCard';
-import clsx from 'clsx';
 
 interface DirectorsTimelineProps {
-  content: any; // Raw Phase 1 JSON content from database
+  content: any; // Master JSON content
   projectId: string;
   projectName: string;
+  phaseId: string;
   onContentUpdate?: (updatedContent: any) => void;
 }
 
@@ -25,23 +25,29 @@ export default function DirectorsTimeline({
   content, 
   projectId, 
   projectName,
+  phaseId,
   onContentUpdate 
 }: DirectorsTimelineProps) {
   const [selectedScene, setSelectedScene] = useState<number | null>(null);
   const [hoveredElement, setHoveredElement] = useState<string | null>(null);
+  const [editingTitle, setEditingTitle] = useState(false);
+  const [titleValue, setTitleValue] = useState('');
 
-  // Parse content into timeline data
+  // Parse master JSON into timeline data
   const timelineData: TimelineData = useMemo(() => {
-    if (!content) return {
-      project_info: { title: 'Loading...', client: '', schema_version: '1.0', production_workflow: '' },
-      global_style: {} as any,
-      scenes: [],
-      elements: [],
-      style_evolution: { color_evolution: [], mood_evolution: [], camera_progression: [] }
-    };
+    if (!content || Object.keys(content).length === 0) {
+      return {
+        project_info: { title: 'Loading...', client: '', schema_version: '1.0', production_workflow: '' },
+        global_style: {} as any,
+        scenes: [],
+        elements: [],
+        style_evolution: { color_evolution: [], mood_evolution: [], camera_progression: [] }
+      };
+    }
     
     try {
-      return TimelineParser.parsePhase1Content(content);
+      const parsed = TimelineParser.parsePhase1Content(content, projectName);
+      return parsed;
     } catch (error) {
       console.error('Error parsing timeline content:', error);
       return {
@@ -52,7 +58,70 @@ export default function DirectorsTimeline({
         style_evolution: { color_evolution: [], mood_evolution: [], camera_progression: [] }
       };
     }
-  }, [content]);
+  }, [content, projectName]);
+
+  // Clean title editor using JsonFieldEditor pattern
+  const titleEditor = useMemo(() => {
+    if (!onContentUpdate) return null;
+    return createTextFieldEditor(content, 'project_metadata.title', onContentUpdate);
+  }, [content, onContentUpdate]);
+
+  // Handle title edit start
+  const handleTitleEditStart = () => {
+    if (!titleEditor?.currentValue) {
+      console.error('Cannot edit title - title editor not available');
+      return;
+    }
+    setTitleValue(titleEditor.currentValue);
+    setEditingTitle(true);
+  };
+
+  // Handle title save
+  const handleTitleSave = async () => {
+    if (!titleEditor || !titleValue.trim()) {
+      setEditingTitle(false);
+      return;
+    }
+
+    try {
+      // Use the clean editor pattern
+      const success = titleEditor.updateValue(titleValue);
+      if (success) {
+        setEditingTitle(false);
+      }
+    } catch (error) {
+      console.error('Error saving title:', error);
+      // Keep editing mode on error
+    }
+  };
+
+  // Handle title cancel
+  const handleTitleCancel = () => {
+    setTitleValue('');
+    setEditingTitle(false);
+  };
+
+  // Calculate total duration and get elements with consistency scoring
+  const projectStats = useMemo(() => {
+    // Calculate total duration by parsing scene durations
+    const totalDurationSeconds = timelineData.scenes.reduce((total, scene) => {
+      const duration = scene.duration || '3s';
+      const seconds = parseInt(duration.replace(/[^\d]/g, '')) || 3;
+      return total + seconds;
+    }, 0);
+    
+    const totalMinutes = Math.floor(totalDurationSeconds / 60);
+    const remainingSeconds = totalDurationSeconds % 60;
+    const formattedDuration = totalMinutes > 0 
+      ? `${totalMinutes}m ${remainingSeconds}s`
+      : `${totalDurationSeconds}s`;
+
+    return {
+      totalDuration: formattedDuration,
+      scenesCount: timelineData.scenes.length,
+      elementsCount: timelineData.elements.length
+    };
+  }, [timelineData]);
 
   // Get elements with consistency scoring, grouped by type
   const elementsWithStats = useMemo(() => {
@@ -83,124 +152,115 @@ export default function DirectorsTimeline({
     setHoveredElement(elementId);
   };
 
-  if (!content) {
+  if (!timelineData.scenes.length) {
     return (
-      <div className="timeline-empty-state">
-        <div className="timeline-empty-icon">📊</div>
-        <p>No content available for timeline visualization</p>
-        <p className="timeline-empty-description">
-          Generate Phase 1 content first to see the timeline
-        </p>
+      <div className="timeline-container">
+        <div className="timeline-header">
+          <h2>Timeline View</h2>
+          <p>No scenes available. Complete Phase 1 to see timeline.</p>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="directors-timeline">
-      {/* Compact Project Header */}
-      <div className="timeline-header-section">
-        <div className="timeline-header-content mb-lg">
-          <div className="timeline-header-info">
-            <h2 className="timeline-project-title" style={{ fontSize: '1.25rem', marginBottom: '2px' }}>
-              {projectName}
-            </h2>
-            <div style={{ fontSize: '1rem', color: '#66ccff', marginBottom: '8px', fontWeight: '500' }}>
-              Script: {timelineData.project_info.title}
+    <div className="timeline-container">
+      {/* Project Header */}
+      <div className="timeline-header">
+        <div className="project-title-section">
+          {editingTitle ? (
+            <div className="title-edit-container">
+              <input
+                type="text"
+                value={titleValue}
+                onChange={(e) => setTitleValue(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') handleTitleSave();
+                  if (e.key === 'Escape') handleTitleCancel();
+                }}
+                className="title-edit-input"
+                autoFocus
+                onBlur={handleTitleSave}
+              />
+              <div className="title-edit-buttons">
+                <button onClick={handleTitleSave} className="title-save-btn">
+                  ✓
+                </button>
+                <button onClick={handleTitleCancel} className="title-cancel-btn">
+                  ✕
+                </button>
+              </div>
             </div>
-            <div style={{ 
-              display: 'flex',
-              alignItems: 'center',
-              gap: '16px',
-              fontSize: '13px',
-              color: '#999'
-            }}>
-              <span>🎬 {timelineData.scenes.length} scenes</span>
-              <span>🎭 {timelineData.elements.length} elements</span>
-              <span>👤 {timelineData.elements.find(el => el.subtype === 'primary')?.name || 'No primary'}</span>
-              <span>⏱️ {timelineData.scenes.reduce((total, scene) => {
-                const duration = parseInt(scene.duration) || 3;
-                return total + duration;
-              }, 0)}s total</span>
-              <span>🎨 {timelineData.global_style.mood_style?.overall_mood || 'Mixed mood'}</span>
-            </div>
+          ) : (
+            <h1 
+              className="project-title-display editable-title"
+              onClick={handleTitleEditStart}
+              title="Click to edit project title"
+            >
+              {timelineData?.project_info?.title || 'Untitled Project'}
+            </h1>
+          )}
+          <div className="project-stats">
+            <span><strong>{projectStats.scenesCount}</strong> scenes</span>
+            <span>•</span>
+            <span><strong>{projectStats.elementsCount}</strong> elements</span>
+            <span>•</span>
+            <span><strong>{projectStats.totalDuration}</strong> total</span>
+            <span>•</span>
+            <span><strong>{timelineData.project_info.client}</strong></span>
           </div>
-
         </div>
       </div>
 
-      {/* Timeline Content */}
-      <div className="timeline-main-content">
-        {/* Scenes View */}
-          <div className="timeline-scenes-wrapper">
-            {/* Element Overview Bar */}
-            <div className="timeline-legend-container">
-              <div className="timeline-legend-header">
-                Element Overview ({timelineData.elements.length} total)
-              </div>
-              <div className="flex flex-col gap-md">
-                {Object.entries(elementsWithStats).map(([type, elements]) => (
-                  <div key={type} className="timeline-legend-group">
-                    <span className="timeline-legend-text" style={{ minWidth: '4.375rem' }}>
-                      {type}:
-                    </span>
-                    <div className="flex flex-wrap gap-sm">
-                      {elements.map(element => (
-                        <motion.div
-                          key={element.id}
-                          whileHover={{ scale: 1.05 }}
-                          onMouseEnter={() => handleElementHover(element.id)}
-                          onMouseLeave={() => handleElementHover(null)}
-                          style={{
-                            display: 'flex',
-                            alignItems: 'center',
-                            backgroundColor: hoveredElement === element.id ? element.color : 'white',
-                            color: hoveredElement === element.id ? 'white' : element.color,
-                            border: `1px solid ${element.color}`,
-                            borderRadius: '12px',
-                            padding: '4px 8px',
-                            fontSize: '11px',
-                            fontWeight: '500',
-                            cursor: 'pointer',
-                            transition: 'all 0.2s ease'
-                          }}
-                        >
-                          {element.name}
-                          <span 
-                            className="timeline-element-percentage"
-                            style={{ 
-                              backgroundColor: hoveredElement === element.id ? 'rgba(255,255,255,0.2)' : `${element.color}20`
-                            }}>
-                            {element.usage_percentage}%
-                          </span>
-                          <span className="timeline-element-consistency">
-                            {element.consistency_score === 'excellent' ? '✅' : 
-                             element.consistency_score === 'good' ? '👍' : '⚠️'}
-                          </span>
-                        </motion.div>
-                      ))}
-                    </div>
-                  </div>
+      {/* Elements Overview Bar - Use same format as scene card elements */}
+      <div className="elements-overview">
+        <div className="elements-overview-header">
+          <h3>Story Elements</h3>
+          <span className="elements-count">{timelineData.elements.length} total</span>
+        </div>
+        
+        <div className="elements-horizontal">
+          {Object.entries(elementsWithStats).map(([type, elements]) => (
+            <div key={type} className="scene-element-group">
+              <span className="scene-element-type">{type}s:</span>
+              <div className="scene-element-tags">
+                {elements.map((element) => (
+                  <motion.div
+                    key={element.id}
+                    whileHover={{ scale: 1.05 }}
+                    onMouseEnter={() => handleElementHover(element.id)}
+                    onMouseLeave={() => handleElementHover(null)}
+                    className="scene-element-tag"
+                    style={{
+                      backgroundColor: hoveredElement === element.id ? element.color : `${element.color}20`,
+                      color: hoveredElement === element.id ? 'white' : element.color,
+                      borderColor: element.color
+                    }}
+                  >
+                    {element.name} ({element.usage_percentage}%)
+                  </motion.div>
                 ))}
               </div>
             </div>
+          ))}
+        </div>
+      </div>
 
-            {/* Scene Grid Timeline */}
-            <div className="timeline-scenes-main">
-              <div className="timeline-scenes-responsive-grid" style={{ paddingBottom: '1.25rem' }}>
-                {timelineData.scenes.map((scene) => (
-                  <SceneCard
-                    key={scene.scene_id}
-                    scene={scene}
-                    elements={timelineData.elements}
-                    onSelect={handleSceneSelect}
-                    isSelected={selectedScene === scene.scene_id}
-                    onElementHover={handleElementHover}
-                    hoveredElement={hoveredElement}
-                  />
-                ))}
-              </div>
-            </div>
-          </div>
+      {/* Timeline Scenes */}
+      <div className="timeline-scenes">
+        <div className="timeline-scenes-responsive-grid">
+          {timelineData.scenes.map((scene) => (
+            <SceneCard
+              key={scene.scene_id}
+              scene={scene}
+              elements={timelineData.elements}
+              isSelected={selectedScene === scene.scene_id}
+              hoveredElement={hoveredElement}
+              onSelect={() => handleSceneSelect(scene.scene_id)}
+              onElementHover={handleElementHover}
+            />
+          ))}
+        </div>
       </div>
     </div>
   );
