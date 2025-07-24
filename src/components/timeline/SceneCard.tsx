@@ -28,13 +28,15 @@ export default function SceneCard({
   hoveredElement 
 }: SceneCardProps) {
   const [expandedSections, setExpandedSections] = useState<{
+    description: boolean;
+    elements: boolean;
     primaryFocus: boolean;
     composition: boolean;
-    description: boolean;
   }>({
+    description: false,
+    elements: false,
     primaryFocus: false,
-    composition: false,
-    description: false
+    composition: false
   });
 
   // Get elements present in this scene, grouped by type
@@ -106,61 +108,126 @@ export default function SceneCard({
           {scene.action_summary || scene.title}
         </h3>
 
-        {/* Camera Type & Mood - Two Rows */}
-        <div className="scene-meta">
-          <div className="scene-meta-item">
-            Camera: <span className="scene-camera">{scene.camera_type}</span>
+        {/* Camera Section */}
+        <div className="scene-meta-item">
+          <strong style={{ fontSize: '0.8125rem', color: '#999999' }}>Camera:</strong>
+          <div className="scene-dialogue">
+            <p className="scene-dialogue-text">
+              {scene.camera_type}
+            </p>
           </div>
-          <div className="scene-meta-item">
-            Mood: <span className="scene-mood">{scene.mood}</span>
+        </div>
+
+        {/* Mood Section */}
+        <div className="scene-meta-item">
+          <strong style={{ fontSize: '0.8125rem', color: '#999999' }}>Mood:</strong>
+          <div className="scene-dialogue">
+            <p className="scene-dialogue-text">
+              {scene.mood}
+            </p>
           </div>
         </div>
 
         {/* Dialogue Section */}
         {scene.dialogue && (
-          <div className="scene-dialogue">
-            <p className="scene-dialogue-text">
-              "{scene.dialogue.length > 80 ? `${scene.dialogue.substring(0, 80)}...` : scene.dialogue}"
-            </p>
+          <div className="scene-meta-item">
+            <strong style={{ fontSize: '0.8125rem', color: '#999999' }}>Speech:</strong>
+            <div className="scene-dialogue">
+              <p className="scene-dialogue-text">
+                "{scene.dialogue.length > 80 ? `${scene.dialogue.substring(0, 80)}...` : scene.dialogue}"
+              </p>
+            </div>
           </div>
         )}
 
-        {/* Elements Section */}
-        <div className="scene-elements">
-          <div className="scene-elements-title">
-            Elements ({sceneElements.length})
-          </div>
-          <div className="scene-elements-list">
-            {Object.entries(groupedElements).map(([type, typeElements]) => (
-              <div key={type} className="scene-element-group">
-                <span className="scene-element-type">
-                  {type}:
-                </span>
-                <div className="scene-element-tags">
-                  {typeElements.map(element => (
-                    <motion.div
-                      key={element.id}
-                      whileHover={{ scale: 1.05 }}
-                      onMouseEnter={() => onElementHover(element.id)}
-                      onMouseLeave={() => onElementHover(null)}
-                      className="scene-element-tag"
-                      style={{
-                        backgroundColor: hoveredElement === element.id ? element.color : `${element.color}20`,
-                        color: hoveredElement === element.id ? 'white' : element.color,
-                        borderColor: element.color
-                      }}
-                    >
-                      {element.name}
-                    </motion.div>
-                  ))}
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-
         {/* Individual Expandable Sections */}
         <div className="scene-expandable-sections">
+          {/* Description Button & Content - MOVED TO TOP */}
+          <div>
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                setExpandedSections(prev => ({ ...prev, description: !prev.description }));
+              }}
+              className={`scene-expand-button ${expandedSections.description ? 'expanded' : ''}`}
+            >
+              <span>📝 Description</span>
+              <span>{expandedSections.description ? '▼' : '▶'}</span>
+            </button>
+            <AnimatePresence>
+              {expandedSections.description && scene.natural_description && (
+                <motion.div
+                  variants={expandVariants}
+                  initial="collapsed"
+                  animate="expanded"
+                  exit="collapsed"
+                  className="scene-expand-content"
+                >
+                  <div className="scene-expand-inner">
+                    <p className="scene-expand-text description">
+                      {scene.natural_description}
+                    </p>
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>
+
+          {/* Elements Button & Content - NEW EXPANDABLE SECTION */}
+          <div>
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                setExpandedSections(prev => ({ ...prev, elements: !prev.elements }));
+              }}
+              className={`scene-expand-button ${expandedSections.elements ? 'expanded' : ''}`}
+            >
+              <span>🎭 Elements ({sceneElements.length})</span>
+              <span>{expandedSections.elements ? '▼' : '▶'}</span>
+            </button>
+            <AnimatePresence>
+              {expandedSections.elements && (
+                <motion.div
+                  variants={expandVariants}
+                  initial="collapsed"
+                  animate="expanded"
+                  exit="collapsed"
+                  className="scene-expand-content"
+                >
+                  <div className="scene-expand-inner">
+                    <div className="scene-elements-list">
+                      {Object.entries(groupedElements).map(([type, typeElements]) => (
+                        <div key={type} className="scene-element-group">
+                          <span className="scene-element-type">
+                            {type}:
+                          </span>
+                          <div className="scene-element-tags">
+                            {typeElements.map(element => (
+                              <motion.div
+                                key={element.id}
+                                whileHover={{ scale: 1.05 }}
+                                onMouseEnter={() => onElementHover(element.id)}
+                                onMouseLeave={() => onElementHover(null)}
+                                className="scene-element-tag"
+                                style={{
+                                  backgroundColor: hoveredElement === element.id ? element.color : `${element.color}20`,
+                                  color: hoveredElement === element.id ? 'white' : element.color,
+                                  borderColor: element.color
+                                }}
+                              >
+                                {element.name}
+                              </motion.div>
+                            ))}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>
+
           {/* Primary Focus Button & Content */}
           <div>
             <button
@@ -216,37 +283,6 @@ export default function SceneCard({
                   <div className="scene-expand-inner">
                     <p className="scene-expand-text">
                       {scene.composition_approach || 'Standard composition'}
-                    </p>
-                  </div>
-                </motion.div>
-              )}
-            </AnimatePresence>
-          </div>
-
-          {/* Description Button & Content */}
-          <div>
-            <button
-              onClick={(e) => {
-                e.stopPropagation();
-                setExpandedSections(prev => ({ ...prev, description: !prev.description }));
-              }}
-              className={`scene-expand-button ${expandedSections.description ? 'expanded' : ''}`}
-            >
-              <span>📝 Description</span>
-              <span>{expandedSections.description ? '▼' : '▶'}</span>
-            </button>
-            <AnimatePresence>
-              {expandedSections.description && scene.natural_description && (
-                <motion.div
-                  variants={expandVariants}
-                  initial="collapsed"
-                  animate="expanded"
-                  exit="collapsed"
-                  className="scene-expand-content"
-                >
-                  <div className="scene-expand-inner">
-                    <p className="scene-expand-text description">
-                      {scene.natural_description}
                     </p>
                   </div>
                 </motion.div>

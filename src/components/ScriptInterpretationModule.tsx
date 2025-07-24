@@ -33,6 +33,9 @@ interface ScriptInterpretationModuleProps {
   onLoadVersionHistory: (phaseId: string) => void
   onLoadVersionContent: (phaseId: string, versionNumber: number) => void
   onShowVersionHistory: (show: boolean) => void
+  // Webhook configuration
+  useProduction: boolean
+  onUseProductionChange: (value: boolean) => void
 }
 
 export default function ScriptInterpretationModule({ 
@@ -55,10 +58,12 @@ export default function ScriptInterpretationModule({
   onLoadPhaseContent,
   onLoadVersionHistory,
   onLoadVersionContent,
-  onShowVersionHistory
+  onShowVersionHistory,
+  // Webhook configuration
+  useProduction,
+  onUseProductionChange
 }: ScriptInterpretationModuleProps) {
   const [isGenerating, setIsGenerating] = useState(false)
-  const [useProduction, setUseProduction] = useState(true)
   const [showRegenerateConfirm, setShowRegenerateConfirm] = useState(false)
 
   // Load existing content and database status on mount
@@ -131,118 +136,118 @@ export default function ScriptInterpretationModule({
 
 
   return (
-    <div className="flex flex-col p-xl">
-      {/* Project Header - Context Information */}
-      <div className="project-header flex justify-between items-center text-sm text-muted">
-        <div>
-          Project: <strong className="text-primary">{projectName}</strong>
+    <div style={{ padding: '0.5rem' }}>
+      {/* 2-Column Layout */}
+      <div style={{ display: 'flex', gap: '1rem' }}>
+        
+        {/* LEFT COLUMN - Information */}
+        <div style={{ flex: 1 }}>
+          {/* Phase Status Info */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', fontSize: '0.875rem', color: '#999', marginBottom: '0.375rem' }}>
+            <span>
+              Phase 1: <strong style={{ color: '#66ccff' }}>Script Interpretation</strong>
+            </span>
+            <span>•</span>
+            <span>
+              Status: <strong className={phase.user_saved ? 'script-status-completed' : 'script-status-progress'}>
+                {phase.user_saved ? 'Completed' : 'In Progress'}
+              </strong>
+            </span>
+            <span>•</span>
+            <span>
+              DB v<strong className={databaseStatus.loaded ? 'script-db-connected' : 'script-db-error'}>
+                {databaseStatus.loaded ? databaseStatus.version : '?'}
+              </strong>
+            </span>
+          </div>
+          
+          {/* Description */}
+          <div style={{ marginBottom: '0.25rem' }}>
+            <p style={{ color: '#cccccc', fontSize: '0.875rem', margin: 0 }}>
+              Generate structured JSON from your storyboard using n8n workflow
+            </p>
+          </div>
+          
+          {/* Status Messages */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', fontSize: '0.875rem' }}>
+            <span className={databaseStatus.error ? 'text-error' : 'text-success'}>
+              {databaseStatus.error ? (
+                <>❌ DB Error</>
+              ) : databaseStatus.loaded ? (
+                <>✅ Connected</>
+              ) : (
+                <>⏳ Loading</>
+              )}
+            </span>
+            
+            {error && (
+              <span className="text-error">❌ {error}</span>
+            )}
+            
+            {hasUnsavedChanges && (
+              <span className="text-warning">⚠️ Unsaved changes</span>
+            )}
+            
+            <span className={useProduction ? 'text-success' : 'text-accent'}>
+              {useProduction ? '🟢 PROD' : '🟣 TEST'}
+            </span>
+            
+            {databaseStatus.loaded && databaseStatus.lastSaved && (
+              <span className="text-muted" style={{ fontSize: '0.75rem' }}>
+                Saved: {new Date(databaseStatus.lastSaved).toLocaleTimeString()}
+              </span>
+            )}
+          </div>
         </div>
-        <div>
-          Phase: <strong className="text-accent">1/5</strong> • 
-          Status: <strong className={phase.user_saved ? 'script-status-completed' : 'script-status-progress'}>
-            {phase.user_saved ? 'Completed' : 'In Progress'}
-          </strong> •
-          DB Version: <strong className={databaseStatus.loaded ? 'script-db-connected' : 'script-db-error'}>
-            {databaseStatus.loaded ? databaseStatus.version : 'Error'}
-          </strong>
-        </div>
-        <div>
-          Webhook: <strong className={useProduction ? 'script-webhook-prod' : 'script-webhook-test'}>
-            {useProduction ? 'Production' : 'Test'}
-          </strong>
-        </div>
-      </div>
-
-      {/* Module Title and Controls */}
-      <div className="flex justify-between items-center mb-2xl">
-        <div>
-          <h2 className="text-primary text-3xl mb-md">
-            📄 Script Interpretation
-          </h2>
-          <p className="text-secondary">
-            Generate structured JSON from your storyboard using n8n workflow
-          </p>
-        </div>
-
-        <div className="flex items-center gap-xl">
-          {/* Webhook environment toggle */}
-          <div className="flex items-center gap-md">
-            <label className="form-label text-sm mb-0">
+        
+        {/* RIGHT COLUMN - Controls */}
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '0.375rem' }}>
+          {/* Production Webhook Toggle */}
+          <div>
+            <label style={{ display: 'flex', alignItems: 'center', fontSize: '0.875rem', color: '#cccccc' }}>
               <input
                 type="checkbox"
                 checked={useProduction}
-                onChange={(e) => setUseProduction(e.target.checked)}
-                className="mr-sm"
+                onChange={(e) => onUseProductionChange(e.target.checked)}
+                style={{ marginRight: '0.375rem' }}
               />
-              Use Production Webhook
+              Production Webhook
             </label>
           </div>
-
-          <button
-            onClick={() => handleGenerateScript()}
-            disabled={isGenerating}
-            className={`btn ${isGenerating ? 'btn-secondary' : 'btn-primary'}`}
-          >
-            {isGenerating ? '⏳ Generating...' : '🚀 Generate Script'}
-          </button>
-
-          <button
-            onClick={onSavePhase}
-            disabled={isSaving || !hasUnsavedChanges || !jsonContent.trim()}
-            className={`btn ${(!hasUnsavedChanges || !jsonContent.trim()) ? 'btn-secondary' : 
-                         isSaving ? 'btn-secondary' : 'btn-success'}`}
-          >
-            {isSaving ? '💾 Saving...' : hasUnsavedChanges ? '💾 Save & Unlock Phase 2' : '✅ Saved'}
-          </button>
-
-          {databaseStatus.version > 0 && (
+          
+          {/* Action Buttons */}
+          <div style={{ display: 'flex', gap: '0.375rem' }}>
             <button
-              onClick={() => {
-                onLoadVersionHistory(phase.id);
-                onShowVersionHistory(true);
-              }}
-              className="btn btn-secondary"
+              onClick={() => handleGenerateScript()}
+              disabled={isGenerating}
+              className={`btn text-xs px-md py-xs ${isGenerating ? 'btn-secondary' : 'btn-primary'}`}
             >
-              📋 Version History
+              {isGenerating ? '⏳ Generating...' : '🚀 Generate'}
             </button>
-          )}
-        </div>
-      </div>
 
-      {/* Database Status */}
-      <div className={`db-status ${databaseStatus.error ? 'db-status-error' : 'db-status-success'}`}>
-        <div>
-          {databaseStatus.error ? (
-            <>❌ Database Error: {databaseStatus.error}</>
-          ) : databaseStatus.loaded ? (
-            <>✅ Database Connected • Version {databaseStatus.version}</>
-          ) : (
-            <>⏳ Loading database status...</>
-          )}
-        </div>
-        {databaseStatus.loaded && databaseStatus.lastSaved && (
-          <div className="text-xs script-last-saved">
-            Last saved: {new Date(databaseStatus.lastSaved).toLocaleString()}
+            <button
+              onClick={onSavePhase}
+              disabled={isSaving || !hasUnsavedChanges || !jsonContent.trim()}
+              className={`btn text-xs px-md py-xs ${(!hasUnsavedChanges || !jsonContent.trim()) ? 'btn-secondary' : 
+                           isSaving ? 'btn-secondary' : 'btn-success'}`}
+            >
+              {isSaving ? '💾 Saving...' : hasUnsavedChanges ? '💾 Save & Unlock' : '✅ Saved'}
+            </button>
+
+            {databaseStatus.version > 0 && (
+              <button
+                onClick={() => {
+                  onLoadVersionHistory(phase.id);
+                  onShowVersionHistory(true);
+                }}
+                className="btn text-xs px-md py-xs btn-secondary"
+              >
+                📋 History
+              </button>
+            )}
           </div>
-        )}
-      </div>
-
-      {/* Error messages */}
-      {error && (
-        <div className="db-status db-status-error mb-xl">
-          ❌ {error}
         </div>
-      )}
-
-      {hasUnsavedChanges && (
-        <div className="status-badge status-warning mb-xl script-unsaved-warning">
-          ⚠️ You have unsaved changes
-        </div>
-      )}
-
-      {/* Environment indicator */}
-      <div className={`env-indicator ${useProduction ? 'env-production' : 'env-test'}`}>
-        {useProduction ? '🟢 PRODUCTION' : '🟣 TEST'} webhook environment
+        
       </div>
 
       {/* n8n Loading Modal */}

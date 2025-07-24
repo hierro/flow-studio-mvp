@@ -24,6 +24,9 @@ export default function ProjectDetailPage({ user }: ProjectDetailPageProps) {
   const [versionHistory, setVersionHistory] = useState<PhaseVersion[]>([])
   const [loadingVersions, setLoadingVersions] = useState(false)
 
+  // Webhook configuration state (moved from ScriptInterpretationModule)
+  const [useProduction, setUseProduction] = useState(true)
+
   // Content management state (moved from ScriptInterpretationModule)
   const [jsonContent, setJsonContent] = useState('')
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false)
@@ -352,78 +355,105 @@ export default function ProjectDetailPage({ user }: ProjectDetailPageProps) {
     }
   }
 
+  const renderProjectStatusBar = () => {
+    if (!project) return null
+
+    const completedPhases = phases.filter(p => p.user_saved).length
+    const currentPhaseData = phases.find(p => p.phase_name === selectedPhase)
+
+    return (
+      <div className="project-header flex justify-between items-center text-sm text-muted mb-xl">
+        <div>
+          Project: <strong className="text-primary">{project.name}</strong>
+        </div>
+        <div>
+          Client: <strong className="text-accent">{project.project_metadata?.client || 'Unknown Client'}</strong> •
+          Progress: <strong className="text-success">{completedPhases}/5 phases completed</strong>
+        </div>
+        <div>
+          {currentPhaseData && (
+            <>Current: <strong className="text-accent">Phase {currentPhaseData.phase_index}</strong></>
+          )}
+        </div>
+      </div>
+    )
+  }
+
   const renderPhaseContent = () => {
     const selectedPhaseData = phases.find(p => p.phase_name === selectedPhase)
     if (!selectedPhaseData || !project) return null
 
-    // Render specific phase modules
-    if (selectedPhase === 'script_interpretation') {
-      return (
-        <ScriptInterpretationModule
-          phase={selectedPhaseData}
-          projectId={project.id}
-          projectName={project.name}
-          onContentChange={loadProject}
-          // Content management props
-          jsonContent={jsonContent}
-          hasUnsavedChanges={hasUnsavedChanges}
-          isSaving={isSaving}
-          error={error}
-          databaseStatus={databaseStatus}
-          showVersionHistory={showVersionHistory}
-          versionHistory={versionHistory}
-          loadingVersions={loadingVersions}
-          // Content management functions
-          onJsonChange={handleJsonChange}
-          onSavePhase={handleSavePhase}
-          onLoadPhaseContent={loadPhaseContent}
-          onLoadVersionHistory={loadVersionHistory}
-          onLoadVersionContent={loadVersionContent}
-          onShowVersionHistory={setShowVersionHistory}
-        />
-      )
-    }
-
-    // Placeholder for other phases
     return (
       <div className="phase-content-container">
-        <div className="phase-content-header">
-          <div>
-            <h2 className="phase-content-title">
-              {getPhaseIcon(selectedPhaseData.phase_name)} {getPhaseDisplayName(selectedPhaseData.phase_name)}
-            </h2>
-            <div className="phase-content-meta">
-              <span>Phase {selectedPhaseData.phase_index} of 5</span>
-              <span className="phase-status" style={{
-                background: getPhaseStatusColor(selectedPhaseData)
-              }}>
-                {getPhaseStatusText(selectedPhaseData)}
-              </span>
-            </div>
-          </div>
-        </div>
-
-        <div className="phase-placeholder">
-          <div className="phase-placeholder-content">
-            <div className="phase-placeholder-icon">
-              {getPhaseIcon(selectedPhaseData.phase_name)}
-            </div>
-            <h3 className="phase-placeholder-title">
-              {getPhaseDisplayName(selectedPhaseData.phase_name)} Module
-            </h3>
-            <p className="phase-placeholder-description">
-              This phase module will be implemented next. It will handle the {selectedPhaseData.phase_name.replace('_', ' ')} 
-              workflow including n8n integration, content generation, and user approval interface.
-            </p>
-            {selectedPhaseData.can_proceed && !selectedPhaseData.user_saved && (
+        {/* Phase-specific module content */}
+        {selectedPhase === 'script_interpretation' ? (
+          <ScriptInterpretationModule
+            phase={selectedPhaseData}
+            projectId={project.id}
+            projectName={project.name}
+            onContentChange={loadProject}
+            // Content management props
+            jsonContent={jsonContent}
+            hasUnsavedChanges={hasUnsavedChanges}
+            isSaving={isSaving}
+            error={error}
+            databaseStatus={databaseStatus}
+            showVersionHistory={showVersionHistory}
+            versionHistory={versionHistory}
+            loadingVersions={loadingVersions}
+            // Content management functions
+            onJsonChange={handleJsonChange}
+            onSavePhase={handleSavePhase}
+            onLoadPhaseContent={loadPhaseContent}
+            onLoadVersionHistory={loadVersionHistory}
+            onLoadVersionContent={loadVersionContent}
+            onShowVersionHistory={setShowVersionHistory}
+            // Webhook configuration
+            useProduction={useProduction}
+            onUseProductionChange={setUseProduction}
+          />
+        ) : (
+          // Placeholder for other phases
+          <div className="phase-content-container">
+            <div className="phase-content-header">
               <div>
-                <button className="phase-start-button">
-                  Start {getPhaseDisplayName(selectedPhaseData.phase_name)}
-                </button>
+                <h2 className="phase-content-title">
+                  {getPhaseIcon(selectedPhaseData.phase_name)} {getPhaseDisplayName(selectedPhaseData.phase_name)}
+                </h2>
+                <div className="phase-content-meta">
+                  <span>Phase {selectedPhaseData.phase_index} of 5</span>
+                  <span className="phase-status" style={{
+                    background: getPhaseStatusColor(selectedPhaseData)
+                  }}>
+                    {getPhaseStatusText(selectedPhaseData)}
+                  </span>
+                </div>
               </div>
-            )}
+            </div>
+
+            <div className="phase-placeholder">
+              <div className="phase-placeholder-content">
+                <div className="phase-placeholder-icon">
+                  {getPhaseIcon(selectedPhaseData.phase_name)}
+                </div>
+                <h3 className="phase-placeholder-title">
+                  {getPhaseDisplayName(selectedPhaseData.phase_name)} Module
+                </h3>
+                <p className="phase-placeholder-description">
+                  This phase module will be implemented next. It will handle the {selectedPhaseData.phase_name.replace('_', ' ')} 
+                  workflow including n8n integration, content generation, and user approval interface.
+                </p>
+                {selectedPhaseData.can_proceed && !selectedPhaseData.user_saved && (
+                  <div>
+                    <button className="phase-start-button">
+                      Start {getPhaseDisplayName(selectedPhaseData.phase_name)}
+                    </button>
+                  </div>
+                )}
+              </div>
+            </div>
           </div>
-        </div>
+        )}
       </div>
     )
   }
@@ -517,10 +547,21 @@ export default function ProjectDetailPage({ user }: ProjectDetailPageProps) {
       {/* Main content area */}
       <div className="project-main-content">
         
-        {/* AREA 1: GLOBAL PROJECT NAVIGATION */}
+        {/* Project Status Bar - Horizontal span above all areas (Phase Agnostic) */}
+        {renderProjectStatusBar()}
+        
+        {/* AREA 1: PHASE-SPECIFIC CONTENT (Reordered to first position) */}
         <div className="project-area project-area-1">
           <div className="project-area-header area-header-1">
-            🧭 AREA 1: GLOBAL NAVIGATION (4 TABS)
+            🔧 AREA 1: PHASE CONTENT
+          </div>
+          {renderPhaseContent()}
+        </div>
+
+        {/* AREA 2: NAVIGATION BAR (Reordered to second position) */}
+        <div className="project-area project-area-2">
+          <div className="project-area-header area-header-2">
+            🧭 AREA 2: NAVIGATION BAR (4 TABS)
           </div>
           <ProjectViewNavigation 
             activeView={selectedView} 
@@ -528,18 +569,10 @@ export default function ProjectDetailPage({ user }: ProjectDetailPageProps) {
           />
         </div>
 
-        {/* AREA 2: PHASE-SPECIFIC CONTENT */}
-        <div className="project-area project-area-2">
-          <div className="project-area-header area-header-2">
-            🔧 AREA 2: PHASE-SPECIFIC CONTROLS & STATUS
-          </div>
-          {renderPhaseContent()}
-        </div>
-
-        {/* AREA 3: VIEW CONTENT */}
+        {/* AREA 3: CONTENT AREA (Reordered to third position) */}
         <div className="project-area project-area-3">
           <div className="project-area-header area-header-3">
-            📄 AREA 3: VIEW CONTENT (JSON | TIMELINE | ELEMENTS | STYLE)
+            📄 AREA 3: CONTENT AREA (JSON | TIMELINE | ELEMENTS | STYLE)
           </div>
           {renderViewContent()}
         </div>

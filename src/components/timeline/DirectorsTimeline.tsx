@@ -104,6 +104,9 @@ export default function DirectorsTimeline({
             <h2 className="timeline-project-title" style={{ fontSize: '1.25rem', marginBottom: '2px' }}>
               {projectName}
             </h2>
+            <div style={{ fontSize: '1rem', color: '#66ccff', marginBottom: '8px', fontWeight: '500' }}>
+              Script: {timelineData.project_info.title}
+            </div>
             <div style={{ 
               display: 'flex',
               alignItems: 'center',
