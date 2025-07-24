@@ -14,7 +14,8 @@
       "Bash(npm install:*)",
       "Bash(npm uninstall tailwindcss postcss autoprefixer)",
       "Bash(npm run lint)",
-      "Bash(npx tsc:*)"
+      "Bash(npx tsc:*)",
+      "Bash(timeout 5 npm run dev)"
     ],
     "deny": []
   }
