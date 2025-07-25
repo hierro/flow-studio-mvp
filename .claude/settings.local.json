@@ -17,7 +17,8 @@
       "Bash(npx tsc:*)",
       "Bash(timeout 5 npm run dev)",
       "Bash(psql:*)",
-      "Bash(node:*)"
+      "Bash(node:*)",
+      "Bash(mkdir:*)"
     ],
     "deny": []
   }

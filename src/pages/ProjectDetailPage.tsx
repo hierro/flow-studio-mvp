@@ -2,10 +2,10 @@ import { useState, useEffect, useCallback } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { getProject, getProjectPhases, getMasterJSON, saveMasterJSON, saveMasterJSONFromObject, updateMasterJSON, getProjectVersions, getProjectVersion } from '../lib/database'
 import type { Project, ProjectPhase, PhaseName, ProjectVersion } from '../types/project'
-import ScriptInterpretationModule from '../components/ScriptInterpretationModule'
-import ProjectViewNavigation from '../components/ProjectViewNavigation'
+import ScriptInterpretationModule from '../components/phases/ScriptInterpretationModule'
+import Navigation from '../components/common/Navigation'
 import DirectorsTimeline from '../components/timeline/DirectorsTimeline'
-import StyleControl from '../components/timeline/StyleControl'
+import StyleControl from '../components/global/StyleControl'
 import { PhaseCompletion } from '../utils/PhaseCompletion'
 import { BackupManager } from '../utils/BackupManager'
 
@@ -638,7 +638,7 @@ export default function ProjectDetailPage({ user }: ProjectDetailPageProps) {
           <div className="project-area-header area-header-1">
             🧭 AREA 1: NAVIGATION BAR (4 TABS)
           </div>
-          <ProjectViewNavigation 
+          <Navigation 
             activeView={selectedView} 
             onViewChange={setSelectedView}
             masterJSON={masterJSON}
