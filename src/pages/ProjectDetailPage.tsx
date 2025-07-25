@@ -6,6 +6,7 @@ import ScriptInterpretationModule from '../components/phases/ScriptInterpretatio
 import Navigation from '../components/common/Navigation'
 import DirectorsTimeline from '../components/timeline/DirectorsTimeline'
 import StyleControl from '../components/global/StyleControl'
+import ConfigurationTab from '../components/admin/ConfigurationTab'
 import { PhaseCompletion } from '../utils/PhaseCompletion'
 import { BackupManager } from '../utils/BackupManager'
 
@@ -19,7 +20,7 @@ export default function ProjectDetailPage({ user }: ProjectDetailPageProps) {
   const [project, setProject] = useState<Project | null>(null)
   const [phases, setPhases] = useState<ProjectPhase[]>([])
   const [selectedPhase, setSelectedPhase] = useState<PhaseName | null>(null)
-  const [selectedView, setSelectedView] = useState<'json' | 'timeline' | 'elements' | 'style'>('timeline')
+  const [selectedView, setSelectedView] = useState<'json' | 'timeline' | 'elements' | 'style' | 'config'>('timeline')
   const [loading, setLoading] = useState(true)
   
   // Master JSON management state
@@ -233,11 +234,11 @@ export default function ProjectDetailPage({ user }: ProjectDetailPageProps) {
 
   const getPhaseDisplayName = (phaseName: PhaseName): string => {
     const names: Record<PhaseName, string> = {
-      script_interpretation: 'Script Interpretation',
-      element_images: 'Element Images',
-      scene_generation: 'Scene Generation',
-      scene_videos: 'Scene Videos',
-      final_assembly: 'Final Assembly'
+      script_interpretation: 'Script Rendering',
+      element_images: 'Elements Creation',
+      scene_generation: 'Scene Start Frame',
+      scene_videos: 'Scene Video',
+      final_assembly: 'Assembly'
     }
     return names[phaseName] || phaseName
   }
@@ -402,6 +403,9 @@ export default function ProjectDetailPage({ user }: ProjectDetailPageProps) {
             <p><em>Complete Phase 1 first to access style controls</em></p>
           </div>
         )
+
+      case 'config':
+        return <ConfigurationTab />
 
       default:
         return null
@@ -646,12 +650,14 @@ export default function ProjectDetailPage({ user }: ProjectDetailPageProps) {
         </div>
 
         {/* AREA 2: PHASE-SPECIFIC CONTENT (Second position) */}
-        <div className="project-area project-area-2">
-          <div className="project-area-header area-header-2">
-            🔧 AREA 2: PHASE CONTENT
+        {selectedView !== 'config' && (
+          <div className="project-area project-area-2">
+            <div className="project-area-header area-header-2">
+              🔧 AREA 2: PHASE CONTENT
+            </div>
+            {renderPhaseContent()}
           </div>
-          {renderPhaseContent()}
-        </div>
+        )}
 
         {/* AREA 3: CONTENT AREA (Third position) */}
         <div className="project-area project-area-3">

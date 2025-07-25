@@ -11,8 +11,8 @@
 import React from 'react'
 
 interface ProjectViewNavigationProps {
-  activeView: 'json' | 'timeline' | 'elements' | 'style';
-  onViewChange: (view: 'json' | 'timeline' | 'elements' | 'style') => void;
+  activeView: 'json' | 'timeline' | 'elements' | 'style' | 'config';
+  onViewChange: (view: 'json' | 'timeline' | 'elements' | 'style' | 'config') => void;
   masterJSON?: any; // For unlock logic
 }
 
@@ -26,7 +26,8 @@ export default function ProjectViewNavigation({
     { id: 'json', label: 'JSON', icon: '{ }', description: 'Raw data view' },
     { id: 'timeline', label: 'Timeline', icon: '📊', description: 'Visual timeline interface' },
     { id: 'elements', label: 'Elements', icon: '🎭', description: 'Element management (Phase 2+)' },
-    { id: 'style', label: 'Style', icon: '🎨', description: 'Global style control' }
+    { id: 'style', label: 'Style', icon: '🎨', description: 'Global style control' },
+    { id: 'config', label: 'Config', icon: '⚙️', description: 'LLM configuration (Admin)' }
   ] as const;
 
   // Check if Phase 1 JSON generation is complete (has scenes)

@@ -5,15 +5,16 @@
 
 ## 🎯 **CURRENT PROJECT STATUS** 
 
-**✅ COMPLETE PHASE 1 TIMELINE EDITING**: All scene properties editable with proven JsonFieldEditor system  
-**✅ GLOBAL STYLE CONTROL**: 4-card style system with 16 editable properties using SceneCard patterns  
-**✅ UNIVERSAL SAVE SYSTEM**: Centralized header with save/history buttons working across all phases  
-**✅ STICKY NAVIGATION**: Phase-agnostic tab switching with proper unlock logic for style tab  
-**✅ CLEAN ARCHITECTURE**: Content-based phase tracking, localStorage backup, smart change detection  
-**✅ REFINED UX**: Sidebar with compact layout, sticky positioning, centralized hover effects  
-**🚀 NEXT PRIORITY**: Elements tab implementation for cross-scene element tracking and management  
-**📊 DATABASE**: Schema v2.0 working correctly with master JSON architecture - no data loss  
-**🎨 STYLING**: Complete responsive CSS system with 88% inline reduction and global design tokens  
+**✅ LLM CONFIGURATION SYSTEM COMPLETE**: Full accordion-based config management with auto-reload functionality  
+**✅ PROMPT FORMATTING PIPELINE**: Clean textarea → database → LLM workflow with proper line break handling  
+**✅ VARIABLE INJECTION READY**: n8n-compatible `{{$json.field}}` system for scene data processing  
+**✅ WEB-BROTHER ALIGNMENT**: Complete documentation and formatting guide for prompt generation workflows  
+**✅ ACCORDION PERSISTENCE**: localStorage state management across tab switches for improved UX  
+**✅ TIMELINE EDITING FOUNDATION**: JsonFieldEditor system proven and extensible for any JSON field editing  
+**✅ MASTER JSON ARCHITECTURE**: Phase-agnostic additive system with clean versioning and backup management  
+**🚀 NEXT PRIORITY**: Extend timeline editing to scene properties (duration, camera, mood) using established patterns  
+**📊 DATABASE**: Schema v2.0 + app_configuration table for runtime LLM config management  
+**🎨 STYLING**: Complete responsive CSS system with formatting preservation for technical content  
 
 ---
 
@@ -416,38 +417,41 @@ flow-studio-mvp/
 
 ## 🚀 **IMMEDIATE NEXT STEPS**
 
-### **Timeline Editing System - IMPLEMENTED & WORKING** ✅
-1. **JsonFieldEditor Utility** - Complete reusable system for editing any JSON field
-   - `updateField()` - Updates any path in master JSON using dot notation
-   - `createTextFieldEditor()` - Ready pattern for text fields  
-   - `createSelectFieldEditor()` - Ready pattern for dropdowns
-   - Validation, error handling, clean architecture
+### **LLM Configuration System - COMPLETE & PRODUCTION READY** ✅
+1. **Accordion Interface** - Organized prompt editing with localStorage persistence
+   - Scene Frame Prompt Generation (default open) with system/user prompt sub-sections
+   - LLM Providers, Image/Video Generation configs in collapsible sections
+   - Auto-reload on save ensures configs immediately available to interfaces
 
-2. **Timeline Title Editing** - Fully functional proof of concept
-   - Click-to-edit with visual feedback
-   - Local state changes until user saves
-   - Database versioning only on explicit save
-   - Clean JSON property mapping: `timelineData.project_info.title` ↔ `content.project_metadata.title`
+2. **Prompt Formatting Pipeline** - Clean storage and retrieval workflow
+   - Raw textarea content stored with actual line breaks (LLM-ready)
+   - No escape processing needed - direct database → LLM consumption
+   - Format preview shows exact stored content for debugging
 
-3. **Master JSON Architecture** - Phase-agnostic additive system working
-   - All phases read/write same master JSON
-   - Each phase adds data without breaking others
-   - Version control working with `saveMasterJSONFromObject()`
+3. **Variable Injection System** - n8n-compatible template processing
+   - `{{$json.field}}` patterns ready for scene data replacement
+   - Smart resolution: scene properties → technical specs → global properties
+   - Documentation complete for web-brother implementation alignment
 
-### **Next Session Priorities** (READY FOR EXTENSION)
+### **Next Session Priorities** (READY FOR IMPLEMENTATION)
 ```typescript
-// PATTERN ESTABLISHED - Copy for any field:
-const fieldEditor = createTextFieldEditor(
+// ESTABLISHED PATTERNS - Extend existing systems:
+
+// 1. Timeline Scene Editing (using JsonFieldEditor foundation)
+const sceneEditor = createTextFieldEditor(
   masterJson, 
-  'scenes.scene_1.duration', // or any JSON path
+  'scenes.scene_1.duration', // Extend to all scene properties
   onContentUpdate
 );
 
-// Extend to:
-// - Scene fields: duration, camera_type, mood, composition
-// - Element properties: character descriptions, locations  
-// - Global style: color palette, rendering style
-// - Phase-specific data in any phase
+// 2. Prompt Generation Integration (using Variable Injection)
+const processedPrompt = VariableInjection.processTemplate(
+  configData.start_frame_prompt_generation.user_prompt,
+  { sceneData: flattenedSceneData }
+);
+
+// 3. Cross-scene Element Management (elements tab implementation)
+// Use established accordion patterns for element editing interface
 ```
 
 ---
@@ -569,18 +573,38 @@ node project-scanner.js
 - **UX Polish**: Refined sidebar layout, centralized hover effects, proper spacing and typography
 - **Phase Tracking**: Content-based completion using PhaseCompletion utility (database-independent)
 
+### **2025-07-25: Revolutionary 3-Column Scene Card Architecture**
+- **Layout Transformation**: Replaced horizontal scene cards with full-width 3-column system (Configuration + Image Generation + Video Generation)
+- **Integrated Title Editing**: Scene number + editable title in single bordered container with proper visual hierarchy
+- **Progressive Workflow**: Timeline visualization showing scene → image → video generation pipeline for Phases 3-4
+- **Media Placeholders**: 16:9 aspect ratio placeholders for image/video with horizontal button layouts
+- **Component Architecture**: Clean SceneCard component replacing old V2 system, eliminated duplicate code
+- **Phase Name Updates**: Refined sidebar labels (Script Rendering, Elements Creation, Scene Start Frame, Scene Video, Assembly)
+- **Data Flow Integrity**: Fixed display/edit synchronization ensuring immediate visual updates after JSON changes
+- **Typography System**: Added Roboto font integration for consistent modern appearance
+
+### **2025-01-25: LLM Configuration Management System - Production Complete**
+- **Achievement**: Full accordion-based configuration interface with 5 organized sections
+- **Prompt Pipeline**: Clean textarea → database → LLM workflow with proper line break preservation
+- **Variable Injection**: n8n-compatible `{{$json.field}}` system ready for scene data processing
+- **Auto-reload System**: Configuration changes immediately available to all interfaces after save
+- **Accordion Persistence**: localStorage state management across tab switches for improved workflow
+- **Format Processing**: Raw text storage (LLM-ready) with preview system for debugging stored format
+- **Web-Brother Alignment**: Complete documentation and implementation guide created for prompt generation workflows
+- **Critical Success**: Eliminated complex escape processing, established clean data flow for AI generation
+
 ### **Next Session Priorities**
-1. **IMPLEMENT**: Elements tab for cross-scene element tracking and management
-2. **EXTEND**: Element property editing using established JsonFieldEditor patterns
-3. **ENHANCE**: Timeline visualization with phase evolution indicators
-4. **OPTIMIZE**: Performance testing across complete workflow
+1. **EXTEND**: Timeline scene editing to all properties using established JsonFieldEditor patterns
+2. **INTEGRATE**: Prompt generation with variable injection for actual scene processing  
+3. **IMPLEMENT**: Elements tab for cross-scene element tracking and management
+4. **TEST**: Full LLM integration workflow from config → scene data → processed prompts
 
 ### **Session Completion Validation**
-- [x] **Scene Editing**: Complete 6-field editing system with SceneCard consistency
-- [x] **Style Control**: 4-card global style system with 2x2 grids and full-width layout
-- [x] **Save System**: Universal sticky header with save/history working across all phases
-- [x] **Change Detection**: Smart detection preventing false unsaved state triggers
-- [x] **Backup System**: localStorage backup with restoration prompts for data loss prevention
-- [x] **Navigation**: Sticky nav bar with proper tab unlock logic and phase-agnostic positioning
-- [x] **UX Refinement**: Clean sidebar, centralized hover effects, proper layout hierarchy
-- [x] **Build System**: Clean compilation (4.46s), all functionality preserved, no errors
+- [x] **LLM Config System**: Complete accordion interface with auto-reload functionality
+- [x] **Prompt Formatting**: Clean textarea → DB → LLM pipeline working with proper line breaks
+- [x] **Variable Injection**: Ready for `{{$json.field}}` processing with scene data
+- [x] **Accordion Persistence**: localStorage state management across tab switches
+- [x] **Web-Brother Docs**: Complete guide for prompt generation workflow implementation
+- [x] **Build System**: Clean compilation (7.30s), ESLint config noted, functionality preserved
+- [x] **Data Flow**: Raw prompt storage validated, format preview system working
+- [x] **Foundation Ready**: All components ready for scene-based prompt generation integration

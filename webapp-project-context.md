@@ -1,6 +1,6 @@
 FLOW STUDIO MVP - COMPLETE WORKING PATTERNS FOR CLAUDE WEB
 =========================================================
-Generated: 2025-07-25T18:11:03.512Z
+Generated: 2025-07-25T21:14:26.208Z
 Purpose: Show actual working code for proper development planning and suggestions
 
 ## CURRENT STATUS & CRITICAL INSIGHT
@@ -313,75 +313,7 @@ export interface ScriptInterpretationContent {
 
 ### 5. PHASE 1 IMPLEMENTATION (src/components/ScriptInterpretationModule.tsx) - FOUNDATION ✅
 ```typescript
-import { useState, useEffect } from 'react'
-import type { ProjectPhase, ProjectVersion } from '../types/project'
-
-// Webhook configuration (test vs production)
-const WEBHOOK_CONFIG = {
-  test: 'https://azoriusdrake.app.n8n.cloud/webhook-test/4b4638e1-47de-406f-8ef7-136d49bc9bc1',
-  production: 'https://azoriusdrake.app.n8n.cloud/webhook/4b4638e1-47de-406f-8ef7-136d49bc9bc1'
-}
-
-interface ScriptInterpretationModuleProps {
-  phase: ProjectPhase
-  projectId: string
-  projectName: string
-  onContentChange: () => void
-  // Content management props
-  jsonContent: string
-  hasUnsavedChanges: boolean
-  isSaving: boolean
-  error: string
-  databaseStatus: {
-    loaded: boolean;
-    version: number;
-    lastSaved?: string;
-    error?: string;
-  }
-  showVersionHistory: boolean
-  versionHistory: ProjectVersion[]
-  loadingVersions: boolean
-  // Content management functions
-  onJsonChange: (value: string) => void
-  onSavePhase: () => void
-  onLoadPhaseContent: (phaseId: string) => void
-  onLoadVersionHistory: () => void
-  onLoadVersionContent: (versionNumber: number) => void
-  onShowVersionHistory: (show: boolean) => void
-  // Webhook configuration
-  useProduction: boolean
-  onUseProductionChange: (value: boolean) => void
-}
-
-export default function ScriptInterpretationModule({ 
-  phase, 
-  projectId, 
-  projectName,
-  onContentChange,
-  // Content management props
-  jsonContent,
-  hasUnsavedChanges,
-  isSaving,
-  error,
-  databaseStatus,
-  showVersionHistory,
-  versionHistory,
-  loadingVersions,
-  // Content management functions
-  onJsonChange,
-  onSavePhase,
-  onLoadPhaseContent,
-  onLoadVersionHistory,
-  onLoadVersionContent,
-  onShowVersionHistory,
-  // Webhook configuration
-  useProduction,
-  onUseProductionChange
-}: ScriptInterpretationModuleProps) {
-  const [isGenerating, setIsGenerating] = useState(false)
-  const [showRegenerateConfirm, setShowRegenerateConfirm] = useState(false)
-
-  // Load existing content 
+// Error reading file: ENOENT: no such file or directory, open 'C:\_REPO_\flow-studio-mvp\src\components\ScriptInterpretationModule.tsx'
 ```
 
 ## DATABASE SCHEMA (DEPLOYED & WORKING)
@@ -493,6 +425,8 @@ Transform traditional frame-by-frame tools into story intelligence system:
  * Responsive, scalable design system with CSS variables
  */
 
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap');
+
 /* ============================================
    CSS VARIABLES - DESIGN TOKENS
    ============================================ */
@@ -555,9 +489,7 @@ Transform traditional frame-by-frame tools into story intelligence system:
 
   /* Shadows */
   --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.1);
-  --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.1);
-  --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.1);
-  --shadow-focus: 0 0 0 2px 
+  --shadow-md: 0 4px 6px 
 ```
 
 ### CSS Architecture Achievements:

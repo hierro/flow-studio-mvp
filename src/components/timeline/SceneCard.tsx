@@ -1,14 +1,15 @@
 /**
- * SceneCard - Individual scene visualization for DirectorsTimeline
+ * SceneCard - 3-Column Layout for Scene Cards
  * 
- * Simplified display-only component showing scene info with expandable content.
- * No complex editing system - clean visualization for timeline view.
+ * Complete scene card with narrow top row + 3 columns (config, image, video)
+ * Includes title editing, field editing, and media generation placeholders
  */
 
 import { motion, AnimatePresence } from 'framer-motion';
 import { useState } from 'react';
 import { TimelineScene, TimelineElement } from '../../utils/TimelineParser';
 import { createTextFieldEditor, createSelectFieldEditor } from '../../utils/JsonFieldEditor';
+import placeholderImage from '../../assets/16-9placeholder.png';
 
 interface SceneCardProps {
   scene: TimelineScene;
@@ -65,6 +66,7 @@ export default function SceneCard({
 
   // Scene field paths
   const sceneFieldPaths = {
+    title: `scenes.scene_${scene.scene_id}.title`,
     camera_type: `scenes.scene_${scene.scene_id}.camera_type`,
     mood: `scenes.scene_${scene.scene_id}.mood`,
     dialogue: `scenes.scene_${scene.scene_id}.dialogue`,
@@ -73,16 +75,13 @@ export default function SceneCard({
     composition_approach: `scenes.scene_${scene.scene_id}.composition_approach`
   };
 
-  // Removed camera type options - using text input instead
-
-  // Editable field renderer
+  // Editable field renderer (same as original)
   const renderEditableField = (currentValue: string, label: string, fieldKey: string, fieldType: 'text' | 'textarea' | 'select' = 'text', options?: string[]) => {
     const isEditing = editingField === fieldKey;
     const fieldPath = sceneFieldPaths[fieldKey as keyof typeof sceneFieldPaths];
     const fieldEditor = createFieldEditor(fieldPath, fieldType === 'select' ? 'select' : 'text', options);
     
     if (!fieldEditor || !masterJson || !onSceneEdit) {
-      // Fallback to display-only if no editing capability
       return (
         <div className="scene-field-row">
           <strong className="scene-field-label">{label}:</strong>
@@ -99,23 +98,7 @@ export default function SceneCard({
         <div className="scene-field-value-area">
           {isEditing ? (
             <div className="scene-field-edit-container">
-              {fieldType === 'select' && options ? (
-                <select
-                  value={fieldValues[fieldKey] ?? fieldEditor.currentValue}
-                  onChange={(e) => {
-                    const newValue = e.target.value;
-                    setFieldValues(prev => ({ ...prev, [fieldKey]: newValue }));
-                    fieldEditor.updateValue(newValue);
-                  }}
-                  onBlur={() => setEditingField(null)}
-                  className="scene-field-select"
-                  autoFocus
-                >
-                  {options.map(option => (
-                    <option key={option} value={option}>{option}</option>
-                  ))}
-                </select>
-              ) : fieldType === 'textarea' ? (
+              {fieldType === 'textarea' ? (
                 <textarea
                   value={fieldValues[fieldKey] ?? fieldEditor.currentValue}
                   onChange={(e) => {
@@ -124,7 +107,6 @@ export default function SceneCard({
                   }}
                   onBlur={() => {
                     const finalValue = fieldValues[fieldKey] ?? fieldEditor.currentValue;
-                    // JsonFieldEditor will handle change detection - only updates if value actually changed
                     fieldEditor.updateValue(finalValue);
                     setEditingField(null);
                   }}
@@ -136,7 +118,6 @@ export default function SceneCard({
                       });
                       setEditingField(null);
                     }
-                    // Allow Enter for new lines in textarea
                   }}
                   className="scene-field-textarea"
                   autoFocus
@@ -152,14 +133,12 @@ export default function SceneCard({
                   }}
                   onBlur={() => {
                     const finalValue = fieldValues[fieldKey] ?? fieldEditor.currentValue;
-                    // JsonFieldEditor will handle change detection - only updates if value actually changed
                     fieldEditor.updateValue(finalValue);
                     setEditingField(null);
                   }}
                   onKeyDown={(e) => {
                     if (e.key === 'Enter') {
                       const finalValue = fieldValues[fieldKey] ?? fieldEditor.currentValue;
-                      // JsonFieldEditor will handle change detection - only updates if value actually changed
                       fieldEditor.updateValue(finalValue);
                       setEditingField(null);
                     }
@@ -194,14 +173,83 @@ export default function SceneCard({
     );
   };
 
-  // Legacy display field for non-editable fields
-  const renderDisplayField = (value: string, label: string) => {
-    return (
-      <div className="scene-field-row">
-        <strong className="scene-field-label">{label}:</strong>
-        <div className="scene-field-value-area">
-          {value || `No ${label.toLowerCase()}`}
+  // Custom title renderer with scene number
+  const renderTitleWithSceneNumber = (currentValue: string, sceneId: string) => {
+    const isEditing = editingField === 'title';
+    const fieldPath = sceneFieldPaths.title;
+    const fieldEditor = createFieldEditor(fieldPath, 'text');
+    
+    if (!fieldEditor || !masterJson || !onSceneEdit) {
+      return (
+        <div className="scene-title-with-number">
+          <span className="scene-number-part">Scene {sceneId}:</span>
+          <span className="scene-title-part">{currentValue || 'Untitled'}</span>
         </div>
+      );
+    }
+
+    return (
+      <div className="scene-title-with-number">
+        <span className="scene-number-part">Scene {sceneId}:</span>
+        {isEditing ? (
+          <input
+            type="text"
+            value={fieldValues.title ?? currentValue ?? 'Untitled'}
+            onChange={(e) => {
+              const newValue = e.target.value;
+              setFieldValues(prev => ({ ...prev, title: newValue }));
+            }}
+            onBlur={() => {
+              const finalValue = fieldValues.title ?? currentValue;
+              if (finalValue !== currentValue) {
+                fieldEditor.updateValue(finalValue);
+              }
+              setEditingField(null);
+              // Clear the local field value after saving
+              setFieldValues(prev => {
+                const { title: _, ...rest } = prev;
+                return rest;
+              });
+            }}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter') {
+                const finalValue = fieldValues.title ?? currentValue;
+                if (finalValue !== currentValue) {
+                  fieldEditor.updateValue(finalValue);
+                }
+                setEditingField(null);
+                // Clear the local field value after saving
+                setFieldValues(prev => {
+                  const { title: _, ...rest } = prev;
+                  return rest;
+                });
+              }
+              if (e.key === 'Escape') {
+                // Cancel editing - revert to original value without saving
+                setFieldValues(prev => {
+                  const { title: _, ...rest } = prev;
+                  return rest;
+                });
+                setEditingField(null);
+              }
+            }}
+            className="scene-title-input"
+            autoFocus
+          />
+        ) : (
+          <span 
+            className="scene-title-part editable-field"
+            onClick={(e) => {
+              e.stopPropagation();
+              setEditingField('title');
+              // Store the current displayed value for editing
+              setFieldValues(prev => ({ ...prev, title: currentValue || 'Untitled' }));
+            }}
+            title="Click to edit title"
+          >
+            {currentValue || 'Untitled'}
+          </span>
+        )}
       </div>
     );
   };
@@ -251,173 +299,258 @@ export default function SceneCard({
       className="timeline-scene-card rounded-lg border overflow-hidden cursor-pointer"
       onClick={onSelect}
     >
-      {/* Scene Header */}
-      <div className="scene-card-content">
-        <div className="scene-card-header">
-          <span className="scene-badge">
-            Scene {scene.scene_id}
-          </span>
-          <span className="scene-duration">
-            {scene.duration}
-          </span>
+      {/* NEW: Narrow Top Row - Title with Scene Number, Duration (right aligned) */}
+      <div className="scene-top-row">
+        <div className="scene-title-container">
+          {renderTitleWithSceneNumber(
+            masterJson && createFieldEditor(sceneFieldPaths.title, 'text')?.currentValue || scene.title || '', 
+            scene.scene_id
+          )}
         </div>
-
-        {/* Action Summary (Main Title) */}
-        <h3 className="scene-title">
-          {scene.title}
-        </h3>
-
-        {/* Scene Primary Fields - Individual bordered fields */}
-        {renderEditableField(scene.camera_type || '', 'Camera', 'camera_type')}
-        {renderEditableField(scene.mood || '', 'Mood', 'mood')}
-        {renderEditableField(scene.dialogue || '', 'Speech', 'dialogue')}
-
-        {/* Individual Expandable Sections - REORDERED: description, primary focus, composition, elements */}
-        <div className="scene-expandable-sections">
-          {/* Description Button & Content */}
-          <div>
-            <button
-              onClick={(e) => {
-                e.stopPropagation();
-                setExpandedSections(prev => ({ ...prev, description: !prev.description }));
-              }}
-              className={`scene-expand-button ${expandedSections.description ? 'expanded' : ''}`}
-            >
-              <span>📝 Description</span>
-              <span>{expandedSections.description ? '▼' : '▶'}</span>
-            </button>
-            <AnimatePresence>
-              {expandedSections.description && (
-                <motion.div
-                  variants={expandVariants}
-                  initial="collapsed"
-                  animate="expanded"
-                  exit="collapsed"
-                  className="scene-expand-content"
-                >
-                  <div className="scene-expand-inner">
-                    {renderEditableField(scene.natural_description || '', 'Description', 'natural_description', 'textarea')}
-                  </div>
-                </motion.div>
-              )}
-            </AnimatePresence>
-          </div>
-
-          {/* Primary Focus Button & Content */}
-          <div>
-            <button
-              onClick={(e) => {
-                e.stopPropagation();
-                setExpandedSections(prev => ({ ...prev, primaryFocus: !prev.primaryFocus }));
-              }}
-              className={`scene-expand-button ${expandedSections.primaryFocus ? 'expanded' : ''}`}
-            >
-              <span>🎯 Primary Focus</span>
-              <span>{expandedSections.primaryFocus ? '▼' : '▶'}</span>
-            </button>
-            <AnimatePresence>
-              {expandedSections.primaryFocus && (
-                <motion.div
-                  variants={expandVariants}
-                  initial="collapsed"
-                  animate="expanded"
-                  exit="collapsed"
-                  className="scene-expand-content"
-                >
-                  <div className="scene-expand-inner">
-                    {renderEditableField(scene.primary_focus || '', 'Primary Focus', 'primary_focus', 'textarea')}
-                  </div>
-                </motion.div>
-              )}
-            </AnimatePresence>
-          </div>
-
-          {/* Composition Button & Content */}
-          <div>
-            <button
-              onClick={(e) => {
-                e.stopPropagation();
-                setExpandedSections(prev => ({ ...prev, composition: !prev.composition }));
-              }}
-              className={`scene-expand-button ${expandedSections.composition ? 'expanded' : ''}`}
-            >
-              <span>📐 Composition</span>
-              <span>{expandedSections.composition ? '▼' : '▶'}</span>
-            </button>
-            <AnimatePresence>
-              {expandedSections.composition && (
-                <motion.div
-                  variants={expandVariants}
-                  initial="collapsed"
-                  animate="expanded"
-                  exit="collapsed"
-                  className="scene-expand-content"
-                >
-                  <div className="scene-expand-inner">
-                    {renderEditableField(scene.composition_approach || '', 'Composition', 'composition_approach', 'textarea')}
-                  </div>
-                </motion.div>
-              )}
-            </AnimatePresence>
-          </div>
-
-          {/* Elements Button & Content - MOVED TO LAST */}
-          <div>
-            <button
-              onClick={(e) => {
-                e.stopPropagation();
-                setExpandedSections(prev => ({ ...prev, elements: !prev.elements }));
-              }}
-              className={`scene-expand-button ${expandedSections.elements ? 'expanded' : ''}`}
-            >
-              <span>🎭 Elements ({sceneElements.length})</span>
-              <span>{expandedSections.elements ? '▼' : '▶'}</span>
-            </button>
-            <AnimatePresence>
-              {expandedSections.elements && (
-                <motion.div
-                  variants={expandVariants}
-                  initial="collapsed"
-                  animate="expanded"
-                  exit="collapsed"
-                  className="scene-expand-content"
-                >
-                  <div className="scene-expand-inner">
-                    <div className="scene-elements-list">
-                      {Object.entries(groupedElements).map(([type, typeElements]) => (
-                        <div key={type} className="scene-element-group">
-                          <span className="scene-element-type">
-                            {type}:
-                          </span>
-                          <div className="scene-element-tags">
-                            {typeElements.map(element => (
-                              <motion.div
-                                key={element.id}
-                                whileHover={{ scale: 1.05 }}
-                                onMouseEnter={() => onElementHover(element.id)}
-                                onMouseLeave={() => onElementHover(null)}
-                                className="scene-element-tag"
-                                style={{
-                                  backgroundColor: hoveredElement === element.id ? element.color : `${element.color}20`,
-                                  color: hoveredElement === element.id ? 'white' : element.color,
-                                  borderColor: element.color
-                                }}
-                              >
-                                {element.name}
-                              </motion.div>
-                            ))}
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                </motion.div>
-              )}
-            </AnimatePresence>
-          </div>
-        </div>
+        <span className="scene-duration">
+          {scene.duration}
+        </span>
       </div>
 
+      {/* NEW: Three Column Layout */}
+      <div className="scene-card-three-columns">
+        
+        {/* Column 1: Configuration (existing content moved here) */}
+        <div className="scene-column scene-column-config">
+          <div className="scene-column-header">
+            <h4 className="scene-column-title">Configuration</h4>
+          </div>
+          
+          {/* Scene Primary Fields */}
+          {renderEditableField(scene.camera_type || '', 'Camera', 'camera_type')}
+          {renderEditableField(scene.mood || '', 'Mood', 'mood')}
+          {renderEditableField(scene.dialogue || '', 'Speech', 'dialogue')}
+
+          {/* Expandable Sections */}
+          <div className="scene-expandable-sections">
+            {/* Description */}
+            <div>
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setExpandedSections(prev => ({ ...prev, description: !prev.description }));
+                }}
+                className={`scene-expand-button ${expandedSections.description ? 'expanded' : ''}`}
+              >
+                <span>📝 Description</span>
+                <span>{expandedSections.description ? '▼' : '▶'}</span>
+              </button>
+              <AnimatePresence>
+                {expandedSections.description && (
+                  <motion.div
+                    variants={expandVariants}
+                    initial="collapsed"
+                    animate="expanded"
+                    exit="collapsed"
+                    className="scene-expand-content"
+                  >
+                    <div className="scene-expand-inner">
+                      {renderEditableField(scene.natural_description || '', 'Description', 'natural_description', 'textarea')}
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
+
+            {/* Primary Focus */}
+            <div>
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setExpandedSections(prev => ({ ...prev, primaryFocus: !prev.primaryFocus }));
+                }}
+                className={`scene-expand-button ${expandedSections.primaryFocus ? 'expanded' : ''}`}
+              >
+                <span>🎯 Primary Focus</span>
+                <span>{expandedSections.primaryFocus ? '▼' : '▶'}</span>
+              </button>
+              <AnimatePresence>
+                {expandedSections.primaryFocus && (
+                  <motion.div
+                    variants={expandVariants}
+                    initial="collapsed"
+                    animate="expanded"
+                    exit="collapsed"
+                    className="scene-expand-content"
+                  >
+                    <div className="scene-expand-inner">
+                      {renderEditableField(scene.primary_focus || '', 'Primary Focus', 'primary_focus', 'textarea')}
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
+
+            {/* Composition */}
+            <div>
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setExpandedSections(prev => ({ ...prev, composition: !prev.composition }));
+                }}
+                className={`scene-expand-button ${expandedSections.composition ? 'expanded' : ''}`}
+              >
+                <span>📐 Composition</span>
+                <span>{expandedSections.composition ? '▼' : '▶'}</span>
+              </button>
+              <AnimatePresence>
+                {expandedSections.composition && (
+                  <motion.div
+                    variants={expandVariants}
+                    initial="collapsed"
+                    animate="expanded"
+                    exit="collapsed"
+                    className="scene-expand-content"
+                  >
+                    <div className="scene-expand-inner">
+                      {renderEditableField(scene.composition_approach || '', 'Composition', 'composition_approach', 'textarea')}
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
+
+            {/* Elements */}
+            <div>
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setExpandedSections(prev => ({ ...prev, elements: !prev.elements }));
+                }}
+                className={`scene-expand-button ${expandedSections.elements ? 'expanded' : ''}`}
+              >
+                <span>🎭 Elements ({sceneElements.length})</span>
+                <span>{expandedSections.elements ? '▼' : '▶'}</span>
+              </button>
+              <AnimatePresence>
+                {expandedSections.elements && (
+                  <motion.div
+                    variants={expandVariants}
+                    initial="collapsed"
+                    animate="expanded"
+                    exit="collapsed"
+                    className="scene-expand-content"
+                  >
+                    <div className="scene-expand-inner">
+                      <div className="scene-elements-list">
+                        {Object.entries(groupedElements).map(([type, typeElements]) => (
+                          <div key={type} className="scene-element-group">
+                            <span className="scene-element-type">
+                              {type}:
+                            </span>
+                            <div className="scene-element-tags">
+                              {typeElements.map(element => (
+                                <motion.div
+                                  key={element.id}
+                                  whileHover={{ scale: 1.05 }}
+                                  onMouseEnter={() => onElementHover(element.id)}
+                                  onMouseLeave={() => onElementHover(null)}
+                                  className="scene-element-tag"
+                                  style={{
+                                    backgroundColor: hoveredElement === element.id ? element.color : `${element.color}20`,
+                                    color: hoveredElement === element.id ? 'white' : element.color,
+                                    borderColor: element.color
+                                  }}
+                                >
+                                  {element.name}
+                                </motion.div>
+                              ))}
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
+          </div>
+        </div>
+
+        {/* Column 2: Image Generation (NEW - Phase 3) */}
+        <div className="scene-column scene-column-image">
+          <div className="scene-column-header">
+            <h4 className="scene-column-title">Image Generation</h4>
+          </div>
+          
+          {/* Image Placeholder */}
+          <div className="scene-media-placeholder">
+            <img 
+              src={placeholderImage} 
+              alt="Scene placeholder" 
+              style={{
+                width: '100%',
+                height: '100%',
+                objectFit: 'cover',
+                borderRadius: 'var(--radius-sm)'
+              }}
+            />
+          </div>
+          
+          {/* Generated Prompt */}
+          <textarea
+            className="scene-prompt-textarea"
+            placeholder="Generated image prompt will appear here..."
+            rows={4}
+            readOnly
+          />
+          
+          {/* Generation Buttons */}
+          <div className="scene-generate-buttons">
+            <button className="scene-generate-btn" disabled>
+              Prompt
+            </button>
+            <button className="scene-generate-btn" disabled>
+              Image
+            </button>
+          </div>
+        </div>
+
+        {/* Column 3: Video Generation (NEW - Phase 4 Future) */}
+        <div className="scene-column scene-column-video">
+          <div className="scene-column-header">
+            <h4 className="scene-column-title">Video Generation</h4>
+          </div>
+          
+          {/* Video Placeholder */}
+          <div className="scene-media-placeholder">
+            <img 
+              src={placeholderImage} 
+              alt="Video placeholder" 
+              style={{
+                width: '100%',
+                height: '100%',
+                objectFit: 'cover',
+                borderRadius: 'var(--radius-sm)'
+              }}
+            />
+          </div>
+          
+          {/* Video Prompt */}
+          <textarea
+            className="scene-prompt-textarea"
+            placeholder="Video generation prompt will appear here..."
+            rows={4}
+            readOnly
+          />
+          
+          {/* Generation Buttons */}
+          <div className="scene-generate-buttons">
+            <button className="scene-generate-btn" disabled>
+              Prompt
+            </button>
+            <button className="scene-generate-btn" disabled>
+              Video
+            </button>
+          </div>
+        </div>
+
+      </div>
     </motion.div>
   );
 }

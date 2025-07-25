@@ -8,7 +8,7 @@
       "type": "n8n-nodes-base.manualTrigger",
       "typeVersion": 1,
       "position": [
-        -1888,
+        -2000,
         80
       ]
     },
@@ -691,18 +691,195 @@
     },
     {
       "parameters": {
-        "path": "a1dbfc3a-b5fa-41be-9720-13960051b88d",
+        "mode": "combine",
+        "combineBy": "combineAll",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.1,
+      "position": [
+        480,
+        64
+      ],
+      "id": "77008ad5-7636-4a02-a5cf-f08ec7bc9b8e",
+      "name": "Merge_Data3"
+    },
+    {
+      "parameters": {
+        "mode": "raw",
+        "jsonOutput": "{\n  \"image_engine\": \"FLUX DEV\",\n  \"model_endpoint\": \"fal-ai/flux/dev\",\n  \"base_url\": \"https://queue.fal.run\",\n  \"max_prompt_length\": 800,\n  \"aspect_ratio\": \"16:9\"\n}",
+        "includeOtherFields": "=",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        288,
+        -96
+      ],
+      "id": "ad667747-47aa-4ce3-be99-2062481f4652",
+      "name": "GLOBAL CONFIG1"
+    },
+    {
+      "parameters": {
+        "jsCode": "// STORYBOARD DATA FOR ITALIAN VACCINATION CAMPAIGN\nconst storyboardData = {\n  \"project_metadata\": {\n    \"title\": \"UN CONSIGLIO STELLARE\",\n    \"client\": \"Ministero della Salute\",\n    \"extraction_date\": \"2025-01-28\",\n    \"schema_version\": \"1.0\",\n    \"production_workflow\": \"animatic_to_video_scalable\"\n  },\n\n  \"global_style\": {\n    \"color_palette\": {\n      \"primary\": \"Deep blue backgrounds (library, tech elements)\",\n      \"secondary\": \"Warm amber/golden lighting\",\n      \"accent\": \"Bright cyan/blue (holograms, tech effects)\",\n      \"character_tones\": \"Natural skin tones, blue uniforms\"\n    },\n    \"rendering_style\": {\n      \"level\": \"simplified illustration transitioning to cinematic realism\",\n      \"line_work\": \"clean vector-style outlines\",\n      \"shading\": \"minimal, flat color zones with depth\",\n      \"detail_level\": \"stylized but scalable to photorealistic\"\n    },\n    \"composition\": {\n      \"framing\": \"cinematic storyboard frames\",\n      \"depth\": \"clear foreground/background separation\",\n      \"camera_style\": \"traditional film language (wide/medium/close-up)\",\n      \"aspect_ratio\": \"16:9\"\n    },\n    \"mood_style\": {\n      \"overall_mood\": \"educational, inspiring, warm\",\n      \"lighting_description\": \"soft, natural library lighting with holographic tech elements\",\n      \"atmosphere\": \"technological wonder, protective, educational\",\n      \"tone\": \"professional, accessible, reassuring\"\n    }\n  },\n\n  \"elements\": {\n    \"samantha\": {\n      \"element_type\": \"character\",\n      \"element_subtype\": \"primary\",\n      \"frequency\": 10,\n      \"scenes_present\": [1, 2, 3, 5, 6, 7, 9, 10, 11, 12],\n      \"base_description\": \"Samantha Cristoforetti, 47 years old, short brown hair, confident expression, blue ESA astronaut uniform with patches\",\n      \"consistency_rules\": [\n        \"Identical facial features and hair across all scenes\",\n        \"Blue ESA uniform must be consistent in color and design\",\n        \"Confident, authoritative expression maintained\",\n        \"Professional astronaut posture and demeanor\"\n      ],\n      \"variants_by_scene\": {\n        \"scene_1\": {\n          \"action\": \"standing confidently at entrance, welcoming gesture toward children\",\n          \"position\": \"foreground center, facing children group\",\n          \"expression\": \"warm, welcoming, confident\",\n          \"props_interaction\": \"none\",\n          \"dialogue_state\": \"introducing, setting context\"\n        },\n        \"scene_2\": {\n          \"action\": \"pointing at space imagery, explaining with gestures\",\n          \"position\": \"beside display area, angled toward children\",\n          \"expression\": \"focused, educational, protective\",\n          \"props_interaction\": \"gesturing toward space_imagery_displays\",\n          \"dialogue_state\": \"teaching, explaining dangers\"\n        },\n        \"scene_3\": {\n          \"action\": \"interacting with astronaut hologram, demonstrating\",\n          \"position\": \"at library table, engaging with hologram\",\n          \"expression\": \"knowledgeable, demonstrative\",\n          \"props_interaction\": \"activating/pointing to astronaut_hologram\",\n          \"dialogue_state\": \"demonstrating, showing equipment\"\n        }\n      }\n    },\n\n    \"children_group\": {\n      \"element_type\": \"character\",\n      \"element_subtype\": \"group\",\n      \"frequency\": 7,\n      \"scenes_present\": [1, 2, 4, 5, 7, 9, 12],\n      \"base_description\": \"5 diverse children aged 6-7, small stature, mixed gender, curious expressions, casual school clothes\",\n      \"consistency_rules\": [\n        \"Same 5 children throughout (consistent faces and diversity)\",\n        \"Age range 6-7 maintained across all scenes\",\n        \"Casual school clothing consistent per child\",\n        \"Curious, engaged expressions as baseline\"\n      ],\n      \"variants_by_scene\": {\n        \"scene_1\": {\n          \"action\": \"grouped together, looking around with wonder\",\n          \"position\": \"clustered near entrance, facing library interior\",\n          \"expression\": \"wonder, anticipation, slight awe\",\n          \"props_interaction\": \"carrying children_backpacks\",\n          \"dialogue_state\": \"listening, absorbing introduction\"\n        },\n        \"scene_2\": {\n          \"action\": \"attentively watching Samantha's explanation\",\n          \"position\": \"semicircle facing Samantha and displays\",\n          \"expression\": \"focused attention, learning engagement\",\n          \"props_interaction\": \"some still holding children_backpacks\",\n          \"dialogue_state\": \"engaged learning, processing information\"\n        }\n      }\n    },\n\n    \"circular_library\": {\n      \"element_type\": \"location\",\n      \"element_subtype\": \"primary\",\n      \"frequency\": 10,\n      \"scenes_present\": [1, 2, 3, 5, 6, 7, 9, 10, 11, 12],\n      \"base_description\": \"magnificent circular library with multiple levels, warm ambient lighting, wood and modern architectural elements, balcony overlooks\",\n      \"consistency_rules\": [\n        \"Circular architecture always prominent\",\n        \"Warm ambient lighting consistent throughout\",\n        \"Wood and modern elements balance maintained\",\n        \"Multi-level structure visible when relevant\"\n      ],\n      \"variants_by_scene\": {\n        \"scene_1\": {\n          \"view_angle\": \"wide establishing shot from entrance\",\n          \"focus_area\": \"full architectural magnificence, circular grandeur\",\n          \"lighting_state\": \"welcoming warm entrance lighting\",\n          \"architectural_details\": \"entrance perspective, full space visibility\",\n          \"camera_position\": \"entrance level, looking into main space\"\n        },\n        \"scene_2\": {\n          \"view_angle\": \"medium shot focusing on display area\",\n          \"focus_area\": \"educational zone with space imagery capability\",\n          \"lighting_state\": \"focused lighting on display area\",\n          \"architectural_details\": \"space imagery integration, teaching zone\",\n          \"camera_position\": \"interior, focusing on interaction area\"\n        },\n        \"scene_3\": {\n          \"view_angle\": \"close-up on library table area\",\n          \"focus_area\": \"table with holographic projection capability\",\n          \"lighting_state\": \"tech-enhanced lighting, hologram ambiance\",\n          \"architectural_details\": \"holographic technology integration\",\n          \"camera_position\": \"table level, intimate technology focus\"\n        }\n      }\n    },\n\n    \"space_imagery_displays\": {\n      \"element_type\": \"prop\",\n      \"element_subtype\": \"technological\",\n      \"frequency\": 4,\n      \"scenes_present\": [2, 4, 6, 8],\n      \"base_description\": \"educational space imagery and astronomical displays showing space operations, astronauts, and cosmic scenes\",\n      \"consistency_rules\": [\n        \"Educational content focus maintained\",\n        \"Professional space imagery quality\",\n        \"Integrated into library technology seamlessly\",\n        \"Blue-dominant color scheme for space content\"\n      ],\n      \"variants_by_scene\": {\n        \"scene_2\": {\n          \"state\": \"active, displaying space dangers and beauty\",\n          \"interaction_mode\": \"samantha pointing and explaining\",\n          \"visibility\": \"clearly visible, prominent in scene\",\n          \"technical_specs\": \"wall-mounted displays, clear resolution\",\n          \"position_relative\": \"background to teaching moment, supporting\"\n        }\n      }\n    },\n\n    \"earth_hologram\": {\n      \"element_type\": \"prop\",\n      \"element_subtype\": \"holographic\",\n      \"frequency\": 3,\n      \"scenes_present\": [5, 6, 8],\n      \"base_description\": \"realistic Earth hologram with glowing red indicator points concentrated on Italy, interactive and detailed\",\n      \"consistency_rules\": [\n        \"Realistic Earth appearance maintained\",\n        \"Red indicator points specifically on Italy\",\n        \"Holographic blue glow effect consistent\",\n        \"Interactive capability demonstrated\"\n      ],\n      \"variants_by_scene\": {\n        \"scene_5\": {\n          \"state\": \"approaching activation, becoming visible\",\n          \"interaction_mode\": \"children_group approaching with fascination\",\n          \"visibility\": \"emerging prominence, drawing attention\",\n          \"technical_specs\": \"holographic projection system activating\",\n          \"position_relative\": \"central space, becoming focal point\"\n        },\n        \"scene_6\": {\n          \"state\": \"fully active, Italy focus clearly visible\",\n          \"interaction_mode\": \"samantha explaining and pointing\",\n          \"visibility\": \"primary focus, red points on Italy prominent\",\n          \"technical_specs\": \"full holographic detail, interactive capability\",\n          \"position_relative\": \"central display, primary educational tool\"\n        }\n      }\n    },\n\n    \"astronaut_hologram\": {\n      \"element_type\": \"prop\",\n      \"element_subtype\": \"holographic\",\n      \"frequency\": 1,\n      \"scenes_present\": [3],\n      \"base_description\": \"full-body astronaut in complete spacesuit, holographic projection, realistic detail showing space protection equipment\",\n      \"consistency_rules\": [\n        \"Complete spacesuit with all details\",\n        \"Holographic blue glow effect\",\n        \"Realistic proportions and appearance\"\n      ],\n      \"variants_by_scene\": {\n        \"scene_3\": {\n          \"state\": \"fully active, demonstration mode\",\n          \"interaction_mode\": \"samantha demonstrating and explaining\",\n          \"visibility\": \"prominent, clear detail of spacesuit\",\n          \"technical_specs\": \"full holographic projection, interactive demonstration\",\n          \"position_relative\": \"library table, central demonstration focus\"\n        }\n      }\n    },\n\n    \"children_backpacks\": {\n      \"element_type\": \"prop\",\n      \"element_subtype\": \"physical\",\n      \"frequency\": 7,\n      \"scenes_present\": [1, 2, 4, 5, 7, 9, 12],\n      \"base_description\": \"casual school backpacks and books carried by children, age-appropriate school equipment\",\n      \"consistency_rules\": [\n        \"Age-appropriate school equipment\",\n        \"Casual, not uniform appearance\",\n        \"Proportional to children's size\"\n      ],\n      \"variants_by_scene\": {\n        \"scene_1\": {\n          \"state\": \"carried and held, arrival configuration\",\n          \"interaction_mode\": \"children_group naturally carrying\",\n          \"visibility\": \"clearly visible, establishing school context\",\n          \"technical_specs\": \"standard school backpacks and books\",\n          \"position_relative\": \"with children_group, natural school appearance\"\n        },\n        \"scene_2\": {\n          \"state\": \"mixed - some set aside, some still carried\",\n          \"interaction_mode\": \"transitioning to learning mode\",\n          \"visibility\": \"partially visible, learning focus emerging\",\n          \"technical_specs\": \"standard school equipment\",\n          \"position_relative\": \"secondary to learning interaction\"\n        }\n      }\n    },\n\n    \"library_entrance\": {\n      \"element_type\": \"location\",\n      \"element_subtype\": \"specific\",\n      \"frequency\": 1,\n      \"scenes_present\": [1],\n      \"base_description\": \"grand entrance portal to circular library, establishing architectural context and welcoming atmosphere\",\n      \"consistency_rules\": [\n        \"Architectural grandeur maintained\",\n        \"Welcoming portal appearance\",\n        \"Consistent with circular_library design\"\n      ],\n      \"variants_by_scene\": {\n        \"scene_1\": {\n          \"view_angle\": \"through entrance, looking into library\",\n          \"focus_area\": \"entrance portal framing library interior\",\n          \"lighting_state\": \"welcoming transition lighting\",\n          \"architectural_details\": \"grand entrance portal, threshold emphasis\",\n          \"camera_position\": \"entrance threshold, establishing perspective\"\n        }\n      }\n    },\n\n    \"warm_library_lighting\": {\n      \"element_type\": \"atmosphere\",\n      \"element_subtype\": \"lighting\",\n      \"frequency\": 10,\n      \"scenes_present\": [1, 2, 3, 5, 6, 7, 9, 10, 11, 12],\n      \"base_description\": \"soft, warm ambient lighting creating educational and welcoming atmosphere throughout library\",\n      \"consistency_rules\": [\n        \"Warm color temperature maintained\",\n        \"Soft, diffused quality consistent\",\n        \"Educational ambiance preserved\"\n      ],\n      \"variants_by_scene\": {\n        \"scene_1\": {\n          \"intensity\": \"welcoming, establishing mood\",\n          \"color_temperature\": \"warm amber, inviting\",\n          \"mood_contribution\": \"wonder and anticipation\",\n          \"effect_type\": \"ambient, architectural enhancement\",\n          \"coverage_area\": \"full library space, entrance emphasis\"\n        },\n        \"scene_2\": {\n          \"intensity\": \"focused on educational interaction\",\n          \"color_temperature\": \"warm amber with display enhancement\",\n          \"mood_contribution\": \"educational, protective\",\n          \"effect_type\": \"focused ambient with display lighting\",\n          \"coverage_area\": \"display area emphasis\"\n        },\n        \"scene_3\": {\n          \"intensity\": \"enhanced for technology demonstration\",\n          \"color_temperature\": \"warm amber with holographic blue accents\",\n          \"mood_contribution\": \"technological wonder\",\n          \"effect_type\": \"ambient with tech enhancement\",\n          \"coverage_area\": \"table area, hologram enhancement\"\n        }\n      }\n    }\n  },\n\n  \"scenes\": {\n    \"scene_1\": {\n      \"scene_id\": 1,\n      \"duration\": \"3 seconds\",\n      \"camera_type\": \"wide establishing shot\",\n      \"mood\": \"wonder and anticipation\",\n      \"natural_description\": \"The spot opens in a magnificent circular environment: it's the hall of the great library of the Monte Porzio Catone Astronomical Observatory. We immediately notice a group of children with a very special guide...\",\n      \"dialogue\": \"LO SPAZIO È UN LUOGO INOSPITALE E PERICOLOSO...\",\n      \"action_summary\": \"Introduction of the setting and characters\",\n      \"elements_present\": [\n        \"samantha\",\n        \"children_group\", \n        \"circular_library\",\n        \"children_backpacks\",\n        \"library_entrance\",\n        \"warm_library_lighting\"\n      ],\n      \"element_interactions\": [\n        {\n          \"primary_element\": \"samantha\",\n          \"secondary_element\": \"children_group\",\n          \"interaction_type\": \"welcoming_introduction\",\n          \"description\": \"Samantha welcomes children to library space\"\n        },\n        {\n          \"primary_element\": \"children_group\",\n          \"secondary_element\": \"circular_library\",\n          \"interaction_type\": \"discovery_wonder\",\n          \"description\": \"Children discovering magnificent library architecture\"\n        },\n        {\n          \"primary_element\": \"warm_library_lighting\",\n          \"secondary_element\": \"circular_library\",\n          \"interaction_type\": \"atmosphere_enhancement\",\n          \"description\": \"Lighting enhances architectural grandeur\"\n        }\n      ],\n      \"primary_focus\": \"establishing magnificent circular library architecture with character introduction\",\n      \"lighting_approach\": \"warm welcoming library lighting, architectural grandeur emphasis\",\n      \"composition_approach\": \"wide shot showing full space, character positioning for introduction\"\n    },\n\n    \"scene_2\": {\n      \"scene_id\": 2,\n      \"duration\": \"3 seconds\",\n      \"camera_type\": \"medium shot\",\n      \"mood\": \"educational, protective\",\n      \"natural_description\": \"Samantha, in the company of some small guests, shows them the beauty of space while explaining at the same time that it is a dangerous environment: it must be faced with the right protections.\",\n      \"dialogue\": \"MA C'È LA SCIENZA CHE PENSA A NOI.\",\n      \"action_summary\": \"Samantha explains space dangers and protection needs\",\n      \"elements_present\": [\n        \"samantha\",\n        \"children_group\",\n        \"circular_library\", \n        \"space_imagery_displays\",\n        \"children_backpacks\",\n        \"warm_library_lighting\"\n      ],\n      \"element_interactions\": [\n        {\n          \"primary_element\": \"samantha\",\n          \"secondary_element\": \"space_imagery_displays\",\n          \"interaction_type\": \"educational_demonstration\",\n          \"description\": \"Samantha pointing to and explaining space imagery\"\n        },\n        {\n          \"primary_element\": \"children_group\",\n          \"secondary_element\": \"space_imagery_displays\",\n          \"interaction_type\": \"focused_observation\",\n          \"description\": \"Children attentively watching space imagery\"\n        },\n        {\n          \"primary_element\": \"samantha\",\n          \"secondary_element\": \"children_group\",\n          \"interaction_type\": \"teaching_protection\",\n          \"description\": \"Samantha educating children about space dangers\"\n        }\n      ],\n      \"primary_focus\": \"Samantha teaching children about space dangers using imagery displays\",\n      \"lighting_approach\": \"focused lighting on display area, educational ambiance\",\n      \"composition_approach\": \"medium shot emphasizing teaching interaction and space displays\"\n    },\n\n    \"scene_3\": {\n      \"scene_id\": 3,\n      \"duration\": \"1.5 seconds\",\n      \"camera_type\": \"close-up on hologram interaction\",\n      \"mood\": \"technological wonder\",\n      \"natural_description\": \"Samantha interacts with the hologram of an astronaut, in his typical suit, which she knows very well.\",\n      \"dialogue\": \"VEDETE LE NOSTRE TUTE?\",\n      \"action_summary\": \"Holographic demonstration of space protection equipment\",\n      \"elements_present\": [\n        \"samantha\",\n        \"circular_library\",\n        \"astronaut_hologram\",\n        \"warm_library_lighting\"\n      ],\n      \"element_interactions\": [\n        {\n          \"primary_element\": \"samantha\",\n          \"secondary_element\": \"astronaut_hologram\",\n          \"interaction_type\": \"technology_demonstration\",\n          \"description\": \"Samantha demonstrating and explaining holographic astronaut equipment\"\n        },\n        {\n          \"primary_element\": \"astronaut_hologram\",\n          \"secondary_element\": \"circular_library\",\n          \"interaction_type\": \"technology_integration\",\n          \"description\": \"Hologram seamlessly integrated into library environment\"\n        }\n      ],\n      \"primary_focus\": \"close-up interaction between Samantha and astronaut hologram demonstration\",\n      \"lighting_approach\": \"tech-enhanced lighting, hologram blue glow effects\",\n      \"composition_approach\": \"close-up framing, technological demonstration focus\",\n      \"special_notes\": \"children not present in this scene, focus on technology demonstration\"\n    }\n  }\n};\n\nreturn storyboardData;"
+      },
+      "id": "01ddc0d5-05a3-47db-acda-772e71aa1f80",
+      "name": "Load Script Data1",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        288,
+        80
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// STORYBOARD DATA FOR ITALIAN VACCINATION CAMPAIGN\nconst schema = {\n  \"schema_metadata\": {\n    \"version\": \"1.0\",\n    \"purpose\": \"Abstract schema for parsing any storyboard/script into structured animatic production data\",\n    \"compatibility\": \"n8n workflow, UI interfaces, prompt generation systems\",\n    \"extraction_date\": \"2025-01-28\",\n    \"scope\": \"universal_storyboard_processing\"\n  },\n\n  \"element_type_schemas\": {\n    \"character\": {\n      \"description\": \"Living beings and personas in the scene\",\n      \"required_properties\": [\n        \"action\",\n        \"position\", \n        \"expression\",\n        \"props_interaction\",\n        \"dialogue_state\"\n      ],\n      \"subtypes\": [\n        \"primary\",\n        \"secondary\", \n        \"group\"\n      ],\n      \"consistency_fields\": [\n        \"appearance\",\n        \"costume\",\n        \"personality_traits\"\n      ],\n      \"property_descriptions\": {\n        \"action\": \"What the character is doing in the scene\",\n        \"position\": \"Where the character is positioned relative to other elements\",\n        \"expression\": \"Facial expression and emotional state\",\n        \"props_interaction\": \"How character interacts with props/objects (reference to element IDs)\",\n        \"dialogue_state\": \"Character's speaking/communication state\"\n      },\n      \"extraction_rules\": [\n        \"Identify all recurring human/persona references across scenes\",\n        \"Extract appearance descriptions from visual references and text\",\n        \"Map character actions per scene from script descriptions\",\n        \"Define consistency rules by comparing all character appearances\"\n      ]\n    },\n\n    \"location\": {\n      \"description\": \"Physical spaces and environments\",\n      \"required_properties\": [\n        \"view_angle\",\n        \"focus_area\",\n        \"lighting_state\", \n        \"architectural_details\",\n        \"camera_position\"\n      ],\n      \"subtypes\": [\n        \"primary\",\n        \"secondary\",\n        \"specific\"\n      ],\n      \"consistency_fields\": [\n        \"architecture\",\n        \"lighting_base\",\n        \"atmosphere\"\n      ],\n      \"property_descriptions\": {\n        \"view_angle\": \"Camera angle and perspective of the location\",\n        \"focus_area\": \"Which part of the location is emphasized\",\n        \"lighting_state\": \"Lighting conditions specific to this scene\",\n        \"architectural_details\": \"Specific architectural elements visible\",\n        \"camera_position\": \"Where camera is positioned relative to location\"\n      },\n      \"extraction_rules\": [\n        \"Identify all recurring location references across scenes\",\n        \"Extract architectural details from location descriptions and images\",\n        \"Map different camera angles/views per scene\",\n        \"Define consistency rules for architectural and atmospheric elements\"\n      ]\n    },\n\n    \"prop\": {\n      \"description\": \"Objects and items within scenes\",\n      \"required_properties\": [\n        \"state\",\n        \"interaction_mode\",\n        \"visibility\",\n        \"technical_specs\",\n        \"position_relative\"\n      ],\n      \"subtypes\": [\n        \"physical\",\n        \"technological\", \n        \"holographic\"\n      ],\n      \"consistency_fields\": [\n        \"appearance\",\n        \"functionality\",\n        \"size_scale\"\n      ],\n      \"property_descriptions\": {\n        \"state\": \"Current condition/status of the prop\",\n        \"interaction_mode\": \"How the prop is being used or interacted with (reference to element IDs)\",\n        \"visibility\": \"How prominent/visible the prop is in scene\",\n        \"technical_specs\": \"Technical capabilities or specifications\",\n        \"position_relative\": \"Position relative to other elements in scene\"\n      },\n      \"extraction_rules\": [\n        \"Identify all recurring object references across scenes\",\n        \"Extract object descriptions from script and visual references\",\n        \"Map different states/uses per scene\",\n        \"Classify by subtype based on technological capabilities\"\n      ]\n    },\n\n    \"atmosphere\": {\n      \"description\": \"Environmental effects and ambient conditions\",\n      \"required_properties\": [\n        \"intensity\",\n        \"color_temperature\",\n        \"mood_contribution\",\n        \"effect_type\",\n        \"coverage_area\"\n      ],\n      \"subtypes\": [\n        \"lighting\",\n        \"mood\",\n        \"effect\"\n      ],\n      \"consistency_fields\": [\n        \"base_characteristics\",\n        \"variation_range\"\n      ],\n      \"property_descriptions\": {\n        \"intensity\": \"Strength or prominence of the atmospheric effect\",\n        \"color_temperature\": \"Color characteristics of the effect\",\n        \"mood_contribution\": \"How the effect contributes to scene mood\",\n        \"effect_type\": \"Type of atmospheric effect being created\",\n        \"coverage_area\": \"Spatial coverage of the atmospheric effect\"\n      },\n      \"extraction_rules\": [\n        \"Identify recurring atmospheric/mood references across scenes\",\n        \"Extract lighting and mood descriptions from script and images\",\n        \"Map intensity and coverage variations per scene\",\n        \"Define consistency rules for base atmospheric characteristics\"\n      ]\n    }\n  },\n\n  \"scene_schema\": {\n    \"description\": \"Standard structure for all scene objects\",\n    \"required_properties\": [\n      \"scene_id\",\n      \"duration\",\n      \"camera_type\", \n      \"mood\",\n      \"natural_description\",\n      \"dialogue\",\n      \"action_summary\",\n      \"elements_present\",\n      \"element_interactions\",\n      \"primary_focus\",\n      \"lighting_approach\",\n      \"composition_approach\"\n    ],\n    \"optional_properties\": [\n      \"special_notes\",\n      \"technical_requirements\",\n      \"post_production_notes\"\n    ],\n    \"optional_property_handling\": {\n      \"rule\": \"Scenes may include additional properties beyond required ones based on script content\",\n      \"validation\": \"Optional properties should be descriptive and relevant to scene\",\n      \"examples\": \"special_notes for scene-specific information, technical_requirements for special effects\",\n      \"format\": \"Optional properties should be strings or arrays as appropriate to content\"\n    },\n    \"property_descriptions\": {\n      \"scene_id\": \"Unique identifier for the scene (integer)\",\n      \"duration\": \"Scene duration extracted from script\",\n      \"camera_type\": \"Type of camera shot/angle from storyboard\",\n      \"mood\": \"Overall emotional tone extracted from scene description\",\n      \"natural_description\": \"Natural language description from script (original text)\",\n      \"dialogue\": \"Spoken words in the scene (original text)\",\n      \"action_summary\": \"Brief summary of what happens (extracted/derived)\",\n      \"elements_present\": \"Array of element IDs present in scene\",\n      \"element_interactions\": \"Array of interaction objects between elements\",\n      \"primary_focus\": \"Main visual focus of the scene\",\n      \"lighting_approach\": \"Lighting strategy for the scene\",\n      \"composition_approach\": \"Visual composition strategy\"\n    },\n    \"extraction_rules\": [\n      \"Extract scene ID from sequential numbering\",\n      \"Extract duration from script timing information\",\n      \"Extract camera type from storyboard visual references or descriptions\",\n      \"Extract mood from script descriptions and visual mood references\",\n      \"Preserve original natural description text from script\",\n      \"Extract dialogue exactly as written in script\",\n      \"Derive action summary from scene description analysis\"\n    ]\n  },\n\n  \"element_interaction_schema\": {\n    \"description\": \"Structure for defining interactions between elements\",\n    \"required_properties\": [\n      \"primary_element\",\n      \"secondary_element\", \n      \"interaction_type\",\n      \"description\"\n    ],\n    \"property_descriptions\": {\n      \"primary_element\": \"ID of the primary element in the interaction\",\n      \"secondary_element\": \"ID of the secondary element in the interaction\",\n      \"interaction_type\": \"Type of interaction (project-specific, derived from script)\",\n      \"description\": \"Natural language description of the interaction\"\n    },\n    \"extraction_rules\": [\n      \"Identify direct interactions mentioned in script between elements\",\n      \"Create interaction_type labels based on the nature of interactions found\",\n      \"Focus on interactions that affect visual composition or narrative\",\n      \"Interaction types are project-specific and derived during extraction\"\n    ],\n    \"interaction_type_derivation\": {\n      \"methodology\": \"Create interaction_type by combining action verb with purpose/object\",\n      \"format\": \"[action_verb]_[purpose/object]\",\n      \"examples\": \"teaching → educational_demonstration, welcoming → welcoming_introduction, showcasing → technology_demonstration\",\n      \"validation\": \"interaction_type should be descriptive and unique within project\"\n    },\n    \"element_reference_validation\": {\n      \"props_interaction_references\": \"When element variants reference other elements, validate referenced element exists in elements list\",\n      \"interaction_mode_references\": \"When props reference characters in interaction_mode, validate character element exists\",\n      \"cross_reference_integrity\": \"All element ID references must point to valid elements in the project\"\n    },\n    \"extensible\": true,\n    \"note\": \"interaction_type values are project-specific and determined during extraction\"\n  },\n\n  \"global_style_schema\": {\n    \"description\": \"Overall style configuration extracted from storyboard visuals and descriptions\",\n    \"required_sections\": [\n      \"color_palette\",\n      \"rendering_style\",\n      \"composition\", \n      \"mood_style\"\n    ],\n    \"color_palette_properties\": [\n      \"primary\",\n      \"secondary\",\n      \"accent\",\n      \"character_tones\"\n    ],\n    \"rendering_style_properties\": [\n      \"level\",\n      \"line_work\",\n      \"shading\",\n      \"detail_level\"\n    ],\n    \"composition_properties\": [\n      \"framing\",\n      \"depth\",\n      \"camera_style\",\n      \"aspect_ratio\"\n    ],\n    \"mood_style_properties\": [\n      \"overall_mood\",\n      \"lighting_description\",\n      \"atmosphere\", \n      \"tone\"\n    ],\n    \"extraction_rules\": [\n      \"Extract color palette from storyboard visual references and style notes\",\n      \"Determine rendering style from storyboard illustration style\",\n      \"Extract composition approach from camera and framing descriptions\",\n      \"Derive mood style from script tone and visual atmosphere descriptions\"\n    ]\n  },\n\n  \"element_structure_schema\": {\n    \"description\": \"Standard structure for all element objects\",\n    \"required_properties\": [\n      \"element_type\",\n      \"element_subtype\",\n      \"frequency\",\n      \"scenes_present\",\n      \"base_description\",\n      \"consistency_rules\",\n      \"variants_by_scene\"\n    ],\n    \"property_descriptions\": {\n      \"element_type\": \"One of: character, location, prop, atmosphere\",\n      \"element_subtype\": \"Subtype from element_type schema\",\n      \"frequency\": \"Number of scenes where element appears\",\n      \"scenes_present\": \"Array of scene IDs where element appears\",\n      \"base_description\": \"Consistent description extracted from all appearances\",\n      \"consistency_rules\": \"Array of rules derived from analyzing all appearances\",\n      \"variants_by_scene\": \"Object with scene-specific property variations\"\n    },\n    \"extraction_rules\": [\n      \"Determine element_type based on semantic analysis of element\",\n      \"Assign element_subtype based on element characteristics\",\n      \"Calculate frequency by counting scene appearances\",\n      \"Build base_description by finding common elements across all appearances\",\n      \"Derive consistency_rules by comparing variations across scenes\",\n      \"Create variants_by_scene using element_type property schema\"\n    ],\n    \"variant_structure_rule\": \"Properties in variants_by_scene must match element_type schema properties\"\n  },\n\n  \"frequency_analysis_rules\": {\n    \"shared_element_threshold\": 2,\n    \"description\": \"Elements appearing in 2+ scenes are considered shared and need consistency rules\",\n    \"single_element_handling\": \"Elements appearing in 1 scene still follow same structure but with single variant\",\n    \"cross_scene_analysis\": \"All extraction must analyze complete script before defining base descriptions\"\n  },\n\n  \"consistency_extraction_methodology\": {\n    \"step_1\": \"Identify all element appearances across all scenes\",\n    \"step_2\": \"Group appearances by semantic similarity\",\n    \"step_3\": \"Extract common characteristics for base_description\",\n    \"step_4\": \"Identify variations that need consistency rules\",\n    \"step_5\": \"Map scene-specific variants using element_type property schema\",\n    \"step_6\": \"Validate that all variants conform to element_type schema\"\n  },\n\n  \"validation_rules\": {\n    \"element_type_validation\": \"All elements must have valid element_type from schema\",\n    \"property_validation\": \"All variant properties must match element_type schema\",\n    \"scene_consistency\": \"All scenes must follow scene_schema structure\",\n    \"reference_integrity\": \"All element references in scenes must exist in elements list\",\n    \"interaction_validation\": \"All interactions must reference valid elements\",\n    \"frequency_validation\": \"Element frequency must match scenes_present array length\",\n    \"element_reference_validation\": {\n      \"cross_element_references\": \"When element properties reference other elements (e.g., props_interaction: 'carrying element_id'), validate referenced element exists\",\n      \"interaction_mode_validation\": \"When prop interaction_mode references characters, validate character elements exist\",\n      \"consistency_check\": \"All element ID references must be valid and maintain referential integrity\"\n    }\n  },\n\n  \"usage_guidelines\": {\n    \"for_llm_prompts\": \"Use schema to understand element structure and generate consistent descriptions\",\n    \"for_ui_interfaces\": \"Use schema to build dynamic forms and validation\",\n    \"for_workflow_processing\": \"Use schema to ensure consistent data processing across different scripts\",\n    \"for_extensibility\": \"Add new element_types or properties following schema patterns\",\n    \"for_new_projects\": \"Apply same extraction methodology to any storyboard/script\"\n  },\n\n  \"abstraction_level\": {\n    \"schema_defines\": \"Structure, rules, and methodology for extraction\",\n    \"schema_does_not_define\": \"Project-specific content, interaction types, or element names\",\n    \"reusability\": \"This schema can be applied to any storyboard/script in any domain\",\n    \"project_specificity\": \"All content and interaction types are derived during extraction process\"\n  }};\n\nreturn schema;"
+      },
+      "id": "aa3e640c-1349-40a3-b574-d7feefeea96c",
+      "name": "Load Schema1",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        288,
+        -400
+      ]
+    },
+    {
+      "parameters": {
+        "content": "SCENE INTERPRETATION",
+        "height": 720,
+        "width": 600,
+        "color": 7
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        240,
+        -480
+      ],
+      "id": "85341a92-b780-4285-8efb-54d4da63a8da",
+      "name": "Sticky Note6"
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "combineBy": "combineAll",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        480,
+        -208
+      ],
+      "id": "ccf38e62-75a4-41cf-b5db-f3969db5bab8",
+      "name": "Merge2"
+    },
+    {
+      "parameters": {
+        "jsCode": "const now = new Date();\n\nconst month = String(now.getMonth() + 1).padStart(2, '0'); // 01-12\nconst day = String(now.getDate()).padStart(2, '0');        // 01-31\nconst year = now.getFullYear();\n\nconst hours = String(now.getHours()).padStart(2, '0');     // 00-23\nconst minutes = String(now.getMinutes()).padStart(2, '0'); // 00-59\n\nconst timestamp = `${month}_${day}_${year}_${hours}_${minutes}`;\n\nreturn [{ json: { timestamp } }];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        288,
+        -240
+      ],
+      "id": "6ca9d7e3-ee25-4fc5-b67d-486a5969918d",
+      "name": "TIMESTAMP1"
+    },
+    {
+      "parameters": {
+        "jsCode": "const input = items[0].json;\n\nconst timestamp = input.timestamp || 'NO_TIMESTAMP';\nconst project_title = input.project_metadata.title;\n\nconst newJson = {\n  // 1️⃣ Copia le chiavi principali\n  timestamp: input.timestamp,\n  image_engine: input.image_engine,\n  max_prompt_length: input.max_prompt_length,\n  aspect_ratio: input.aspect_ratio,\n  model_endpoint:input.model_endpoint,\n  base_url:input.base_url,\n  project_dest_folder: `${project_title}_${timestamp}`,\n\n  // 2️⃣ Inserisci project_metadata\n  project_metadata: input.project_metadata,\n\n  // 3️⃣ Subito dopo metti project_dest_folder\n\n\n  // 4️⃣ Poi tutto il resto (per esempio global_style, elements, scenes)\n  global_style: input.global_style,\n  elements: input.elements,\n  scenes: input.scenes\n};\n\nreturn [{ json: newJson }];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        640,
+        64
+      ],
+      "id": "7ebd21be-f737-4611-b6a6-fa8228b29e3b",
+      "name": "DATA_FINALIZER1"
+    },
+    {
+      "parameters": {
+        "path": "0830247e-0639-4bbd-b44d-039abfeea68b",
+        "responseMode": "lastNode",
         "options": {}
       },
       "type": "n8n-nodes-base.webhook",
       "typeVersion": 2,
       "position": [
-        -1920,
-        -336
+        -208,
+        368
       ],
-      "id": "2ef1b85c-0a5b-4592-9338-f11da4e8af64",
+      "id": "4818efd1-0461-416c-97a2-2655e78b6d64",
       "name": "Webhook",
-      "webhookId": "a1dbfc3a-b5fa-41be-9720-13960051b88d"
+      "webhookId": "0830247e-0639-4bbd-b44d-039abfeea68b"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "phase",
+                    "rightValue": "script_interpretation",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "1d96a67b-37e7-4648-9ad1-467fd67ca884"
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "2b193213-eba1-43c7-a84a-151d1cb4cd75",
+                    "leftValue": "phase",
+                    "rightValue": "element_generation",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        -32,
+        368
+      ],
+      "id": "3fa4a80c-77a1-4a73-aace-0048813651bf",
+      "name": "Switch"
     }
   ],
   "pinData": {},
@@ -1045,13 +1222,100 @@
       "main": [
         []
       ]
+    },
+    "Merge_Data3": {
+      "main": [
+        [
+          {
+            "node": "DATA_FINALIZER1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "GLOBAL CONFIG1": {
+      "main": [
+        [
+          {
+            "node": "Merge2",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Load Script Data1": {
+      "main": [
+        [
+          {
+            "node": "Merge_Data3",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Merge2": {
+      "main": [
+        [
+          {
+            "node": "Merge_Data3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "TIMESTAMP1": {
+      "main": [
+        [
+          {
+            "node": "Merge2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch": {
+      "main": [
+        [
+          {
+            "node": "Load Script Data1",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "GLOBAL CONFIG1",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "TIMESTAMP1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     }
   },
   "active": false,
   "settings": {
     "executionOrder": "v1"
   },
-  "versionId": "63b04ad7-fe7e-4a64-8a67-1317e5306cf6",
+  "versionId": "4fa160f6-01ff-4f8a-91e8-f532656472fc",
   "meta": {
     "templateCredsSetupCompleted": true,
     "instanceId": "9034c3b2992f22f7d19b46604ec8a4fb225ca54f2b9310c377550809f6589adb"

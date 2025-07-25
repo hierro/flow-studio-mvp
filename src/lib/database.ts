@@ -609,3 +609,38 @@ export async function savePhaseAndUnlockNext(phaseId: string): Promise<boolean> 
     return false
   }
 }
+
+// App Configuration Functions
+export async function getAppConfiguration(): Promise<any> {
+  try {
+    const { data, error } = await supabase
+      .from('app_configuration')
+      .select('config_data')
+      .order('updated_at', { ascending: false })
+      .limit(1)
+      .single();
+      
+    if (error) throw error;
+    return data?.config_data || {};
+  } catch (error) {
+    console.error('Error loading app configuration:', error);
+    return {};
+  }
+}
+
+export async function saveAppConfiguration(configData: any): Promise<boolean> {
+  try {
+    const { error } = await supabase
+      .from('app_configuration')
+      .upsert({
+        config_data: configData,
+        updated_at: new Date().toISOString()
+      });
+      
+    if (error) throw error;
+    return true;
+  } catch (error) {
+    console.error('Error saving app configuration:', error);
+    return false;
+  }
+}

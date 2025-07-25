@@ -12,10 +12,12 @@
 
 FLOW.STUDIO revolutionizes video production by providing **Story Intelligence** - understanding narrative relationships across scenes instead of just perfecting individual frames. Built for directors, content creators, and production teams who need professional video content with narrative coherence.
 
-### **Key Innovation: 3-Tab Timeline Architecture**
-- **Scenes Tab**: Horizontal timeline with narrative flow visualization
-- **Elements Tab**: Cross-scene character/location consistency tracking  
-- **Style Tab**: Global style control affecting entire production
+### **Key Innovation: LLM-Powered Configuration Management**
+- **Accordion Interface**: Organized prompt editing with persistent UI state
+- **Runtime Configuration**: Database-driven LLM settings with auto-reload functionality  
+- **Variable Injection**: n8n-compatible `{{$json.field}}` template processing
+- **Clean Data Flow**: Textarea → Database → LLM pipeline with proper formatting
+- **Web-Brother Ready**: Complete documentation for prompt generation workflows
 
 ## 🚀 **Quick Start**
 
@@ -37,9 +39,9 @@ npm run dev
 ### **First Project**
 1. **Register/Login** → Secure authentication via Supabase
 2. **Create Project** → Italian Campaign template included
-3. **Generate Script** → AI-powered script interpretation via n8n
-4. **Timeline View** → Visual story intelligence interface
-5. **JSON Editor** → Direct content editing and versioning
+3. **Configure LLMs** → Runtime prompt and model configuration via Config tab
+4. **Generate Script** → AI-powered script interpretation via n8n
+5. **Timeline View** → Visual story intelligence with variable injection ready
 
 ## 🏗️ **Technical Architecture**
 
@@ -47,11 +49,12 @@ npm run dev
 - **Framework**: Vite 5.4 + React 19 + TypeScript 5
 - **Styling**: Global CSS system with design tokens (27.8KB optimized)
 - **Routing**: React Router 6.28 with protected routes
-- **Performance**: 4.46s build time, instant HMR, 486KB JS bundle
+- **Performance**: 4.96s build time, instant HMR, 500KB JS bundle (optimized)
 
 ### **Backend Integration**
-- **Database**: Supabase PostgreSQL with enhanced schema v2.0
-- **Authentication**: Supabase Auth with RLS policies
+- **Database**: Supabase PostgreSQL with enhanced schema v2.0 + LLM configuration
+- **Authentication**: Supabase Auth with RLS policies  
+- **LLM Management**: Runtime configuration with auto-reload functionality
 - **AI Workflow**: n8n TESTA_ANIMATIC integration (95%+ success rate)
 - **Character Consistency**: Proven Samantha Cristoforetti system
 
@@ -62,6 +65,7 @@ npm run dev
 ✅ project_phases    -- 5-phase workflow progression  
 ✅ phase_versions    -- Complete version history
 ✅ n8n_jobs         -- AI workflow tracking
+✅ app_configuration -- LLM settings and prompt management
 
 -- Story intelligence features  
 ✅ content_changes   -- Cross-phase change tracking
@@ -72,11 +76,17 @@ npm run dev
 ## 🎬 **Production Features**
 
 ### **5-Phase Workflow**
-1. **Script Interpretation** ✅ Complete (JSON editing + n8n integration + timeline editing)
-2. **Element Images** 🔄 Ready for implementation  
-3. **Scene Generation** 🔄 TESTA_ANIMATIC integration ready
-4. **Scene Videos** 📋 Planned (FAL.ai FLUX integration)
-5. **Final Assembly** 📋 Planned (compilation workflows)
+1. **Script Rendering** ✅ Complete (master JSON architecture + timeline editing foundation)
+2. **Elements Creation** 🔄 Ready for implementation  
+3. **Scene Start Frame** 🔄 LLM configuration ready, variable injection system complete
+4. **Scene Video** 📋 Planned (FAL.ai FLUX integration + video compilation)
+5. **Assembly** 📋 Planned (final production workflows)
+
+### **LLM Configuration Management** ✅
+- **Accordion Interface**: 5 organized sections with localStorage persistence
+- **Prompt Pipeline**: Clean textarea → database → LLM workflow
+- **Variable Injection**: n8n-compatible `{{$json.field}}` template processing  
+- **Auto-reload System**: Runtime configuration updates for immediate availability
 
 ### **Story Intelligence System**
 - **Narrative Understanding**: Scene relationships vs isolated frames
@@ -109,7 +119,7 @@ flow-studio-mvp/
 ### **Development Commands**
 ```bash
 npm run dev          # Development server (instant startup)
-npm run build        # Production build (4.46s)
+npm run build        # Production build (4.96s)
 npm run lint         # Code quality checks
 npm run preview      # Preview production build
 ```
@@ -123,8 +133,8 @@ npm run preview      # Preview production build
 ## 📊 **Performance Metrics**
 
 ### **Build Performance**
-- **Build Time**: 4.46s (optimized Vite configuration)
-- **Bundle Size**: CSS 27.8KB, JS 486KB (separated and optimized)
+- **Build Time**: 4.96s (optimized Vite configuration)
+- **Bundle Size**: CSS 40.99KB, JS 500KB (separated and optimized)
 - **Hot Reload**: Instant updates during development
 - **TypeScript**: Clean compilation, zero type errors
 
