@@ -10,6 +10,7 @@ import type {
   ProjectCardData
 } from '../types/project'
 import { supabase } from './supabase'
+import { PhaseCompletion } from '../utils/PhaseCompletion'
 
 // Minimal default master JSON - n8n webhook will populate with real data
 const DEFAULT_MASTER_JSON = {
@@ -285,6 +286,7 @@ export async function getUserProjects(userId: string): Promise<ProjectCardData[]
         name,
         status,
         created_at,
+        master_json,
         project_phases(
           phase_index,
           status,
@@ -302,22 +304,15 @@ export async function getUserProjects(userId: string): Promise<ProjectCardData[]
     }
 
     return projects.map(project => {
-      const phases = project.project_phases as ProjectPhase[]
-      const completedPhases = phases.filter(p => p.status === 'completed').length
-      const currentPhase = phases.find(p => p.status === 'processing')?.phase_name || 
-                          phases.find(p => p.can_proceed && p.status === 'pending')?.phase_name ||
-                          null
-
+      // Clean architecture: Phase progress based on content state, not database flags
+      const phaseProgress = PhaseCompletion.getPhaseProgress(project.master_json);
+      
       return {
         id: project.id,
         name: project.name,
         status: project.status,
         created_at: project.created_at,
-        phase_progress: {
-          completed_phases: completedPhases,
-          total_phases: 5,
-          current_phase: currentPhase
-        }
+        phase_progress: phaseProgress
       }
     })
   } catch (error) {
@@ -544,6 +539,32 @@ export async function savePhaseAndUnlockNext(phaseId: string): Promise<boolean> 
 
     if (updateError) {
       console.error('Error updating phase status:', updateError)
+      console.error('Update error details:', JSON.stringify(updateError, null, 2))
+      return false
+    }
+
+    // Verify the update actually worked
+    const { data: verifyPhase, error: verifyError } = await supabase
+      .from('project_phases')
+      .select('id, phase_name, status, user_saved, completed_at')
+      .eq('id', phaseId)
+      .single()
+
+    if (verifyError || !verifyPhase) {
+      console.error('Error verifying phase update:', verifyError)
+      return false
+    }
+
+    console.log('Phase update verification:', {
+      id: verifyPhase.id,
+      phase_name: verifyPhase.phase_name,
+      status: verifyPhase.status,
+      user_saved: verifyPhase.user_saved,
+      completed_at: verifyPhase.completed_at
+    })
+
+    if (verifyPhase.status !== 'completed') {
+      console.error('Phase update failed - status is not completed:', verifyPhase.status)
       return false
     }
 

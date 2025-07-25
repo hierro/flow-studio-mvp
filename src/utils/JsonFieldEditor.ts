@@ -113,7 +113,17 @@ export class JsonFieldEditor {
           return false;
         }
 
-        // Update JSON
+        // Check if value actually changed
+        const currentValue = JsonFieldEditor.getField(masterJson, fieldPath);
+        const normalizedCurrent = (currentValue || '').toString().trim();
+        const normalizedNew = (newValue || '').toString().trim();
+        
+        if (normalizedCurrent === normalizedNew) {
+          // No actual change - don't trigger update
+          return true;
+        }
+
+        // Update JSON only if value actually changed
         const updatedJson = JsonFieldEditor.updateField(masterJson, fieldPath, newValue);
         
         // Call parent update

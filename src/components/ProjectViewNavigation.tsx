@@ -8,14 +8,18 @@
  * - Style: Global style control (future)
  */
 
+import React from 'react'
+
 interface ProjectViewNavigationProps {
   activeView: 'json' | 'timeline' | 'elements' | 'style';
   onViewChange: (view: 'json' | 'timeline' | 'elements' | 'style') => void;
+  masterJSON?: any; // For unlock logic
 }
 
 export default function ProjectViewNavigation({ 
   activeView, 
-  onViewChange 
+  onViewChange,
+  masterJSON
 }: ProjectViewNavigationProps) {
   
   const tabs = [
@@ -25,43 +29,61 @@ export default function ProjectViewNavigation({
     { id: 'style', label: 'Style', icon: '🎨', description: 'Global style control' }
   ] as const;
 
+  // Check if Phase 1 JSON generation is complete (has scenes)
+  const hasScenes = masterJSON?.scenes && 
+                   typeof masterJSON.scenes === 'object' &&
+                   Object.keys(masterJSON.scenes).length > 0
+
+  // Unlock logic for tabs
+  const isTabUnlocked = (tabId: string): boolean => {
+    if (tabId === 'json' || tabId === 'timeline') return true
+    if (tabId === 'style') return hasScenes // Style unlocks after Phase 1 JSON generation
+    if (tabId === 'elements') return false // Elements still locked (Phase 2+)
+    return true
+  }
+
+  const getTabTooltip = (tabId: string): string => {
+    if (tabId === 'elements') return 'Available in Phase 2+'
+    if (tabId === 'style' && !hasScenes) return 'Complete Phase 1 JSON generation first'
+    return tabs.find(t => t.id === tabId)?.description || ''
+  }
+
   return (
     <div className="project-view-navigation">
       {/* Navigation Bar - Horizontal buttons spanning full width */}
       <div className="flex gap-md p-md">
-        {tabs.map((tab) => (
-          <button
-            key={tab.id}
-            onClick={() => onViewChange(tab.id as any)}
-            className={`
-              flex-1 flex items-center justify-center transition-fast cursor-pointer
-              border border-solid rounded-lg font-semibold
-              ${activeView === tab.id 
-                ? 'bg-accent border-focus text-primary shadow-md' 
-                : 'bg-secondary border-default text-secondary hover:text-primary hover:bg-accent hover:border-light'
-              }
-              ${(tab.id === 'elements' || tab.id === 'style') ? 'opacity-50 cursor-not-allowed' : ''}
-            `}
-            style={{
-              padding: '1rem 1.5rem',
-              fontSize: '1rem',
-              minHeight: '3rem'
-            }}
-            disabled={tab.id === 'elements' || tab.id === 'style'}
-            title={
-              tab.id === 'elements' ? 'Available in Phase 2+' :
-              tab.id === 'style' ? 'Coming soon' :
-              tab.description
-            }
-          >
-            <span className="font-semibold">{tab.label}</span>
-            {(tab.id === 'elements' || tab.id === 'style') && (
-              <span className="text-xs text-muted">
-                {tab.id === 'elements' ? '(Phase 2+)' : '(Soon)'}
-              </span>
-            )}
-          </button>
-        ))}
+        {tabs.map((tab) => {
+          const isUnlocked = isTabUnlocked(tab.id)
+          return (
+            <button
+              key={tab.id}
+              onClick={() => isUnlocked && onViewChange(tab.id as any)}
+              className={`
+                flex-1 flex items-center justify-center transition-fast cursor-pointer
+                border border-solid rounded-lg font-semibold
+                ${activeView === tab.id 
+                  ? 'bg-accent border-focus text-primary shadow-md' 
+                  : 'bg-secondary border-default text-secondary hover:text-primary hover:bg-accent hover:border-light'
+                }
+                ${!isUnlocked ? 'opacity-50 cursor-not-allowed' : ''}
+              `}
+              style={{
+                padding: '1rem 1.5rem',
+                fontSize: '1rem',
+                minHeight: '3rem'
+              }}
+              disabled={!isUnlocked}
+              title={getTabTooltip(tab.id)}
+            >
+              <span className="font-semibold">{tab.label}</span>
+              {(tab.id === 'elements' || tab.id === 'style') && (
+                <span className="text-xs text-muted">
+                  {tab.id === 'elements' ? '(Phase 2+)' : '(Soon)'}
+                </span>
+              )}
+            </button>
+          )
+        })}
       </div>
     </div>
   );

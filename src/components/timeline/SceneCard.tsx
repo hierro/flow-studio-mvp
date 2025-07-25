@@ -67,16 +67,19 @@ export default function SceneCard({
   const sceneFieldPaths = {
     camera_type: `scenes.scene_${scene.scene_id}.camera_type`,
     mood: `scenes.scene_${scene.scene_id}.mood`,
-    dialogue: `scenes.scene_${scene.scene_id}.dialogue`
+    dialogue: `scenes.scene_${scene.scene_id}.dialogue`,
+    natural_description: `scenes.scene_${scene.scene_id}.natural_description`,
+    primary_focus: `scenes.scene_${scene.scene_id}.primary_focus`,
+    composition_approach: `scenes.scene_${scene.scene_id}.composition_approach`
   };
 
   // Removed camera type options - using text input instead
 
   // Editable field renderer
-  const renderEditableField = (currentValue: string, label: string, fieldKey: string, fieldType: 'text' | 'select' = 'text', options?: string[]) => {
+  const renderEditableField = (currentValue: string, label: string, fieldKey: string, fieldType: 'text' | 'textarea' | 'select' = 'text', options?: string[]) => {
     const isEditing = editingField === fieldKey;
     const fieldPath = sceneFieldPaths[fieldKey as keyof typeof sceneFieldPaths];
-    const fieldEditor = createFieldEditor(fieldPath, fieldType, options);
+    const fieldEditor = createFieldEditor(fieldPath, fieldType === 'select' ? 'select' : 'text', options);
     
     if (!fieldEditor || !masterJson || !onSceneEdit) {
       // Fallback to display-only if no editing capability
@@ -112,6 +115,33 @@ export default function SceneCard({
                     <option key={option} value={option}>{option}</option>
                   ))}
                 </select>
+              ) : fieldType === 'textarea' ? (
+                <textarea
+                  value={fieldValues[fieldKey] ?? fieldEditor.currentValue}
+                  onChange={(e) => {
+                    const newValue = e.target.value;
+                    setFieldValues(prev => ({ ...prev, [fieldKey]: newValue }));
+                  }}
+                  onBlur={() => {
+                    const finalValue = fieldValues[fieldKey] ?? fieldEditor.currentValue;
+                    // JsonFieldEditor will handle change detection - only updates if value actually changed
+                    fieldEditor.updateValue(finalValue);
+                    setEditingField(null);
+                  }}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Escape') {
+                      setFieldValues(prev => {
+                        const { [fieldKey]: _, ...rest } = prev;
+                        return rest;
+                      });
+                      setEditingField(null);
+                    }
+                    // Allow Enter for new lines in textarea
+                  }}
+                  className="scene-field-textarea"
+                  autoFocus
+                  rows={3}
+                />
               ) : (
                 <input
                   type="text"
@@ -122,12 +152,14 @@ export default function SceneCard({
                   }}
                   onBlur={() => {
                     const finalValue = fieldValues[fieldKey] ?? fieldEditor.currentValue;
+                    // JsonFieldEditor will handle change detection - only updates if value actually changed
                     fieldEditor.updateValue(finalValue);
                     setEditingField(null);
                   }}
                   onKeyDown={(e) => {
                     if (e.key === 'Enter') {
                       const finalValue = fieldValues[fieldKey] ?? fieldEditor.currentValue;
+                      // JsonFieldEditor will handle change detection - only updates if value actually changed
                       fieldEditor.updateValue(finalValue);
                       setEditingField(null);
                     }
@@ -255,7 +287,7 @@ export default function SceneCard({
               <span>{expandedSections.description ? '▼' : '▶'}</span>
             </button>
             <AnimatePresence>
-              {expandedSections.description && scene.natural_description && (
+              {expandedSections.description && (
                 <motion.div
                   variants={expandVariants}
                   initial="collapsed"
@@ -264,7 +296,7 @@ export default function SceneCard({
                   className="scene-expand-content"
                 >
                   <div className="scene-expand-inner">
-                    {scene.natural_description || 'No description available'}
+                    {renderEditableField(scene.natural_description || '', 'Description', 'natural_description', 'textarea')}
                   </div>
                 </motion.div>
               )}
@@ -293,7 +325,7 @@ export default function SceneCard({
                   className="scene-expand-content"
                 >
                   <div className="scene-expand-inner">
-                    {scene.primary_focus || 'No primary focus specified'}
+                    {renderEditableField(scene.primary_focus || '', 'Primary Focus', 'primary_focus', 'textarea')}
                   </div>
                 </motion.div>
               )}
@@ -322,7 +354,7 @@ export default function SceneCard({
                   className="scene-expand-content"
                 >
                   <div className="scene-expand-inner">
-                    {scene.composition_approach || 'No composition details specified'}
+                    {renderEditableField(scene.composition_approach || '', 'Composition', 'composition_approach', 'textarea')}
                   </div>
                 </motion.div>
               )}

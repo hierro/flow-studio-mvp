@@ -149,8 +149,8 @@ export default function ScriptInterpretationModule({
             </span>
             <span>•</span>
             <span>
-              Status: <strong className={phase.user_saved ? 'script-status-completed' : 'script-status-progress'}>
-                {phase.user_saved ? 'Completed' : 'In Progress'}
+              Status: <strong className={phase.status === 'completed' ? 'script-status-completed' : 'script-status-progress'}>
+                {phase.status === 'completed' ? 'Completed' : 'In Progress'}
               </strong>
             </span>
             <span>•</span>
@@ -224,27 +224,6 @@ export default function ScriptInterpretationModule({
             >
               {isGenerating ? '⏳ Generating...' : '🚀 Generate'}
             </button>
-
-            <button
-              onClick={onSavePhase}
-              disabled={isSaving || !hasUnsavedChanges || !jsonContent.trim()}
-              className={`btn text-xs px-md py-xs ${(!hasUnsavedChanges || !jsonContent.trim()) ? 'btn-secondary' : 
-                           isSaving ? 'btn-secondary' : 'btn-success'}`}
-            >
-              {isSaving ? '💾 Saving...' : hasUnsavedChanges ? '💾 Save & Unlock' : '✅ Saved'}
-            </button>
-
-            {databaseStatus.version > 0 && (
-              <button
-                onClick={() => {
-                  onLoadVersionHistory();
-                  onShowVersionHistory(true);
-                }}
-                className="btn text-xs px-md py-xs btn-secondary"
-              >
-                📋 History
-              </button>
-            )}
           </div>
         </div>
         

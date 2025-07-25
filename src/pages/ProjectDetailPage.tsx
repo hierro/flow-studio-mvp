@@ -5,6 +5,9 @@ import type { Project, ProjectPhase, PhaseName, ProjectVersion } from '../types/
 import ScriptInterpretationModule from '../components/ScriptInterpretationModule'
 import ProjectViewNavigation from '../components/ProjectViewNavigation'
 import DirectorsTimeline from '../components/timeline/DirectorsTimeline'
+import StyleControl from '../components/timeline/StyleControl'
+import { PhaseCompletion } from '../utils/PhaseCompletion'
+import { BackupManager } from '../utils/BackupManager'
 
 interface ProjectDetailPageProps {
   user: any
@@ -33,6 +36,10 @@ export default function ProjectDetailPage({ user }: ProjectDetailPageProps) {
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false)
   const [isSaving, setIsSaving] = useState(false)
   const [error, setError] = useState('')
+  
+  // Backup restoration state
+  const [showBackupRestore, setShowBackupRestore] = useState(false)
+  const [backupData, setBackupData] = useState<any>(null)
   const [databaseStatus, setDatabaseStatus] = useState<{
     loaded: boolean;
     version: number;
@@ -45,6 +52,10 @@ export default function ProjectDetailPage({ user }: ProjectDetailPageProps) {
       navigate('/dashboard')
       return
     }
+    
+    // Clean up old backups when loading projects
+    BackupManager.cleanupOldBackups()
+    
     loadProject()
   }, [projectId, navigate])
 
@@ -71,6 +82,13 @@ export default function ProjectDetailPage({ user }: ProjectDetailPageProps) {
         }
         
         setHasUnsavedChanges(false)
+        
+        // Check for backup restoration after loading current state
+        const backup = BackupManager.checkForRestoration(projectId, projectData.current_version)
+        if (backup) {
+          setBackupData(backup)
+          setShowBackupRestore(true)
+        }
       } else {
         setDatabaseStatus({ 
           loaded: false, 
@@ -134,6 +152,19 @@ export default function ProjectDetailPage({ user }: ProjectDetailPageProps) {
         setMasterJSON(parsedJSON)
         setHasUnsavedChanges(false)
         
+        // Clear backup after successful save
+        BackupManager.clearBackup(projectId)
+        
+        // If we're in Phase 1 and have valid scenes, mark Phase 1 as completed
+        const selectedPhaseData = phases.find(p => p.phase_name === selectedPhase)
+        const hasScenes = parsedJSON.scenes && 
+                         typeof parsedJSON.scenes === 'object' &&
+                         parsedJSON.scenes !== null &&
+                         Object.keys(parsedJSON.scenes).length > 0
+        
+        // Phase completion is determined by content state, not database flags
+        // Master JSON with scenes = Phase 1 completed (clean architecture)
+        
         // Reload to get the updated data and version info (preserves exact formatting)
         await loadMasterJSON()
         // Reload phases - can_proceed will be calculated automatically based on data state
@@ -142,10 +173,6 @@ export default function ProjectDetailPage({ user }: ProjectDetailPageProps) {
         
         const phase2 = updatedPhasesData.find(p => p.phase_index === 2)
         const phase3 = updatedPhasesData.find(p => p.phase_index === 3)
-        const hasScenes = parsedJSON.scenes && 
-                         typeof parsedJSON.scenes === 'object' &&
-                         parsedJSON.scenes !== null &&
-                         Object.keys(parsedJSON.scenes).length > 0
         
         if (hasScenes && (!phase2?.can_proceed || !phase3?.can_proceed)) {
           console.warn('Phase unlock validation failed - phases not unlocked as expected')
@@ -326,6 +353,9 @@ export default function ProjectDetailPage({ user }: ProjectDetailPageProps) {
                 setMasterJSON(updatedContent)
                 setJsonContent(JSON.stringify(updatedContent, null, 2))
                 setHasUnsavedChanges(true) // Mark as having unsaved changes
+                
+                // Save backup to localStorage for data loss prevention
+                BackupManager.saveBackup(projectId, updatedContent, databaseStatus.version)
               }}
             />
           )
@@ -349,11 +379,27 @@ export default function ProjectDetailPage({ user }: ProjectDetailPageProps) {
         )
 
       case 'style':
+        if (masterJSON && Object.keys(masterJSON).length > 0) {
+          return (
+            <StyleControl 
+              masterJson={masterJSON}
+              onContentUpdate={(updatedContent) => {
+                // Update local state only - NO database save, NO version creation
+                setMasterJSON(updatedContent)
+                setJsonContent(JSON.stringify(updatedContent, null, 2))
+                setHasUnsavedChanges(true) // Mark as having unsaved changes
+                
+                // Save backup to localStorage for data loss prevention
+                BackupManager.saveBackup(projectId, updatedContent, databaseStatus.version)
+              }}
+            />
+          )
+        }
         return (
           <div className="view-placeholder">
             <div className="view-placeholder-icon">🎨</div>
             <h3 className="view-placeholder-title">Style Control</h3>
-            <p>Global style configuration coming soon</p>
+            <p><em>Complete Phase 1 first to access style controls</em></p>
           </div>
         )
 
@@ -365,7 +411,8 @@ export default function ProjectDetailPage({ user }: ProjectDetailPageProps) {
   const renderProjectStatusBar = () => {
     if (!project) return null
 
-    const completedPhases = phases.filter(p => p.user_saved).length
+    // Clean architecture: Phase completion based on content state
+    const completedPhases = PhaseCompletion.getCompletedPhases(masterJSON)
     const currentPhaseData = phases.find(p => p.phase_name === selectedPhase)
 
     return (
@@ -375,15 +422,42 @@ export default function ProjectDetailPage({ user }: ProjectDetailPageProps) {
             Project: <strong className="text-primary">{project.name}</strong>
           </div>
           <div className="project-status-center">
-            Client: <strong className="text-accent">{masterJSON?.project_metadata?.client || 'Unknown Client'}</strong> •
             Progress: <strong className="text-success">{completedPhases}/5 phases completed</strong>
             {hasUnsavedChanges && (
               <span className="unsaved-changes-indicator">• ⚠️ Unsaved Changes</span>
             )}
           </div>
-          <div>
+          <div className="header-actions">
+            {/* Save Button - Universal across all phases */}
+            <button
+              onClick={handleSaveJSON}
+              disabled={isSaving || !hasUnsavedChanges || !jsonContent.trim()}
+              className={`btn text-xs px-md py-xs ${
+                (!hasUnsavedChanges || !jsonContent.trim()) ? 'btn-secondary' : 
+                isSaving ? 'btn-secondary' : 'btn-success'
+              }`}
+            >
+              {isSaving ? '💾 Saving...' : hasUnsavedChanges ? '💾 Save' : '✅ Saved'}
+            </button>
+            
+            {/* History Button - Universal across all phases */}
+            {databaseStatus.version > 0 && (
+              <button
+                onClick={() => {
+                  loadVersionHistory();
+                  setShowVersionHistory(true);
+                }}
+                className="btn text-xs px-md py-xs btn-secondary"
+              >
+                📋 History
+              </button>
+            )}
+            
+            {/* Current Phase Status */}
             {currentPhaseData && (
-              <>Current: <strong className="text-accent">Phase {currentPhaseData.phase_index}</strong></>
+              <span className="current-phase-status">
+                Phase {currentPhaseData.phase_index}: <strong className="text-accent">{getPhaseDisplayName(currentPhaseData.phase_name)}</strong>
+              </span>
             )}
           </div>
         </div>
@@ -519,14 +593,20 @@ export default function ProjectDetailPage({ user }: ProjectDetailPageProps) {
                 disabled={!phase.can_proceed && !phase.user_saved}
                 className={`phase-button-container ${selectedPhase === phase.phase_name ? 'active' : ''}`}
               >
-                <div className="phase-button-header">
-                  <div className="phase-button-left">
-                    <span className="phase-icon">
-                      {getPhaseIcon(phase.phase_name)}
-                    </span>
+                <div className="phase-button-row">
+                  <div className="phase-number-column">
                     <span className="phase-number">
                       {phase.phase_index}
                     </span>
+                  </div>
+                  
+                  <div className="phase-info-column">
+                    <div className="phase-name">
+                      {getPhaseDisplayName(phase.phase_name)}
+                    </div>
+                    <div className="phase-status-text">
+                      {getPhaseStatusText(phase)}
+                    </div>
                   </div>
                   
                   <div 
@@ -536,14 +616,6 @@ export default function ProjectDetailPage({ user }: ProjectDetailPageProps) {
                     }}
                   />
                 </div>
-                
-                <div className="phase-name">
-                  {getPhaseDisplayName(phase.phase_name)}
-                </div>
-                
-                <div className="phase-status-text">
-                  {getPhaseStatusText(phase)}
-                </div>
               </button>
             ))}
           </div>
@@ -551,7 +623,7 @@ export default function ProjectDetailPage({ user }: ProjectDetailPageProps) {
 
         <div className="progress-summary">
           <strong>Progress:</strong>{' '}
-          {phases.filter(p => p.user_saved).length} of 5 phases completed
+          {PhaseCompletion.getCompletedPhases(masterJSON)} of 5 phases completed
         </div>
       </div>
 
@@ -561,26 +633,27 @@ export default function ProjectDetailPage({ user }: ProjectDetailPageProps) {
         {/* Project Status Bar - Horizontal span above all areas (Phase Agnostic) */}
         {renderProjectStatusBar()}
         
-        {/* AREA 1: PHASE-SPECIFIC CONTENT (Reordered to first position) */}
-        <div className="project-area project-area-1">
+        {/* AREA 1: NAVIGATION BAR (First position - sticky below header) */}
+        <div className="project-area project-area-1 project-nav-sticky">
           <div className="project-area-header area-header-1">
-            🔧 AREA 1: PHASE CONTENT
+            🧭 AREA 1: NAVIGATION BAR (4 TABS)
+          </div>
+          <ProjectViewNavigation 
+            activeView={selectedView} 
+            onViewChange={setSelectedView}
+            masterJSON={masterJSON}
+          />
+        </div>
+
+        {/* AREA 2: PHASE-SPECIFIC CONTENT (Second position) */}
+        <div className="project-area project-area-2">
+          <div className="project-area-header area-header-2">
+            🔧 AREA 2: PHASE CONTENT
           </div>
           {renderPhaseContent()}
         </div>
 
-        {/* AREA 2: NAVIGATION BAR (Reordered to second position) */}
-        <div className="project-area project-area-2">
-          <div className="project-area-header area-header-2">
-            🧭 AREA 2: NAVIGATION BAR (4 TABS)
-          </div>
-          <ProjectViewNavigation 
-            activeView={selectedView} 
-            onViewChange={setSelectedView} 
-          />
-        </div>
-
-        {/* AREA 3: CONTENT AREA (Reordered to third position) */}
+        {/* AREA 3: CONTENT AREA (Third position) */}
         <div className="project-area project-area-3">
           <div className="project-area-header area-header-3">
             📄 AREA 3: CONTENT AREA (JSON | TIMELINE | ELEMENTS | STYLE)
@@ -589,6 +662,59 @@ export default function ProjectDetailPage({ user }: ProjectDetailPageProps) {
         </div>
 
       </div>
+
+      {/* Backup Restoration Modal */}
+      {showBackupRestore && backupData && (
+        <div className="modal-overlay">
+          <div className="modal-content modal-width-500">
+            <h2 className="text-primary text-2xl mb-xl flex items-center gap-md mb-0">
+              💾 Restore Unsaved Changes?
+            </h2>
+            
+            <div className="bg-warning border border-light p-xl rounded-md mb-2xl">
+              <p className="text-secondary mb-md mb-0">
+                We found unsaved changes from your previous session.
+              </p>
+              <p className="text-sm text-muted mb-0">
+                Backup saved: {new Date(backupData.timestamp).toLocaleString()}
+              </p>
+            </div>
+
+            <div className="db-status db-status-info mb-2xl">
+              <p className="text-sm mb-0">
+                ✨ Your changes will be restored and you can continue editing where you left off.
+              </p>
+            </div>
+
+            <div className="flex gap-xl justify-end">
+              <button
+                onClick={() => {
+                  setShowBackupRestore(false)
+                  setBackupData(null)
+                  // Clear the backup since user chose not to restore
+                  BackupManager.clearBackup(projectId)
+                }}
+                className="btn btn-secondary"
+              >
+                Discard Changes
+              </button>
+              <button
+                onClick={() => {
+                  // Restore the backup data
+                  setMasterJSON(backupData.masterJSON)
+                  setJsonContent(JSON.stringify(backupData.masterJSON, null, 2))
+                  setHasUnsavedChanges(true) // Mark as having unsaved changes
+                  setShowBackupRestore(false)
+                  setBackupData(null)
+                }}
+                className="btn btn-primary"
+              >
+                🔄 Restore Changes
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }
