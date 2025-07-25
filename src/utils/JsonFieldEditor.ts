@@ -71,22 +71,28 @@ export class JsonFieldEditor {
    * @returns true if valid, false otherwise
    */
   static validateField(value: any, fieldPath: string): boolean {
-    // Basic validation rules
+    // Very permissive validation - don't be a pain in the ass
     if (fieldPath.includes('title') && typeof value === 'string') {
       return value.trim().length > 0;
     }
     
-    if (fieldPath.includes('duration') && typeof value === 'string') {
-      return /^\d+s$/.test(value); // Format: "3s", "5s", etc.
+    // Allow any duration format - don't enforce strict patterns
+    if (fieldPath.includes('duration')) {
+      return true; // Accept any duration format
     }
     
-    if (fieldPath.includes('camera_type') && typeof value === 'string') {
-      const validCameraTypes = ['wide', 'medium', 'close', 'extreme_close', 'establishing'];
-      return validCameraTypes.includes(value);
+    // Allow any camera type - don't restrict to preset options
+    if (fieldPath.includes('camera_type')) {
+      return true; // Accept any camera type
     }
     
-    // Default: non-empty values are valid
-    return value !== null && value !== undefined && value !== '';
+    // Allow any mood
+    if (fieldPath.includes('mood')) {
+      return true; // Accept any mood
+    }
+    
+    // Default: allow anything that's not null/undefined
+    return value !== null && value !== undefined;
   }
 
   /**

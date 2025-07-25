@@ -258,6 +258,8 @@ export default function DirectorsTimeline({
               hoveredElement={hoveredElement}
               onSelect={() => handleSceneSelect(scene.scene_id)}
               onElementHover={handleElementHover}
+              masterJson={content}
+              onSceneEdit={onContentUpdate}
             />
           ))}
         </div>

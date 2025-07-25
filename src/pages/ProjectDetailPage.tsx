@@ -369,18 +369,23 @@ export default function ProjectDetailPage({ user }: ProjectDetailPageProps) {
     const currentPhaseData = phases.find(p => p.phase_name === selectedPhase)
 
     return (
-      <div className="project-header flex justify-between items-center text-sm text-muted mb-xl">
-        <div>
-          Project: <strong className="text-primary">{project.name}</strong>
-        </div>
-        <div>
-          Client: <strong className="text-accent">{masterJSON?.project_metadata?.client || 'Unknown Client'}</strong> •
-          Progress: <strong className="text-success">{completedPhases}/5 phases completed</strong>
-        </div>
-        <div>
-          {currentPhaseData && (
-            <>Current: <strong className="text-accent">Phase {currentPhaseData.phase_index}</strong></>
-          )}
+      <div className="project-header-sticky">
+        <div className="flex justify-between items-center text-sm text-muted">
+          <div>
+            Project: <strong className="text-primary">{project.name}</strong>
+          </div>
+          <div className="project-status-center">
+            Client: <strong className="text-accent">{masterJSON?.project_metadata?.client || 'Unknown Client'}</strong> •
+            Progress: <strong className="text-success">{completedPhases}/5 phases completed</strong>
+            {hasUnsavedChanges && (
+              <span className="unsaved-changes-indicator">• ⚠️ Unsaved Changes</span>
+            )}
+          </div>
+          <div>
+            {currentPhaseData && (
+              <>Current: <strong className="text-accent">Phase {currentPhaseData.phase_index}</strong></>
+            )}
+          </div>
         </div>
       </div>
     )
