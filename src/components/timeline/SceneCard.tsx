@@ -72,6 +72,7 @@ export default function SceneCard({
     dialogue: `scenes.scene_${scene.scene_id}.dialogue`,
     natural_description: `scenes.scene_${scene.scene_id}.natural_description`,
     primary_focus: `scenes.scene_${scene.scene_id}.primary_focus`,
+    scene_frame_prompt: `scenes.scene_${scene.scene_id}.scene_frame_prompt`,
     composition_approach: `scenes.scene_${scene.scene_id}.composition_approach`
   };
 
@@ -493,12 +494,53 @@ export default function SceneCard({
           </div>
           
           {/* Generated Prompt */}
-          <textarea
-            className="scene-prompt-textarea"
-            placeholder="Generated image prompt will appear here..."
-            rows={4}
-            readOnly
-          />
+          <div className="scene-prompt-container">
+            <div className="scene-prompt-header">
+              <label className="scene-prompt-label">Generated Prompt</label>
+            </div>
+            <textarea
+              className="scene-prompt-textarea"
+              placeholder={scene.scene_frame_prompt ? "Click to edit generated prompt..." : "Generated image prompt will appear here..."}
+              value={editingField === 'scene_frame_prompt' ? (fieldValues.scene_frame_prompt || '') : (scene.scene_frame_prompt || '')}
+              rows={6}
+              readOnly={editingField !== 'scene_frame_prompt'}
+              onClick={(e) => {
+                e.stopPropagation();
+                if (editingField !== 'scene_frame_prompt') {
+                  setEditingField('scene_frame_prompt');
+                  setFieldValues(prev => ({ ...prev, scene_frame_prompt: scene.scene_frame_prompt || '' }));
+                }
+              }}
+              onChange={(e) => {
+                if (editingField === 'scene_frame_prompt') {
+                  setFieldValues(prev => ({ ...prev, scene_frame_prompt: e.target.value }));
+                }
+              }}
+              onBlur={() => {
+                if (editingField === 'scene_frame_prompt') {
+                  const fieldEditor = createFieldEditor(sceneFieldPaths.scene_frame_prompt, 'text');
+                  if (fieldEditor) {
+                    fieldEditor.updateValue(fieldValues.scene_frame_prompt || '');
+                  }
+                  setEditingField(null);
+                }
+              }}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' && e.ctrlKey) {
+                  e.currentTarget.blur();
+                }
+                if (e.key === 'Escape') {
+                  setEditingField(null);
+                  setFieldValues(prev => ({ ...prev, scene_frame_prompt: scene.scene_frame_prompt || '' }));
+                }
+              }}
+              style={{
+                cursor: editingField === 'scene_frame_prompt' ? 'text' : 'pointer',
+                backgroundColor: editingField === 'scene_frame_prompt' ? 'var(--color-bg-tertiary)' : 'var(--color-bg-secondary)',
+                border: editingField === 'scene_frame_prompt' ? '1px solid var(--color-border-focus)' : '1px solid var(--color-border-default)'
+              }}
+            />
+          </div>
           
           {/* Generation Buttons */}
           <div className="scene-generate-buttons">
@@ -535,7 +577,7 @@ export default function SceneCard({
           <textarea
             className="scene-prompt-textarea"
             placeholder="Video generation prompt will appear here..."
-            rows={4}
+            rows={6}
             readOnly
           />
           

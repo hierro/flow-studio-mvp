@@ -1077,13 +1077,199 @@ body {
 .timeline-scene-card {
   min-width: 300px;
   width: 100%; /* Force full width for V2 cards */
-  background-color: var(--color-bg-secondary);
+  background-color: #000000; /* Black background for scene cards */
   border: 1px solid var(--color-border-default);
 }
 
 .scene-card-content {
   padding: var(--space-xl);
 }
+
+/* Scene Prompt Container Styling */
+.scene-prompt-container {
+  margin-top: var(--space-md);
+}
+
+.scene-prompt-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--space-sm);
+}
+
+.scene-prompt-label {
+  font-size: var(--text-sm);
+  font-weight: 500;
+  color: var(--color-text-secondary);
+}
+
+/* ============================================
+   APP MODAL SYSTEM
+   ============================================ */
+
+.app-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10000;
+  padding: var(--space-xl);
+}
+
+.app-modal-content {
+  background-color: var(--color-bg-secondary);
+  border: 1px solid var(--color-border-default);
+  border-radius: var(--radius-lg);
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.4);
+  max-width: 500px;
+  width: 100%;
+  max-height: 80vh;
+  overflow-y: auto;
+  animation: modalSlideIn 0.2s ease-out;
+}
+
+.app-modal-loading {
+  border-color: var(--color-text-accent);
+}
+
+.app-modal-success {
+  border-color: var(--color-success);
+}
+
+.app-modal-error {
+  border-color: var(--color-error);
+}
+
+.app-modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--space-xl);
+  border-bottom: 1px solid var(--color-border-default);
+}
+
+.app-modal-title {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+}
+
+.app-modal-title h3 {
+  margin: 0;
+  font-size: var(--text-lg);
+  color: var(--color-text-primary);
+}
+
+.app-modal-icon {
+  font-size: var(--text-xl);
+}
+
+.app-modal-close {
+  background: none;
+  border: none;
+  color: var(--color-text-muted);
+  font-size: var(--text-2xl);
+  cursor: pointer;
+  padding: var(--space-xs);
+  line-height: 1;
+  transition: color 0.2s ease;
+}
+
+.app-modal-close:hover {
+  color: var(--color-text-primary);
+}
+
+.app-modal-body {
+  padding: var(--space-xl);
+}
+
+.app-modal-message {
+  margin: 0 0 var(--space-lg) 0;
+  color: var(--color-text-primary);
+  font-size: var(--text-base);
+}
+
+.app-modal-progress {
+  margin: var(--space-lg) 0;
+}
+
+.app-modal-progress-bar {
+  background-color: var(--color-bg-accent);
+  border-radius: var(--radius-sm);
+  height: 8px;
+  overflow: hidden;
+  margin-bottom: var(--space-sm);
+}
+
+.app-modal-progress-fill {
+  background-color: var(--color-text-accent);
+  height: 100%;
+  transition: width 0.3s ease;
+  border-radius: var(--radius-sm);
+}
+
+.app-modal-progress-text {
+  font-size: var(--text-sm);
+  color: var(--color-text-secondary);
+  text-align: center;
+  display: block;
+}
+
+.app-modal-progress-item {
+  display: block;
+  margin-top: var(--space-xs);
+  font-style: italic;
+}
+
+.app-modal-details {
+  margin-top: var(--space-lg);
+  padding-top: var(--space-lg);
+  border-top: 1px solid var(--color-border-default);
+}
+
+.app-modal-detail {
+  margin: var(--space-sm) 0;
+  font-size: var(--text-sm);
+  color: var(--color-text-muted);
+}
+
+.app-modal-spinner-container {
+  display: flex;
+  justify-content: center;
+  padding: var(--space-lg);
+  border-top: 1px solid var(--color-border-default);
+}
+
+.app-modal-spinner {
+  width: 24px;
+  height: 24px;
+  border: 3px solid var(--color-bg-accent);
+  border-top: 3px solid var(--color-text-accent);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes modalSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-20px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
 
 .scene-card-header {
   display: flex;

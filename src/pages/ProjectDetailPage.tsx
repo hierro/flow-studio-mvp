@@ -3,10 +3,13 @@ import { useParams, useNavigate } from 'react-router-dom'
 import { getProject, getProjectPhases, getMasterJSON, saveMasterJSON, saveMasterJSONFromObject, updateMasterJSON, getProjectVersions, getProjectVersion } from '../lib/database'
 import type { Project, ProjectPhase, PhaseName, ProjectVersion } from '../types/project'
 import ScriptInterpretationModule from '../components/phases/ScriptInterpretationModule'
+import ScenesFrameGenerationModule from '../components/phases/ScenesFrameGenerationModule'
 import Navigation from '../components/common/Navigation'
 import DirectorsTimeline from '../components/timeline/DirectorsTimeline'
 import StyleControl from '../components/global/StyleControl'
 import ConfigurationTab from '../components/admin/ConfigurationTab'
+import AppModal from '../components/AppModal'
+import { useAppModal, setGlobalModalInstance } from '../hooks/useAppModal'
 import { PhaseCompletion } from '../utils/PhaseCompletion'
 import { BackupManager } from '../utils/BackupManager'
 
@@ -27,7 +30,15 @@ export default function ProjectDetailPage({ user }: ProjectDetailPageProps) {
   const [masterJSON, setMasterJSON] = useState<any>({})
   const [showVersionHistory, setShowVersionHistory] = useState(false)
   const [versionHistory, setVersionHistory] = useState<ProjectVersion[]>([])
+
+  // App-level modal system
+  const appModal = useAppModal()
   const [loadingVersions, setLoadingVersions] = useState(false)
+
+  // Set global modal instance for other components to use
+  useEffect(() => {
+    setGlobalModalInstance(appModal)
+  }, [appModal])
 
   // Webhook configuration state (moved from ScriptInterpretationModule)
   const [useProduction, setUseProduction] = useState(true)
@@ -236,7 +247,7 @@ export default function ProjectDetailPage({ user }: ProjectDetailPageProps) {
     const names: Record<PhaseName, string> = {
       script_interpretation: 'Script Rendering',
       element_images: 'Elements Creation',
-      scene_generation: 'Scene Start Frame',
+      scene_generation: 'Scenes Frame Generation',
       scene_videos: 'Scene Video',
       final_assembly: 'Assembly'
     }
@@ -502,6 +513,24 @@ export default function ProjectDetailPage({ user }: ProjectDetailPageProps) {
             useProduction={useProduction}
             onUseProductionChange={setUseProduction}
           />
+        ) : selectedPhase === 'scene_generation' ? (
+          <ScenesFrameGenerationModule
+            phase={selectedPhaseData}
+            projectId={project.id}
+            projectName={project.name}
+            masterJSON={masterJSON}
+            onContentUpdate={(updatedJSON) => {
+              // Update local state only - NO database save, NO version creation
+              setMasterJSON(updatedJSON)
+              setJsonContent(JSON.stringify(updatedJSON, null, 2))
+              setHasUnsavedChanges(true) // Mark as having unsaved changes
+              
+              // Save backup to localStorage for data loss prevention
+              BackupManager.saveBackup(projectId, updatedJSON, databaseStatus.version)
+            }}
+            hasUnsavedChanges={hasUnsavedChanges}
+            onJsonChange={handleJsonChange}
+          />
         ) : (
           // Placeholder for other phases
           <div className="phase-content-container">
@@ -721,6 +750,12 @@ export default function ProjectDetailPage({ user }: ProjectDetailPageProps) {
           </div>
         </div>
       )}
+
+      {/* App-Level Modal System */}
+      <AppModal 
+        modalState={appModal.modalState}
+        onClose={appModal.hideModal}
+      />
     </div>
   )
 }

@@ -617,11 +617,19 @@ export async function getAppConfiguration(): Promise<any> {
       .from('app_configuration')
       .select('config_data')
       .order('updated_at', { ascending: false })
-      .limit(1)
-      .single();
+      .limit(1);
       
-    if (error) throw error;
-    return data?.config_data || {};
+    if (error) {
+      console.error('Error loading app configuration:', error);
+      return {};
+    }
+    
+    if (!data || data.length === 0) {
+      console.log('No app configuration found in database');
+      return {};
+    }
+    
+    return data[0]?.config_data || {};
   } catch (error) {
     console.error('Error loading app configuration:', error);
     return {};

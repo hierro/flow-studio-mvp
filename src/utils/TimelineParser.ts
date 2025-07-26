@@ -64,6 +64,9 @@ export interface TimelineScene {
   lighting_approach: string;
   composition_approach: string;
   
+  // Generated prompts (Phase 3+)
+  scene_frame_prompt?: string;
+  
   // Rich content for expandable view (equivalent to scenes_description.json)
   expandable_content: {
     locations_text: string;
@@ -201,6 +204,9 @@ export class TimelineParser {
       primary_focus: sceneData.primary_focus || '',
       lighting_approach: sceneData.lighting_approach || '',
       composition_approach: sceneData.composition_approach || '',
+      
+      // Generated prompts (Phase 3+)
+      scene_frame_prompt: sceneData.scene_frame_prompt,
       
       // Rich expandable content (from scenes_description.json equivalent)
       expandable_content: {
