@@ -8,6 +8,7 @@
 import { useState, useEffect } from 'react';
 import type { ProjectPhase } from '../../types/project';
 import { useLLMGeneration } from '../../hooks/useLLMGeneration';
+import { useImageGeneration } from '../../hooks/useImageGeneration';
 import { getGlobalModal } from '../../hooks/useAppModal';
 
 interface ScenesFrameGenerationModuleProps {
@@ -31,20 +32,37 @@ export default function ScenesFrameGenerationModule({
 }: ScenesFrameGenerationModuleProps) {
   const {
     generateAllPrompts,
-    isGenerating,
-    isReady,
-    progress,
-    error,
+    isGenerating: isGeneratingPrompts,
+    isReady: isLLMReady,
+    progress: llmProgress,
+    error: llmError,
     currentProvider,
     setProvider,
-    initializeService
+    initializeService: initializeLLMService
   } = useLLMGeneration();
 
-  // Initialize LLM service on mount
+  const {
+    generateAllSceneImages,
+    isGenerating: isGeneratingImages,
+    isReady: isImageServiceReady,
+    progress: imageProgress,
+    error: imageError,
+    currentService,
+    initializeService: initializeImageService
+  } = useImageGeneration();
+
+  // Initialize both services on mount
   useEffect(() => {
-    console.log('🚀 ScenesFrameGenerationModule: Initializing LLM service...');
-    initializeService().then((success) => {
+    console.log('🚀 ScenesFrameGenerationModule: Initializing services...');
+    
+    // Initialize LLM service
+    initializeLLMService().then((success) => {
       console.log(`✅ LLM service initialization: ${success ? 'SUCCESS' : 'FAILED'}`);
+    });
+    
+    // Initialize Image service
+    initializeImageService().then((success) => {
+      console.log(`✅ Image service initialization: ${success ? 'SUCCESS' : 'FAILED'}`);
     });
   }, []);
 
@@ -54,14 +72,21 @@ export default function ScenesFrameGenerationModule({
   const scenesWithPrompts = scenes.filter(sceneId => 
     masterJSON.scenes[sceneId]?.scene_frame_prompt
   ).length;
+  const scenesWithImages = scenes.filter(sceneId => 
+    masterJSON.scenes[sceneId]?.scene_start_frame
+  ).length;
 
   console.log('📊 Scenes Frame Generation State:', {
     totalScenes,
     scenesWithPrompts,
+    scenesWithImages,
     hasUnsavedChanges,
-    isGenerating,
-    isReady,
-    currentProvider
+    isGeneratingPrompts,
+    isGeneratingImages,
+    isLLMReady,
+    isImageServiceReady,
+    currentProvider,
+    currentService
   });
 
   // Handle bulk prompt generation
@@ -180,9 +205,280 @@ export default function ScenesFrameGenerationModule({
     }
   };
 
-  // Handle single scene prompt (placeholder for future)
-  const handleGenerateSinglePrompt = async () => {
-    console.log('🎯 Single scene generation - placeholder for future implementation');
+  // Handle bulk frame generation
+  const handleGenerateAllFrames = async () => {
+    console.log('🎨 Starting bulk frame generation for all scenes...');
+    
+    // Check if we have prompts to work with
+    const scenesWithPromptsData = scenes.filter(sceneId => 
+      masterJSON.scenes[sceneId]?.scene_frame_prompt
+    );
+    
+    if (scenesWithPromptsData.length === 0) {
+      const modal = getGlobalModal();
+      if (modal) {
+        modal.showModal({
+          title: '⚠️ No Prompts Available',
+          message: 'Generate prompts first before creating frames',
+          details: [
+            'Click "Generate Prompts" to create image prompts',
+            'Then use "Generate Frames" to create the actual images'
+          ],
+          type: 'error'
+        });
+      }
+      return;
+    }
+
+    // TESTING MODE: Limit to first 3 scenes for development
+    const TESTING_MODE = true;
+    const maxScenes = TESTING_MODE ? 3 : scenesWithPromptsData.length;
+    const processScenes = scenesWithPromptsData.slice(0, maxScenes);
+    
+    console.log(`🧪 Testing mode: Processing ${processScenes.length} of ${scenesWithPromptsData.length} scenes`);
+    
+    console.log('📊 Bulk frame generation context:', {
+      totalScenes: scenesWithPromptsData.length,
+      processScenes: processScenes.length,
+      testingMode: TESTING_MODE,
+      currentService,
+      hasPrompts: true
+    });
+
+    // Enhanced modal with detailed process tracking
+    const modal = getGlobalModal();
+    let completedScenes = 0;
+    
+    // Scene details with process status tracking
+    const sceneDetails = processScenes.map(sceneId => {
+      const sceneData = masterJSON.scenes[sceneId];
+      const sceneNumber = sceneId.replace('scene_', '');
+      const title = sceneData?.title || sceneData?.action_summary || `Scene ${sceneNumber}`;
+      return { 
+        id: sceneId, 
+        number: sceneNumber, 
+        title: title.substring(0, 35),
+        status: 'pending',
+        step: 'queued',
+        details: ''
+      };
+    });
+
+    // Show detailed process modal
+    if (modal) {
+      const testingNote = TESTING_MODE ? ` (Testing: First ${maxScenes} scenes only)` : '';
+      modal.showModal({
+        title: '🎨 Generating Scene Frames with Database Storage',
+        message: `Processing ${processScenes.length} scene images${testingNote}`,
+        details: [
+          `🔧 Service Pipeline: FAL.ai FLUX → Download → Supabase Storage → Database`,
+          `📊 Progress: 0/${processScenes.length} completed`,
+          `⏱️ Process: Each scene goes through 5 steps (Generate → Download → Upload → Database → Complete)`,
+          '',
+          '📋 Scene Processing List:',
+          ...sceneDetails.map(scene => `⚪ Scene ${scene.number}: ${scene.title} - Queued`),
+          '',
+          '🔄 Process Steps for Each Scene:',
+          '  1️⃣ Generate with FAL.ai FLUX API',
+          '  2️⃣ Download image from FAL.ai servers', 
+          '  3️⃣ Upload to our Supabase Storage',
+          '  4️⃣ Create database record with metadata',
+          '  5️⃣ Update masterJSON with permanent URL',
+          '',
+          '💾 Storage: Images stored permanently in our database',
+          '🔗 URLs: Permanent URLs replace temporary FAL.ai links',
+          '✅ Phase 3: Completes when all scenes have permanent stored images'
+        ],
+        type: 'loading'
+      });
+    }
+
+    try {
+      console.log(`🚀 STARTING BULK FRAME GENERATION PROCESS`);
+      console.log(`📊 Session Context:`, {
+        testingMode: TESTING_MODE,
+        totalAvailableScenes: scenesWithPromptsData.length,
+        processingScenes: processScenes.length,
+        projectId: projectId,
+        currentService: currentService
+      });
+      
+      // Prepare scene prompts for image generation (limited to testing scenes)
+      const scenePrompts = processScenes.map(sceneId => ({
+        sceneId,
+        prompt: masterJSON.scenes[sceneId].scene_frame_prompt,
+        projectId: projectId // Required for our storage system
+      }));
+      
+      console.log(`🎬 SCENE PROCESSING QUEUE:`, scenePrompts.map(s => ({
+        sceneId: s.sceneId,
+        promptLength: s.prompt?.length || 0,
+        hasPrompt: !!s.prompt
+      })));
+
+      // Generate images with detailed real-time progress updates
+      const result = await generateAllSceneImages(scenePrompts, {
+        onProgress: (progress) => {
+          completedScenes = progress.completed;
+          if (modal) {
+            // Update scene status with detailed process tracking
+            const updatedDetails = sceneDetails.map((scene, index) => {
+              if (index < completedScenes) {
+                return `✅ Scene ${scene.number}: ${scene.title} - ✅ COMPLETE (Database Stored)`;
+              } else if (index === completedScenes) {
+                // Current scene - show detailed step
+                const currentStep = progress.currentScene === scene.id ? 
+                  '⏳ Generating → Download → Upload → Database → Complete' : 
+                  '⏳ Processing...';
+                return `🔄 Scene ${scene.number}: ${scene.title} - ${currentStep}`;
+              } else {
+                return `⚪ Scene ${scene.number}: ${scene.title} - Queued`;
+              }
+            });
+
+            modal.showModal({
+              title: '🎨 Frame Generation Progress',
+              message: `${completedScenes}/${processScenes.length} scenes completed${testingNote}`,
+              details: [
+                '📋 Scene Status:',
+                ...updatedDetails,
+                '',
+                `🔄 Current Step: ${progress.currentScene ? `Processing ${progress.currentScene}` : 'Starting...'}`,
+                `📊 Overall: ${progress.percentage}% complete`
+              ],
+              type: 'loading'
+            });
+          }
+        }
+      });
+
+      console.log(`🎊 BULK FRAME GENERATION PROCESS COMPLETE`);
+      console.log(`📋 Final Results Summary:`, {
+        success: result.success,
+        totalScenes: result.totalScenes,
+        successfulScenes: result.successfulScenes,
+        failedScenes: result.totalScenes - result.successfulScenes,
+        errors: result.errors,
+        testingMode: TESTING_MODE,
+        processingTime: 'Logged individually per scene'
+      });
+      
+      // Log detailed per-scene results
+      result.results.forEach((sceneResult, index) => {
+        const logPrefix = `📊 [${sceneResult.sceneId}]`;
+        if (sceneResult.success) {
+          console.log(`${logPrefix} ✅ COMPLETE SUCCESS:`);
+          console.log(`${logPrefix}   • FAL.ai generation: SUCCESS`);
+          console.log(`${logPrefix}   • Database storage: SUCCESS`);
+          console.log(`${logPrefix}   • Final URL: ${sceneResult.imageUrl}`);
+          console.log(`${logPrefix}   • Original FAL.ai: ${sceneResult.originalFalUrl || 'N/A'}`);
+        } else {
+          console.log(`${logPrefix} ❌ FAILED:`);
+          console.log(`${logPrefix}   • Error: ${sceneResult.error}`);
+        }
+      });
+
+      if (result.successfulScenes > 0) {
+        // Update master JSON with all successful images
+        const updatedJSON = { ...masterJSON };
+        
+        result.results.forEach(imageResult => {
+          if (imageResult.success && imageResult.imageUrl) {
+            const sceneKey = imageResult.sceneId.startsWith('scene_') 
+              ? imageResult.sceneId 
+              : `scene_${imageResult.sceneId}`;
+            
+            if (!updatedJSON.scenes[sceneKey]) {
+              updatedJSON.scenes[sceneKey] = {};
+            }
+            
+            updatedJSON.scenes[sceneKey].scene_start_frame = imageResult.imageUrl;
+            updatedJSON.scenes[sceneKey].frame_metadata = {
+              generated_at: new Date().toISOString(),
+              provider: imageResult.provider,
+              width: imageResult.width,
+              height: imageResult.height,
+              content_type: imageResult.contentType,
+              seed: imageResult.seed,
+              request_id: imageResult.requestId
+            };
+
+            console.log(`✅ Updated scene ${sceneKey} with generated frame image`);
+          }
+        });
+
+        console.log('🎉 Master JSON updated with all successful frame images');
+
+        // Trigger content update and mark as changed
+        onContentUpdate(updatedJSON);
+        onJsonChange(JSON.stringify(updatedJSON, null, 2));
+
+        // Check Phase 3 completion status
+        const allScenesHavePrompts = scenes.every(sceneId => 
+          masterJSON.scenes[sceneId]?.scene_frame_prompt
+        );
+        const allProcessedScenesHaveImages = processScenes.every(sceneId => 
+          updatedJSON.scenes[sceneId]?.scene_start_frame
+        );
+        
+        const phase3Complete = allScenesHavePrompts && allProcessedScenesHaveImages;
+        const testingProgress = TESTING_MODE ? ` (${processScenes.length}/${scenesWithPromptsData.length} in testing mode)` : '';
+
+        // Show detailed success modal with complete process summary
+        if (modal) {
+          const successfulScenes = result.results.filter(r => r.success);
+          const failedScenes = result.results.filter(r => !r.success);
+          
+          modal.showModal({
+            title: '✅ Generation Complete',
+            message: `${result.successfulScenes}/${result.totalScenes} scenes processed successfully${testingProgress}`,
+            details: [
+              '✅ Completed Scenes:',
+              ...successfulScenes.map(scene => 
+                `  ✅ ${scene.sceneId}: Stored in database`
+              ),
+              ...(failedScenes.length > 0 ? [
+                '',
+                '❌ Failed Scenes:',
+                ...failedScenes.map(scene => 
+                  `  ❌ ${scene.sceneId}: ${scene.error}`
+                )
+              ] : []),
+              '',
+              `📊 Project: ${scenesWithImages + result.successfulScenes}/${totalScenes} scenes have images`,
+              phase3Complete ? '🎉 Phase 3 Complete!' : '⏳ Generate remaining scenes to complete Phase 3'
+            ],
+            type: 'success'
+          });
+          
+          // Auto-hide success modal after 7 seconds (more details to read)
+          setTimeout(() => {
+            modal.hideModal();
+          }, 7000);
+        }
+      } else {
+        // Show error if no frames generated
+        if (modal) {
+          modal.showModal({
+            title: '❌ Frame Generation Failed',
+            message: 'No frame images were generated successfully',
+            type: 'error'
+          });
+        }
+      }
+    } catch (error) {
+      console.error('💥 Exception during bulk frame generation:', error);
+      
+      // Show error modal
+      const modal = getGlobalModal();
+      if (modal) {
+        modal.showModal({
+          title: '❌ Frame Generation Error',
+          message: `Error: ${error instanceof Error ? error.message : 'Unknown error occurred'}`,
+          type: 'error'
+        });
+      }
+    }
   };
 
   return (
@@ -205,8 +501,14 @@ export default function ScenesFrameGenerationModule({
             </span>
             <span>•</span>
             <span>
-              Scenes: <strong className="script-db-connected">
+              Prompts: <strong className="script-db-connected">
                 {scenesWithPrompts}/{totalScenes}
+              </strong>
+            </span>
+            <span>•</span>
+            <span>
+              Frames: <strong className="script-db-connected">
+                {scenesWithImages}/{totalScenes}
               </strong>
             </span>
           </div>
@@ -220,18 +522,28 @@ export default function ScenesFrameGenerationModule({
           
           {/* Status Messages */}
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', fontSize: '0.875rem' }}>
-            <span className={!isReady ? 'text-error' : 'text-success'}>
-              {!isReady ? (
+            <span className={!isLLMReady ? 'text-error' : 'text-success'}>
+              {!isLLMReady ? (
                 <>❌ LLM Error</>
-              ) : isReady ? (
-                <>✅ Ready</>
+              ) : isLLMReady ? (
+                <>✅ LLM Ready</>
               ) : (
-                <>⏳ Loading</>
+                <>⏳ LLM Loading</>
               )}
             </span>
             
-            {error && (
-              <span className="text-error">❌ {error}</span>
+            <span className={!isImageServiceReady ? 'text-error' : 'text-success'}>
+              {!isImageServiceReady ? (
+                <>❌ Image Error</>
+              ) : isImageServiceReady ? (
+                <>✅ Image Ready</>
+              ) : (
+                <>⏳ Image Loading</>
+              )}
+            </span>
+            
+            {(llmError || imageError) && (
+              <span className="text-error">❌ {llmError || imageError}</span>
             )}
             
             {hasUnsavedChanges && (
@@ -242,9 +554,15 @@ export default function ScenesFrameGenerationModule({
               {currentProvider === 'openai' ? '🤖 OPENAI' : '🧠 CLAUDE'}
             </span>
             
-            {isGenerating && progress.total > 0 && (
+            {currentService && (
+              <span className="text-accent">
+                🎨 {currentService.toUpperCase().replace('_', ' ')}
+              </span>
+            )}
+            
+            {(isGeneratingPrompts || isGeneratingImages) && (
               <span className="text-muted" style={{ fontSize: '0.75rem' }}>
-                Progress: {progress.completed}/{progress.total} ({progress.percentage}%)
+                {isGeneratingPrompts ? 'Generating prompts...' : 'Generating frames...'}
               </span>
             )}
           </div>
@@ -260,7 +578,7 @@ export default function ScenesFrameGenerationModule({
                 checked={currentProvider === 'claude'}
                 onChange={(e) => setProvider(e.target.checked ? 'claude' : 'openai')}
                 style={{ marginRight: '0.375rem' }}
-                disabled={isGenerating}
+                disabled={isGeneratingPrompts || isGeneratingImages}
               />
               Use Claude (vs OpenAI)
             </label>
@@ -270,18 +588,19 @@ export default function ScenesFrameGenerationModule({
           <div style={{ display: 'flex', gap: '0.375rem' }}>
             <button
               onClick={handleGenerateAllPrompts}
-              disabled={!isReady || isGenerating || totalScenes === 0}
-              className={`btn text-xs px-md py-xs ${isGenerating ? 'btn-secondary' : 'btn-primary'}`}
+              disabled={!isLLMReady || isGeneratingPrompts || isGeneratingImages || totalScenes === 0}
+              className={`btn text-xs px-md py-xs ${isGeneratingPrompts ? 'btn-secondary' : 'btn-primary'}`}
             >
-              {isGenerating ? '⏳ Generating...' : 'Generate Prompts'}
+              {isGeneratingPrompts ? '⏳ Generating...' : 'Generate Prompts'}
             </button>
             
             <button
-              onClick={handleGenerateSinglePrompt}
-              disabled={!isReady || isGenerating || totalScenes === 0}
-              className="btn text-xs px-md py-xs btn-secondary"
+              onClick={handleGenerateAllFrames}
+              disabled={!isImageServiceReady || isGeneratingPrompts || isGeneratingImages || scenesWithPrompts === 0}
+              className={`btn text-xs px-md py-xs ${isGeneratingImages ? 'btn-secondary' : 'btn-primary'}`}
+              title="Testing mode: Generates first 3 scenes only"
             >
-              Generate Frames
+              {isGeneratingImages ? '⏳ Generating...' : '🧪 Generate Frames (Test: 3 scenes)'}
             </button>
           </div>
         </div>

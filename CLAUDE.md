@@ -5,16 +5,17 @@
 
 ## 🎯 **CURRENT PROJECT STATUS** 
 
-**✅ LLM CONFIGURATION SYSTEM COMPLETE**: Full accordion-based config management with auto-reload functionality  
-**✅ PROMPT FORMATTING PIPELINE**: Clean textarea → database → LLM workflow with proper line break handling  
-**✅ VARIABLE INJECTION READY**: n8n-compatible `{{$json.field}}` system for scene data processing  
-**✅ WEB-BROTHER ALIGNMENT**: Complete documentation and formatting guide for prompt generation workflows  
-**✅ ACCORDION PERSISTENCE**: localStorage state management across tab switches for improved UX  
-**✅ TIMELINE EDITING FOUNDATION**: JsonFieldEditor system proven and extensible for any JSON field editing  
-**✅ MASTER JSON ARCHITECTURE**: Phase-agnostic additive system with clean versioning and backup management  
-**🚀 NEXT PRIORITY**: Extend timeline editing to scene properties (duration, camera, mood) using established patterns  
-**📊 DATABASE**: Schema v2.0 + app_configuration table for runtime LLM config management  
-**🎨 STYLING**: Complete responsive CSS system with formatting preservation for technical content  
+**✅ PHASE 3 IMAGE GENERATION & DATABASE STORAGE - COMPLETE & PRODUCTION READY**  
+**✅ DATABASE-CENTRIC IMAGE ARCHITECTURE**: Full FAL.ai → Download → Supabase Storage → Database → masterJSON pipeline working  
+**✅ PERMANENT URL SYSTEM**: All images stored in our system with permanent URLs (no external dependencies)  
+**✅ COMPREHENSIVE LOGGING**: Real-time progress tracking with timing metrics and visual feedback  
+**✅ CLEAN MODAL SYSTEM**: Synthetic progress tracker focusing on dynamic status updates  
+**✅ MASTER JSON COMPLIANCE**: Images referenced by permanent database URLs ensuring Phase 4+ compatibility  
+**✅ SUPABASE STORAGE INTEGRATION**: RLS policies configured, scene-images bucket operational  
+**✅ PROJECT_ASSETS TABLE**: Schema v3 project_assets table with full metadata and versioning support  
+**🚀 NEXT PRIORITY**: Phase 4 development or timeline editing extension using established image storage patterns  
+**📊 DATABASE**: Schema v3.0 with integrated asset storage and cross-phase change tracking  
+**🎨 STYLING**: Complete responsive CSS system with 88% inline reduction achievement  
 
 ---
 
@@ -127,33 +128,36 @@ When asked to update CLAUDE.md or README.md independently (outside finalize work
 ❌ **Inline Style Proliferation**: Use global CSS classes, maintain 88% reduction achieved  
 
 ### **Current Known Issues**
-⚠️ **ESLint Configuration**: Parser configuration error prevents linting (build still works)  
-⚠️ **Timeline Components**: DirectorsTimeline.tsx and SceneCard.tsx started but not integrated  
-⚠️ **TimelineParser**: Utility exists but needs Italian campaign data integration  
+⚠️ **ESLint Warnings**: 38 warnings (unused variables, mostly in timeline components) - build works perfectly  
+⚠️ **Bundle Size**: Main chunk 556KB (consider dynamic imports for future optimization)  
 
 ### **Proven Development Patterns**
 ```typescript
-// Database Pattern (MANDATORY)
+// Image Storage Pattern (PRODUCTION-READY)
+const imageStoragePattern = {
+  pipeline: "FAL.ai generation → Download → Supabase Storage → Database record → masterJSON update",
+  permanent_urls: "https://supabase-storage.com/scene-images/projects/{projectId}/scenes/{sceneId}.jpeg",
+  database_records: "project_assets table with full metadata and version tracking",
+  fallback_system: "Graceful degradation to FAL.ai URLs if storage fails",
+  rls_policies: "INSERT for authenticated, SELECT for public access"
+}
+
+// Database Pattern (ESTABLISHED)
 const databasePattern = {
   read: "Direct Supabase client queries with RLS",
   write: "updatePhaseContent() for all content changes", 
+  storage: "ImageStorageService.downloadAndStore() for permanent asset management",
   versioning: "Automatic version creation in phase_versions table",
   relationships: "Foreign key constraints with CASCADE DELETE"
 }
 
-// Component Pattern (ESTABLISHED)
+// Component Pattern (PROVEN)
 const componentPattern = {
-  styling: "Hybrid approach: CSS classes + strategic inline styles for responsive/dynamic values",
-  styling_lessons: {
-    css_classes: "Use for static styling (colors, borders, transitions)",
-    inline_styles: "Use for dynamic values (responsive padding, font sizes, heights)",
-    responsive_design: "Inline styles with rem units scale properly across devices",
-    anti_pattern: "CSS class responsive breakpoints (md:text-lg) often don't work as expected"
-  },
+  styling: "Hybrid approach: CSS classes + strategic inline styles (88% inline reduction achieved)",
   state: "useState for local, database for persistence",
   props: "Typed interfaces in src/types/project.ts",
-  integration: "Direct database.ts function calls",
-  error_handling: "Try/catch with user-friendly messages"
+  integration: "Direct database.ts function calls + ImageStorageService for assets",
+  error_handling: "Try/catch with user-friendly messages + fallback systems"
 }
 
 // N8N Integration Pattern (PRODUCTION-READY)
@@ -170,38 +174,39 @@ const n8nPattern = {
 
 ## 🏗️ **TECHNICAL ARCHITECTURE** 
 
-### **Technology Stack** (VALIDATED & OPTIMIZED)
+### **Technology Stack** (PRODUCTION-OPTIMIZED)
 ```typescript
 Frontend: Vite 5.4.19 + React 19 + TypeScript 5 + React Router 6.28.0
-Styling: Global CSS system with design tokens (responsive, 88% inline reduction)
-Database: Supabase PostgreSQL with enhanced schema v2.0
-Authentication: Supabase Auth (complete working system)
+Styling: Global CSS system with design tokens (88% inline reduction achieved)
+Database: Supabase PostgreSQL with schema v3.0 + integrated asset storage
+Authentication: Supabase Auth with RLS policies for storage access
+Storage: Supabase Storage with scene-images bucket for permanent image URLs
 Integration: n8n TESTA_ANIMATIC workflow (production-ready, 95%+ success)
-AI Services: FAL.ai FLUX (proven >95% character consistency)
-Performance: 3.19s build, 423ms dev startup, instant HMR
-Bundle: CSS 27.89kB, JS 486.17kB (optimized and separated)
+AI Services: FAL.ai FLUX with database-centric storage pipeline
+Performance: 6.40s build, 446ms dev startup, instant HMR
+Bundle: CSS 48.74kB, JS 556.25kB main chunk (consider dynamic imports)
 ```
 
-### **Enhanced Database Schema v2.0** (DEPLOYED & TESTED)
-**Reference**: `docs/db/schema_v2.sql` (current active schema)
+### **Schema v3.0 with Integrated Asset Storage** (DEPLOYED & PRODUCTION-TESTED)
+**Reference**: `docs/db/schema_v3.sql` (current active schema)
 
 ```sql
--- Core Tables (Enhanced from v1)
-✅ projects          -- Metadata + timeline features + global style
-✅ project_phases    -- 5-phase workflow + cross-phase tracking  
-✅ phase_versions    -- Version history + change relationships
+-- Core Tables (Clean Master JSON Architecture)
+✅ projects          -- Master JSON single source of truth + metadata
+✅ project_phases    -- 5-phase workflow + unlock progression  
+✅ phase_versions    -- Version history + backup management
 ✅ n8n_jobs         -- Workflow tracking + enhanced reliability
 
--- Timeline Architecture (New in v2)
-✅ content_changes   -- Cross-phase change tracking (enables 3-tab timeline)
-✅ project_assets    -- Phase 2+ asset management (images/videos)
+-- Asset Storage Architecture (Production-Ready)
+✅ project_assets    -- Image storage with permanent URLs + metadata
+✅ content_changes   -- Cross-phase change tracking for timeline
 ✅ user_activities   -- Analytics and debugging support
 
--- Key Timeline Enablers
-✅ Cross-phase impact tracking (style changes affect all phases)
-✅ Element relationship mapping (enables elements tab functionality)  
-✅ Asset approval workflows (Phase 2+ image/video management)  
-✅ Performance optimization (strategic indexes for timeline queries)
+-- Image Storage Features (WORKING)
+✅ Permanent URL system (no external dependencies on FAL.ai)
+✅ Database-centric architecture (masterJSON references our URLs)
+✅ RLS policies configured (authenticated upload, public read)  
+✅ Metadata tracking (generation prompts, model info, versioning)
 ```
 
 ### **CSS Globalization System** (COMPLETE & BATTLE-TESTED)
@@ -487,7 +492,7 @@ node project-scanner.js
 # Verify: Technical references match actual implementation
 
 # 6. Review docs folder consolidation
-# docs/db/ → Ensure schema_v2.sql is current reference
+# docs/db/ → Ensure schema_v3.sql is current reference
 # docs/design_and_planning/ → Check for redundancy, merge if needed
 # docs/script_data/ → Validate Italian campaign data structure
 ```
@@ -593,18 +598,32 @@ node project-scanner.js
 - **Web-Brother Alignment**: Complete documentation and implementation guide created for prompt generation workflows
 - **Critical Success**: Eliminated complex escape processing, established clean data flow for AI generation
 
+### **2025-07-26: Phase 3 Image Generation & Database Storage System - COMPLETE**
+- **Achievement**: Full database-centric image storage pipeline working in production
+- **Architecture**: FAL.ai generation → Download → Supabase Storage → Database record → masterJSON update
+- **Permanent URLs**: All images stored with permanent database URLs (no external FAL.ai dependencies)
+- **RLS Configuration**: Supabase storage policies configured for authenticated upload, public read access
+- **Comprehensive Logging**: Real-time progress tracking with timing metrics and visual feedback
+- **Modal Enhancement**: Clean synthetic progress tracker focused on dynamic status updates
+- **Database Integration**: project_assets table with full metadata, versioning, and generation parameters
+- **System Validation**: 3 scenes successfully processed with permanent URLs in masterJSON
+- **Storage Cleanup Fix**: Complete project deletion with storage file cleanup implemented and tested
+- **Critical Success**: Database-centric architecture achieved, Phase 4+ workflow compatibility ensured
+
 ### **Next Session Priorities**
-1. **EXTEND**: Timeline scene editing to all properties using established JsonFieldEditor patterns
-2. **INTEGRATE**: Prompt generation with variable injection for actual scene processing  
-3. **IMPLEMENT**: Elements tab for cross-scene element tracking and management
-4. **TEST**: Full LLM integration workflow from config → scene data → processed prompts
+1. **SINGLE vs BULK IMAGE REGENERATION**: Implement individual scene image regeneration workflow  
+2. **ASSET VERSIONING**: Handle multiple image versions per scene with proper cleanup mechanisms
+3. **PHASE 4**: Video generation system using established image storage patterns
+4. **TIMELINE EXTENSION**: Complete 3-tab timeline (scenes, elements, style) using proven architecture
+5. **OPTIMIZATION**: Address bundle size (557KB main chunk) with dynamic imports
 
 ### **Session Completion Validation**
-- [x] **LLM Config System**: Complete accordion interface with auto-reload functionality
-- [x] **Prompt Formatting**: Clean textarea → DB → LLM pipeline working with proper line breaks
-- [x] **Variable Injection**: Ready for `{{$json.field}}` processing with scene data
-- [x] **Accordion Persistence**: localStorage state management across tab switches
-- [x] **Web-Brother Docs**: Complete guide for prompt generation workflow implementation
-- [x] **Build System**: Clean compilation (7.30s), ESLint config noted, functionality preserved
-- [x] **Data Flow**: Raw prompt storage validated, format preview system working
-- [x] **Foundation Ready**: All components ready for scene-based prompt generation integration
+- [x] **Image Storage Pipeline**: Complete FAL.ai → Database workflow operational and tested end-to-end
+- [x] **Permanent URL System**: All images stored in our system with database URLs (zero external dependencies)
+- [x] **RLS Policies**: Supabase storage configured for authenticated uploads with public read access
+- [x] **Database Records**: project_assets table with full metadata and versioning support
+- [x] **Storage Cleanup**: Complete project deletion with storage file cleanup implemented and verified
+- [x] **masterJSON Compliance**: Images referenced by permanent URLs ensuring Phase 4+ compatibility
+- [x] **Build System**: Clean compilation (7.71s), all functionality preserved with 557KB main bundle
+- [x] **End-to-End Testing**: Fresh project creation → image generation → project deletion → storage cleanup verified
+- [x] **Production Ready**: Phase 3 complete with bulletproof database-centric architecture

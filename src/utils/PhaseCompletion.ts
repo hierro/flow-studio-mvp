@@ -33,10 +33,10 @@ export class PhaseCompletion {
     //   completed++;
     // }
     
-    // Phase 3: Scene Generation - Has generated frames (future)
-    // if (masterJSON?.scenes && this.hasGeneratedFrames(masterJSON)) {
-    //   completed++;
-    // }
+    // Phase 3: Scene Generation - Has generated frames and prompts
+    if (masterJSON?.scenes && this.hasGeneratedFrames(masterJSON)) {
+      completed++;
+    }
     
     // Phase 4: Scene Videos - Has video files (future)
     // if (masterJSON?.scenes && this.hasSceneVideos(masterJSON)) {
@@ -117,5 +117,25 @@ export class PhaseCompletion {
     }
     
     return false;
+  }
+  
+  /**
+   * Check if scenes have generated frames and prompts (Phase 3 completion)
+   * @param masterJSON - The master JSON object  
+   * @returns true if scenes have both prompts and frame images
+   */
+  private static hasGeneratedFrames(masterJSON: any): boolean {
+    if (!masterJSON.scenes || typeof masterJSON.scenes !== 'object') {
+      return false;
+    }
+    
+    const scenes = Object.keys(masterJSON.scenes);
+    if (scenes.length === 0) return false;
+    
+    // Check if all scenes have both prompts and frame images
+    return scenes.every(sceneId => {
+      const scene = masterJSON.scenes[sceneId];
+      return scene?.scene_frame_prompt && scene?.scene_start_frame;
+    });
   }
 }

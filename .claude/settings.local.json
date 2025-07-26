@@ -18,7 +18,8 @@
       "Bash(timeout 5 npm run dev)",
       "Bash(psql:*)",
       "Bash(node:*)",
-      "Bash(mkdir:*)"
+      "Bash(mkdir:*)",
+      "Bash(grep:*)"
     ],
     "deny": []
   }

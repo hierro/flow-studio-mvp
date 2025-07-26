@@ -37,7 +37,13 @@ const PHASE_DISPLAY_NAMES: Record<PhaseName, string> = {
 
 export async function deleteProject(projectId: string): Promise<boolean> {
   try {
-    // Delete project (cascade will handle phases, versions, etc.)
+    // 1. Get all asset filenames before deletion for storage cleanup
+    const { data: assets } = await supabase
+      .from('project_assets')
+      .select('asset_filename')
+      .eq('project_id', projectId);
+
+    // 2. Delete project (cascade will handle related records)
     const { error } = await supabase
       .from('projects')
       .delete()
@@ -46,6 +52,38 @@ export async function deleteProject(projectId: string): Promise<boolean> {
     if (error) {
       console.error('Error deleting project:', error)
       return false
+    }
+
+    // 3. Clean up storage files
+    if (assets && assets.length > 0) {
+      // First, remove all files in the project folder
+      const { data: files, error: listError } = await supabase.storage
+        .from('scene-images')
+        .list(`projects/${projectId}/scenes`);
+      
+      if (!listError && files && files.length > 0) {
+        const filePaths = files.map(file => `projects/${projectId}/scenes/${file.name}`);
+        
+        const { error: storageError } = await supabase.storage
+          .from('scene-images')
+          .remove(filePaths);
+        
+        if (storageError) {
+          console.warn('Storage cleanup failed (non-critical):', storageError);
+        } else {
+          console.log(`✅ Cleaned up ${filePaths.length} storage files`);
+        }
+      }
+      
+      // Also try to remove the project folder structure if empty
+      try {
+        await supabase.storage
+          .from('scene-images')
+          .remove([`projects/${projectId}/scenes`, `projects/${projectId}`]);
+      } catch (folderError) {
+        // Folder cleanup is optional - may fail if not empty
+        console.log('Folder cleanup completed (or folders non-empty)');
+      }
     }
 
     return true

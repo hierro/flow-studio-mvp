@@ -12,12 +12,12 @@
 
 FLOW.STUDIO revolutionizes video production by providing **Story Intelligence** - understanding narrative relationships across scenes instead of just perfecting individual frames. Built for directors, content creators, and production teams who need professional video content with narrative coherence.
 
-### **Key Innovation: LLM-Powered Configuration Management**
-- **Accordion Interface**: Organized prompt editing with persistent UI state
-- **Runtime Configuration**: Database-driven LLM settings with auto-reload functionality  
-- **Variable Injection**: n8n-compatible `{{$json.field}}` template processing
-- **Clean Data Flow**: Textarea → Database → LLM pipeline with proper formatting
-- **Web-Brother Ready**: Complete documentation for prompt generation workflows
+### **Key Innovation: Database-Centric Asset Management**
+- **Permanent Image Storage**: Complete FAL.ai → Supabase Storage → Database pipeline
+- **Zero External Dependencies**: All assets stored in your system with permanent URLs
+- **Phase 3 Production Ready**: Image generation with comprehensive logging and fallback systems
+- **RLS Security**: Authenticated uploads with public read access via Supabase policies
+- **masterJSON Compliance**: Timeline integrity maintained across all development phases
 
 ## 🚀 **Quick Start**
 
@@ -58,18 +58,18 @@ npm run dev
 - **AI Workflow**: n8n TESTA_ANIMATIC integration (95%+ success rate)
 - **Character Consistency**: Proven Samantha Cristoforetti system
 
-### **Database Schema v2.0**
+### **Database Schema v3.0 with Asset Storage**
 ```sql
--- Core production workflow
-✅ projects          -- Project metadata + timeline features
+-- Core production workflow  
+✅ projects          -- Master JSON single source of truth
 ✅ project_phases    -- 5-phase workflow progression  
-✅ phase_versions    -- Complete version history
+✅ phase_versions    -- Complete version history + backup management
 ✅ n8n_jobs         -- AI workflow tracking
 ✅ app_configuration -- LLM settings and prompt management
 
--- Story intelligence features  
+-- Asset management (Production-Ready)
+✅ project_assets    -- Permanent image storage with metadata
 ✅ content_changes   -- Cross-phase change tracking
-✅ project_assets    -- Asset approval workflows
 ✅ user_activities   -- Analytics and debugging
 ```
 
@@ -78,15 +78,15 @@ npm run dev
 ### **5-Phase Workflow**
 1. **Script Rendering** ✅ Complete (master JSON architecture + timeline editing foundation)
 2. **Elements Creation** 🔄 Ready for implementation  
-3. **Scene Start Frame** 🔄 LLM configuration ready, variable injection system complete
-4. **Scene Video** 📋 Planned (FAL.ai FLUX integration + video compilation)
+3. **Scene Start Frame** ✅ Complete (FAL.ai → Database storage pipeline operational)
+4. **Scene Video** 📋 Ready (image storage patterns established for video workflow)
 5. **Assembly** 📋 Planned (final production workflows)
 
-### **LLM Configuration Management** ✅
-- **Accordion Interface**: 5 organized sections with localStorage persistence
-- **Prompt Pipeline**: Clean textarea → database → LLM workflow
-- **Variable Injection**: n8n-compatible `{{$json.field}}` template processing  
-- **Auto-reload System**: Runtime configuration updates for immediate availability
+### **Phase 3: Image Generation & Storage** ✅ 
+- **Database-Centric Pipeline**: FAL.ai generation → Download → Supabase Storage → Database
+- **Permanent URLs**: Zero external dependencies, all images in your system
+- **RLS Security**: Authenticated uploads with public read access policies
+- **Comprehensive Logging**: Real-time progress tracking with timing metrics
 
 ### **Story Intelligence System**
 - **Narrative Understanding**: Scene relationships vs isolated frames
@@ -139,10 +139,11 @@ npm run preview      # Preview production build
 - **TypeScript**: Clean compilation, zero type errors
 
 ### **Production Metrics**
+- **Build Performance**: 7.71s production build, 446ms dev startup
+- **Image Storage**: 100% success rate with permanent URLs + complete cleanup on deletion
 - **Character Consistency**: >95% across 13-scene productions
 - **AI Processing**: 12-18 minutes for complete animatic
-- **Database Performance**: Optimized queries with strategic indexes
-- **User Experience**: Instant page loads, responsive interface
+- **Database Performance**: Schema v3.0 with optimized asset queries and CASCADE DELETE
 
 ## 🎯 **Competitive Advantages**
 

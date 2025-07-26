@@ -2,9 +2,9 @@
 
 ## 🗂️ **Current Schema Status**
 
-**Active Version:** v2.0 (Fresh deployment with timeline features)  
-**Deployed:** ✅ Successfully deployed and tested  
-**Status:** Production ready with enhanced timeline architecture
+**Active Version:** v3.0 (Clean master JSON architecture with integrated asset storage)  
+**Deployed:** ✅ Successfully deployed with project_assets table
+**Status:** Production ready with integrated image storage support
 
 ---
 

@@ -67,6 +67,9 @@ export interface TimelineScene {
   // Generated prompts (Phase 3+)
   scene_frame_prompt?: string;
   
+  // Generated images (Phase 3+)
+  scene_start_frame?: string;
+  
   // Rich content for expandable view (equivalent to scenes_description.json)
   expandable_content: {
     locations_text: string;
@@ -207,6 +210,9 @@ export class TimelineParser {
       
       // Generated prompts (Phase 3+)
       scene_frame_prompt: sceneData.scene_frame_prompt,
+      
+      // Generated images (Phase 3+)
+      scene_start_frame: sceneData.scene_start_frame,
       
       // Rich expandable content (from scenes_description.json equivalent)
       expandable_content: {

@@ -479,18 +479,24 @@ export default function SceneCard({
             <h4 className="scene-column-title">Image Generation</h4>
           </div>
           
-          {/* Image Placeholder */}
+          {/* Image Display - Generated or Placeholder */}
           <div className="scene-media-placeholder">
             <img 
-              src={placeholderImage} 
-              alt="Scene placeholder" 
+              src={scene.scene_start_frame || placeholderImage} 
+              alt={scene.scene_start_frame ? `Generated frame for scene ${scene.scene_id}` : "Scene placeholder"} 
               style={{
                 width: '100%',
                 height: '100%',
                 objectFit: 'cover',
-                borderRadius: 'var(--radius-sm)'
+                borderRadius: 'var(--radius-sm)',
+                border: scene.scene_start_frame ? '2px solid #10b981' : '1px solid var(--color-border-default)'
               }}
             />
+            {scene.scene_start_frame && (
+              <div className="scene-image-badge">
+                <span style={{ fontSize: '0.75rem', color: '#10b981' }}>✅ Generated</span>
+              </div>
+            )}
           </div>
           
           {/* Generated Prompt */}

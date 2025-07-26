@@ -1,6 +1,6 @@
 FLOW STUDIO MVP - COMPLETE WORKING PATTERNS FOR CLAUDE WEB
 =========================================================
-Generated: 2025-07-25T21:14:26.208Z
+Generated: 2025-07-26T11:50:01.456Z
 Purpose: Show actual working code for proper development planning and suggestions
 
 ## CURRENT STATUS & CRITICAL INSIGHT
@@ -199,7 +199,13 @@ const PHASE_DISPLAY_NAMES: Record<PhaseName, string> = {
 
 export async function deleteProject(projectId: string): Promise<boolean> {
   try {
-    // Delete project (cascade will handle phases, versions, etc.)
+    // 1. Get all asset filenames before deletion for storage cleanup
+    const { data: assets } = await supabase
+      .from('project_assets')
+      .select('asset_filename')
+      .eq('project_id', projectId);
+
+    // 2. Delete project (cascade will handle related records)
     const { error } = await supabase
       .from('projects')
       .delete()
@@ -210,28 +216,15 @@ export async function deleteProject(projectId: string): Promise<boolean> {
       return false
     }
 
-    return true
-  } catch (error) {
-    console.error('Error in deleteProject:', error)
-    return false
-  }
-}
-
-export async function createProject(name: string, userId: string): Promise<{ project: Project; phases: ProjectPhase[] } | null> {
-  try {
-    // Set initial master JSON with project name
-    const initialMasterJSON = {
-      ...DEFAULT_MASTER_JSON,
-      project_metadata: {
-        ...DEFAULT_MASTER_JSON.project_metadata,
-        title: name
-      }
-    }
-
-    // Create project with master JSON
-    const { data: project, error: projectError } = await supabase
-      .from('projects')
-    
+    // 3. Clean up storage files
+    if (assets && assets.length > 0) {
+      // First, remove all files in the project folder
+      const { data: files, error: listError } = await supabase.storage
+        .from('scene-images')
+        .list(`projects/${projectId}/scenes`);
+      
+      if (!listError && files && files.length > 0) {
+        const filePaths = files.map(file => `projects/${projectId}/
 ```
 
 ### 4. TYPESCRIPT INTERFACES (src/types/project.ts) - COMPLETE SYSTEM ✅

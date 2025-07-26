@@ -1708,6 +1708,16 @@ body {
   background: var(--color-bg-secondary);
 }
 
+.scene-image-badge {
+  position: absolute;
+  top: var(--space-xs);
+  right: var(--space-xs);
+  background: rgba(0, 0, 0, 0.8);
+  padding: var(--space-xs) var(--space-sm);
+  border-radius: var(--radius-sm);
+  backdrop-filter: blur(4px);
+}
+
 /* Prompt textarea styling */
 .scene-prompt-textarea {
   background-color: var(--color-bg-secondary);
