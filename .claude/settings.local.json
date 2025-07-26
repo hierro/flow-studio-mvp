@@ -19,7 +19,9 @@
       "Bash(psql:*)",
       "Bash(node:*)",
       "Bash(mkdir:*)",
-      "Bash(grep:*)"
+      "Bash(grep:*)",
+      "Bash(npx supabase:*)",
+      "Bash(sed:*)"
     ],
     "deny": []
   }

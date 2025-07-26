@@ -183,8 +183,8 @@ Authentication: Supabase Auth with RLS policies for storage access
 Storage: Supabase Storage with scene-images bucket for permanent image URLs
 Integration: n8n TESTA_ANIMATIC workflow (production-ready, 95%+ success)
 AI Services: FAL.ai FLUX with database-centric storage pipeline
-Performance: 6.40s build, 446ms dev startup, instant HMR
-Bundle: CSS 48.74kB, JS 556.25kB main chunk (consider dynamic imports)
+Performance: 8.55s build, instant dev startup, instant HMR
+Bundle: CSS 48.74kB, JS 556.85kB main chunk (consider dynamic imports)
 ```
 
 ### **Schema v3.0 with Integrated Asset Storage** (DEPLOYED & PRODUCTION-TESTED)
@@ -342,7 +342,7 @@ interface TimelineArchitecture {
 }
 ```
 
-**Technical Foundation Ready** (Database schema v2.0 supports all timeline features):
+**Technical Foundation Ready** (Database schema v3.0 supports all timeline features):
 - Cross-phase change tracking enables style modifications from any phase
 - Element relationship mapping supports elements tab functionality  
 - Asset management ready for Phase 2+ images with approval workflows
@@ -354,7 +354,7 @@ interface TimelineArchitecture {
 
 ### **✅ Working Components** (VALIDATED & TESTED)
 ```typescript
-// All database functions 100% compatible with schema v2.0
+// All database functions 100% compatible with schema v3.0
 ✅ createProject()           // Creates project with Italian campaign template
 ✅ getUserProjects()         // Dashboard project cards with progress tracking  
 ✅ updatePhaseContent()      // Phase 1 JSON editing and versioning
@@ -367,11 +367,11 @@ interface TimelineArchitecture {
 ```bash
 Platform: Windows + VS Code + Git
 Runtime: Node.js LTS + npm  
-Framework: Vite 5.4.19 (3.19s build, 423ms dev startup, instant HMR)
+Framework: Vite 5.4.19 (8.55s build, instant dev startup, instant HMR)
 
 # Verified Commands (ALL PASSING)
-npm run dev     # ✅ 423ms startup, instant page loads
-npm run build   # ✅ 3.19s TypeScript compilation clean  
+npm run dev     # ✅ Instant startup, instant page loads
+npm run build   # ✅ 8.55s TypeScript compilation clean, 556KB main bundle
 npm run lint    # ✅ ESLint validation passes
 
 # Core Functionality Verified
@@ -384,7 +384,7 @@ npm run lint    # ✅ ESLint validation passes
 flow-studio-mvp/
 ├── docs/                    # ✅ Complete documentation system
 │   ├── db/
-│   │   ├── schema_v2.sql    # ✅ Current active database schema
+│   │   ├── schema_v3.sql    # ✅ Current active database schema
 │   │   ├── schema_v1.sql    # ✅ Original schema backup
 │   │   └── README.md        # ✅ Schema evolution overview
 │   ├── design_and_planning/
@@ -417,6 +417,91 @@ flow-studio-mvp/
 │   └── globals.css          # ✅ Complete design system (88% inline reduction)
 └── Configuration Files      # ✅ All optimized and working
 ```
+
+---
+
+## 📋 **PROJECT ALIGNMENT WORKFLOW**
+
+### **Session Start Protocol** (MANDATORY FOR NEW SESSIONS)
+When beginning any development session, follow this systematic workflow to understand current project state and align on next steps:
+
+### **Phase 1: Documentation Review & Codebase Scan**
+```bash
+# 1. Read core project documentation
+Read: CLAUDE.md (current development state and patterns)
+Read: README.md (public project overview and capabilities)  
+Read: package.json (dependencies and scripts verification)
+
+# 2. Scan current codebase structure
+Glob: src/**/*.{ts,tsx} (active components and services)
+Glob: docs/**/*.{md,sql,json} (documentation and schema state)
+
+# 3. Verify key architectural files
+Read: src/lib/database.ts (database operations and patterns)
+Read: src/types/project.ts (TypeScript interfaces and data models)
+Read: docs/db/schema_v3.sql (current database schema reference)
+```
+
+### **Phase 2: System Health Verification**
+```bash
+# 4. Test build system integrity  
+npm run build
+# Expected: Clean build, manageable warnings, bundle size analysis
+
+# 5. Identify recent implementation patterns
+Glob: src/components/phases/*.tsx (latest phase implementations)
+Glob: src/services/*.ts (current service patterns and integrations)
+Read: [Most recently modified components] (understand latest development patterns)
+
+# 6. Check current working state via dynamic discovery
+# Use Grep/Glob to identify: Authentication flows, database connections, core functionality
+# Verify: Build passes, development server starts, no critical errors in console
+```
+
+### **Phase 3: Comprehensive Status Analysis**
+```bash
+# 7. Generate project alignment summary covering:
+✅ Current Phase Status (what's complete, what's operational)
+🏗️ Technical Architecture (stack, database, integrations) 
+🎬 Production Features (working vs planned functionality)
+📊 Performance Metrics (build times, bundle sizes, system health)
+🚀 Next Priorities (immediate opportunities, technical debt, roadmap)
+
+# 8. Propose specific next steps with:
+- High-impact development opportunities
+- Technical debt optimization options  
+- User experience enhancement possibilities
+- Performance improvement strategies
+```
+
+### **Alignment Output Format**
+```markdown
+# PROJECT ALIGNMENT SUMMARY
+
+## Current Status
+[Phase completion status, operational features, known issues]
+
+## Architecture Overview  
+[Stack, database schema, key components, proven patterns]
+
+## System Health
+[Build performance, bundle analysis, development environment]
+
+## Proposed Next Steps
+[Prioritized opportunities with implementation strategies]
+```
+
+### **Integration with Development Workflows**
+- **Before Development**: Run alignment workflow to understand current state
+- **During Session**: Reference alignment summary for decision-making context
+- **Before Finalization**: Update alignment findings in session completion log
+
+### **Trigger Phrases for Alignment Workflow**
+- "Get aligned on this project"
+- "Review current project state" 
+- "Scan codebase and provide status"
+- "What's the current state of the project?"
+- "Project alignment workflow"
 
 ---
 

@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
-import { getProject, getProjectPhases, getMasterJSON, saveMasterJSON, saveMasterJSONFromObject, updateMasterJSON, getProjectVersions, getProjectVersion } from '../lib/database'
+import logoImage from '../assets/goood_ideas_logo_600x600_white_trans.png'
+import { getProject, getProjectPhases, getMasterJSON, saveMasterJSONFromObject, updateMasterJSON, getProjectVersions, getProjectVersion } from '../lib/database'
 import type { Project, ProjectPhase, PhaseName, ProjectVersion } from '../types/project'
 import ScriptInterpretationModule from '../components/phases/ScriptInterpretationModule'
 import ScenesFrameGenerationModule from '../components/phases/ScenesFrameGenerationModule'
@@ -74,8 +75,6 @@ export default function ProjectDetailPage({ user }: ProjectDetailPageProps) {
   // Load master JSON for the project
   const loadMasterJSON = useCallback(async () => {
     if (!projectId) return
-    
-    setDatabaseStatus({ loaded: false, version: 0 })
     
     try {
       const masterJSONData = await getMasterJSON(projectId)
@@ -245,10 +244,10 @@ export default function ProjectDetailPage({ user }: ProjectDetailPageProps) {
 
   const getPhaseDisplayName = (phaseName: PhaseName): string => {
     const names: Record<PhaseName, string> = {
-      script_interpretation: 'Script Rendering',
-      element_images: 'Elements Creation',
-      scene_generation: 'Scenes Frame Generation',
-      scene_videos: 'Scene Video',
+      script_interpretation: 'Map Script',
+      element_images: 'Generate Elements',
+      scene_generation: 'Generate Scenes Frame',
+      scene_videos: 'Generate Scenes Clip',
       final_assembly: 'Assembly'
     }
     return names[phaseName] || phaseName
@@ -266,14 +265,16 @@ export default function ProjectDetailPage({ user }: ProjectDetailPageProps) {
   }
 
   const getPhaseStatusColor = (phase: ProjectPhase): string => {
-    if (phase.status === 'completed') return '#00cc00' // Completed (green)
+    // Content-based completion check
+    if (PhaseCompletion.isPhaseCompleted(masterJSON, phase.phase_index)) return '#00cc00' // Completed (green)
     if (phase.status === 'processing') return '#ff9900' // Processing (orange)  
     if (phase.can_proceed) return '#0066cc' // Available (blue)
     return '#666' // Locked (gray)
   }
 
   const getPhaseStatusText = (phase: ProjectPhase): string => {
-    if (phase.status === 'completed') return 'Completed'
+    // Content-based completion check
+    if (PhaseCompletion.isPhaseCompleted(masterJSON, phase.phase_index)) return 'Completed'
     if (phase.status === 'processing') return 'Processing'
     if (phase.can_proceed) return 'Available'
     return 'Locked'
@@ -434,15 +435,32 @@ export default function ProjectDetailPage({ user }: ProjectDetailPageProps) {
       <div className="project-header-sticky">
         <div className="flex justify-between items-center text-sm text-muted">
           <div>
-            Project: <strong className="text-primary">{project.name}</strong>
-          </div>
-          <div className="project-status-center">
-            Progress: <strong className="text-success">{completedPhases}/5 phases completed</strong>
-            {hasUnsavedChanges && (
-              <span className="unsaved-changes-indicator">• ⚠️ Unsaved Changes</span>
-            )}
+            <div style={{ fontSize: '1.1rem', marginBottom: '0.25rem' }}>
+              Project: <strong className="text-primary">{project.name}</strong>
+              <span style={{ marginLeft: '1rem', color: '#00cc00', fontSize: '0.9rem' }}>
+                Version {databaseStatus.version}
+              </span>
+            </div>
+            <div>
+              Progress: <strong style={{ color: completedPhases > 0 ? '#00cc00' : '#999' }}>{completedPhases}</strong>/5 phases
+            </div>
           </div>
           <div className="header-actions">
+            {/* Unsaved Changes Indicator - Button styled, not clickable */}
+            {hasUnsavedChanges && (
+              <span 
+                className="btn text-xs px-md py-xs" 
+                style={{
+                  border: '1px solid #ff6600',
+                  color: '#ff6600',
+                  backgroundColor: 'transparent',
+                  cursor: 'default'
+                }}
+              >
+                ⚠️ Unsaved Changes
+              </span>
+            )}
+            
             {/* Save Button - Universal across all phases */}
             <button
               onClick={handleSaveJSON}
@@ -468,12 +486,6 @@ export default function ProjectDetailPage({ user }: ProjectDetailPageProps) {
               </button>
             )}
             
-            {/* Current Phase Status */}
-            {currentPhaseData && (
-              <span className="current-phase-status">
-                Phase {currentPhaseData.phase_index}: <strong className="text-accent">{getPhaseDisplayName(currentPhaseData.phase_name)}</strong>
-              </span>
-            )}
           </div>
         </div>
       </div>
@@ -597,20 +609,37 @@ export default function ProjectDetailPage({ user }: ProjectDetailPageProps) {
     <div className="project-detail-container">
       {/* Sidebar with phase navigation */}
       <div className="project-detail-sidebar">
+        {/* Logo section - CENTERED */}
+        <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 'var(--space-sm)' }}>
+          <img src={logoImage} alt="Flow Studio" className="logo-image" />
+        </div>
+        
         <div className="phase-placeholder-section">
           <button
             onClick={() => navigate('/dashboard')}
-            className="back-button"
+            className="phase-button-container"
+            style={{ 
+              backgroundColor: 'rgba(255, 165, 0, 0.1)',
+              borderColor: '#ffa500'
+            }}
           >
-            ← Back to Projects
+            <div className="phase-button-row">
+              <div className="phase-number-column">
+                <span className="phase-number">
+                  ←
+                </span>
+              </div>
+              
+              <div className="phase-info-column">
+                <div className="phase-name">
+                  Projects
+                </div>
+                <div className="phase-status-text">
+                  Dashboard
+                </div>
+              </div>
+            </div>
           </button>
-          
-          <h1 className="project-title">
-            {project.name}
-          </h1>
-          <p className="project-client">
-            {masterJSON?.project_metadata?.client || 'Unknown Client'}
-          </p>
         </div>
 
         <div className="phase-placeholder-section">
@@ -654,10 +683,6 @@ export default function ProjectDetailPage({ user }: ProjectDetailPageProps) {
           </div>
         </div>
 
-        <div className="progress-summary">
-          <strong>Progress:</strong>{' '}
-          {PhaseCompletion.getCompletedPhases(masterJSON)} of 5 phases completed
-        </div>
       </div>
 
       {/* Main content area */}
@@ -666,11 +691,20 @@ export default function ProjectDetailPage({ user }: ProjectDetailPageProps) {
         {/* Project Status Bar - Horizontal span above all areas (Phase Agnostic) */}
         {renderProjectStatusBar()}
         
-        {/* AREA 1: NAVIGATION BAR (First position - sticky below header) */}
-        <div className="project-area project-area-1 project-nav-sticky">
-          <div className="project-area-header area-header-1">
-            🧭 AREA 1: NAVIGATION BAR (4 TABS)
+        {/* AREA 2: PHASE-SPECIFIC CONTENT (First position - prominent) */}
+        {selectedView !== 'config' && (
+          <div style={{ 
+            borderRadius: 'var(--radius-md)', 
+            margin: 'var(--space-md)', 
+            backgroundColor: '#000000',
+            border: '2px solid #0066cc'
+          }}>
+            {renderPhaseContent()}
           </div>
+        )}
+
+        {/* AREA 1: NAVIGATION BAR (Second position - sticky after phase content) */}
+        <div className="project-nav-sticky" style={{ marginTop: 'var(--space-md)', marginBottom: 'var(--space-sm)' }}>
           <Navigation 
             activeView={selectedView} 
             onViewChange={setSelectedView}
@@ -678,21 +712,8 @@ export default function ProjectDetailPage({ user }: ProjectDetailPageProps) {
           />
         </div>
 
-        {/* AREA 2: PHASE-SPECIFIC CONTENT (Second position) */}
-        {selectedView !== 'config' && (
-          <div className="project-area project-area-2">
-            <div className="project-area-header area-header-2">
-              🔧 AREA 2: PHASE CONTENT
-            </div>
-            {renderPhaseContent()}
-          </div>
-        )}
-
         {/* AREA 3: CONTENT AREA (Third position) */}
-        <div className="project-area project-area-3">
-          <div className="project-area-header area-header-3">
-            📄 AREA 3: CONTENT AREA (JSON | TIMELINE | ELEMENTS | STYLE)
-          </div>
+        <div style={{ margin: 'var(--space-md)' }}>
           {renderViewContent()}
         </div>
 

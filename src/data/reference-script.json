@@ -1,12 +1,12 @@
 [
   {
-    "timestamp": "07_23_2025_19_45",
+    "timestamp": "07_26_2025_16_08",
     "image_engine": "FLUX DEV",
     "max_prompt_length": 800,
     "aspect_ratio": "16:9",
     "model_endpoint": "fal-ai/flux/dev",
     "base_url": "https://queue.fal.run",
-    "project_dest_folder": "UN CONSIGLIO STELLARE_07_23_2025_19_45",
+    "project_dest_folder": "UN CONSIGLIO STELLARE_07_26_2025_16_08",
     "project_metadata": {
       "title": "UN CONSIGLIO STELLARE",
       "client": "Ministero della Salute",
@@ -45,7 +45,18 @@
         "element_type": "character",
         "element_subtype": "primary",
         "frequency": 10,
-        "scenes_present": [1, 2, 3, 5, 6, 7, 8, 9, 10, 12],
+        "scenes_present": [
+          1,
+          2,
+          3,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          12
+        ],
         "base_description": "Samantha Cristoforetti, 47 years old, short brown hair, confident expression, blue ESA astronaut uniform with patches",
         "consistency_rules": [
           "Identical facial features and hair across all scenes",
@@ -130,7 +141,16 @@
         "element_type": "character",
         "element_subtype": "group",
         "frequency": 8,
-        "scenes_present": [1, 2, 4, 5, 7, 9, 11, 12],
+        "scenes_present": [
+          1,
+          2,
+          4,
+          5,
+          7,
+          9,
+          11,
+          12
+        ],
         "base_description": "5 diverse children aged 6-7, small stature, mixed gender, curious expressions, casual school clothes",
         "consistency_rules": [
           "Same 5 children throughout (consistent faces and diversity)",
@@ -201,7 +221,21 @@
         "element_type": "location",
         "element_subtype": "primary",
         "frequency": 13,
-        "scenes_present": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13],
+        "scenes_present": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13
+        ],
         "base_description": "magnificent circular library with multiple levels, warm ambient lighting, wood and modern architectural elements, balcony overlooks",
         "consistency_rules": [
           "Circular architecture always prominent",
@@ -307,7 +341,10 @@
         "element_type": "prop",
         "element_subtype": "technological",
         "frequency": 2,
-        "scenes_present": [2, 4],
+        "scenes_present": [
+          2,
+          4
+        ],
         "base_description": "educational space imagery and astronomical displays showing space operations, astronauts, and cosmic scenes",
         "consistency_rules": [
           "Educational content focus maintained",
@@ -336,7 +373,12 @@
         "element_type": "prop",
         "element_subtype": "holographic",
         "frequency": 4,
-        "scenes_present": [5, 6, 7, 8],
+        "scenes_present": [
+          5,
+          6,
+          7,
+          8
+        ],
         "base_description": "realistic Earth hologram with glowing red indicator points concentrated on Italy, interactive and detailed",
         "consistency_rules": [
           "Realistic Earth appearance maintained",
@@ -379,7 +421,9 @@
         "element_type": "prop",
         "element_subtype": "holographic",
         "frequency": 1,
-        "scenes_present": [3],
+        "scenes_present": [
+          3
+        ],
         "base_description": "full-body astronaut in complete spacesuit, holographic projection, realistic detail showing space protection equipment",
         "consistency_rules": [
           "Complete spacesuit with all details",
@@ -400,7 +444,15 @@
         "element_type": "prop",
         "element_subtype": "physical",
         "frequency": 7,
-        "scenes_present": [1, 2, 4, 5, 7, 9, 12],
+        "scenes_present": [
+          1,
+          2,
+          4,
+          5,
+          7,
+          9,
+          12
+        ],
         "base_description": "casual school backpacks and books carried by children, age-appropriate school equipment",
         "consistency_rules": [
           "Age-appropriate school equipment",
@@ -463,7 +515,21 @@
         "element_type": "atmosphere",
         "element_subtype": "lighting",
         "frequency": 13,
-        "scenes_present": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13],
+        "scenes_present": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13
+        ],
         "base_description": "soft, warm ambient lighting creating educational and welcoming atmosphere throughout library",
         "consistency_rules": [
           "Warm color temperature maintained",

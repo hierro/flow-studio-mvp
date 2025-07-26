@@ -32,6 +32,7 @@ export default function DirectorsTimeline({
   const [hoveredElement, setHoveredElement] = useState<string | null>(null);
   const [editingTitle, setEditingTitle] = useState(false);
   const [titleValue, setTitleValue] = useState('');
+  const [elementsCollapsed, setElementsCollapsed] = useState(true);
 
   // Parse master JSON into timeline data
   const timelineData: TimelineData = useMemo(() => {
@@ -166,7 +167,7 @@ export default function DirectorsTimeline({
   return (
     <div className="timeline-container">
       {/* Project Header */}
-      <div className="timeline-header">
+      <div className="timeline-header" style={{ borderRadius: 'var(--radius-md)' }}>
         <div className="project-title-section">
           {editingTitle ? (
             <div className="title-edit-container">
@@ -212,38 +213,40 @@ export default function DirectorsTimeline({
         </div>
       </div>
 
-      {/* Elements Overview Bar - Use same format as scene card elements */}
+      {/* Elements Overview Bar - Collapsible */}
       <div className="elements-overview">
-        <div className="elements-overview-header">
-          <h3>Story Elements</h3>
+        <div className="elements-overview-header" style={{ cursor: 'pointer' }} onClick={() => setElementsCollapsed(!elementsCollapsed)}>
+          <h3>Story Elements {elementsCollapsed ? '▶' : '▼'}</h3>
           <span className="elements-count">{timelineData.elements.length} total</span>
         </div>
         
-        <div className="elements-horizontal">
-          {Object.entries(elementsWithStats).map(([type, elements]) => (
-            <div key={type} className="scene-element-group">
-              <span className="scene-element-type">{type}s:</span>
-              <div className="scene-element-tags">
-                {elements.map((element) => (
-                  <motion.div
-                    key={element.id}
-                    whileHover={{ scale: 1.05 }}
-                    onMouseEnter={() => handleElementHover(element.id)}
-                    onMouseLeave={() => handleElementHover(null)}
-                    className="scene-element-tag"
-                    style={{
-                      backgroundColor: hoveredElement === element.id ? element.color : `${element.color}20`,
-                      color: hoveredElement === element.id ? 'white' : element.color,
-                      borderColor: element.color
-                    }}
-                  >
-                    {element.name} ({element.usage_percentage}%)
-                  </motion.div>
-                ))}
+        {!elementsCollapsed && (
+          <div className="elements-horizontal">
+            {Object.entries(elementsWithStats).map(([type, elements]) => (
+              <div key={type} className="scene-element-group">
+                <span className="scene-element-type">{type}s:</span>
+                <div className="scene-element-tags">
+                  {elements.map((element) => (
+                    <motion.div
+                      key={element.id}
+                      whileHover={{ scale: 1.05 }}
+                      onMouseEnter={() => handleElementHover(element.id)}
+                      onMouseLeave={() => handleElementHover(null)}
+                      className="scene-element-tag"
+                      style={{
+                        backgroundColor: hoveredElement === element.id ? element.color : `${element.color}20`,
+                        color: hoveredElement === element.id ? 'white' : element.color,
+                        borderColor: element.color
+                      }}
+                    >
+                      {element.name} ({element.usage_percentage}%)
+                    </motion.div>
+                  ))}
+                </div>
               </div>
-            </div>
-          ))}
-        </div>
+            ))}
+          </div>
+        )}
       </div>
 
       {/* Timeline Scenes */}

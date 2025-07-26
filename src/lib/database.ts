@@ -166,37 +166,6 @@ export async function getMasterJSON(projectId: string): Promise<any | null> {
   }
 }
 
-export async function saveMasterJSON(
-  projectId: string, 
-  jsonString: string, 
-  description = 'Master JSON updated'
-): Promise<boolean> {
-  try {
-    // Parse JSON
-    const parsedJSON = JSON.parse(jsonString)
-    
-    // Just update the master JSON - fuck the versioning for now
-    const { error } = await supabase
-      .from('projects')
-      .update({
-        master_json: parsedJSON,
-        updated_at: new Date().toISOString()
-      })
-      .eq('id', projectId)
-
-    if (error) {
-      console.error('Error updating master JSON:', error)
-      console.error('Full error details:', JSON.stringify(error, null, 2))
-      return false
-    }
-
-    return true
-  } catch (error) {
-    console.error('Error in saveMasterJSON:', error)
-    return false
-  }
-}
-
 // Update master JSON without creating version (for editing/n8n webhook)
 export async function updateMasterJSON(
   projectId: string, 
@@ -553,13 +522,13 @@ export async function getPhase(phaseId: string): Promise<ProjectPhase | null> {
 }
 
 // DEPRECATED: This function should not be used in master JSON architecture
-// Use saveMasterJSON() instead for all content updates
+// Use saveMasterJSONFromObject() instead for all content updates
 export async function updatePhaseContent(
   phaseId: string, 
   content: any, 
   description: string
 ): Promise<boolean> {
-  console.error('updatePhaseContent is deprecated - use saveMasterJSON instead')
+  console.error('updatePhaseContent is deprecated - use saveMasterJSONFromObject instead')
   return false
 }
 

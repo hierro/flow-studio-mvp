@@ -332,7 +332,7 @@ BEGIN
       NEW.current_version,
       NEW.master_json,
       'Version ' || NEW.current_version || ' created',
-      auth.uid()
+      NEW.user_id
     );
   END IF;
   
