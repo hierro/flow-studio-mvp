@@ -45,6 +45,8 @@ export interface ImageGenerationProgress {
   currentSceneIndex: number;
   percentage: number;
   provider: string;
+  completedImages: Array<{sceneId: string; imageUrl: string; sceneIndex: number}>;  // All completed images
+  latestImageUrl?: string;  // Current displayed image URL
 }
 
 export class ImageGenerationService {
@@ -129,6 +131,8 @@ export class ImageGenerationService {
   ): Promise<BulkImageResult> {
     const results: ImageGenerationResult[] = [];
     const errors: string[] = [];
+    const completedImages: Array<{sceneId: string; imageUrl: string; sceneIndex: number}> = [];
+    let latestImageUrl: string | undefined = undefined;
     
     console.log(`🚀 Starting bulk image generation for ${requests.length} scenes using ${this.serviceType}...`);
     
@@ -136,14 +140,16 @@ export class ImageGenerationService {
     for (let i = 0; i < requests.length; i++) {
       const request = requests[i];
       
-      // Progress callback
+      // Progress callback - starting scene (keep last image visible)
       const progress: ImageGenerationProgress = {
         completed: i,
         total: requests.length,
         currentScene: request.sceneId,
         currentSceneIndex: i + 1,
         percentage: Math.round((i / requests.length) * 100),
-        provider: this.serviceType || 'unknown'
+        provider: this.serviceType || 'unknown',
+        completedImages: [...completedImages],
+        latestImageUrl: latestImageUrl  // Keep showing last image until new one arrives
       };
       options.onProgress?.(progress);
       
@@ -154,6 +160,28 @@ export class ImageGenerationService {
         if (!result.success && result.error) {
           errors.push(`${request.sceneId}: ${result.error}`);
         }
+        
+        // Update progress with completed scene image - ONLY if image was successful
+        if (result.success && result.imageUrl) {
+          completedImages.push({
+            sceneId: request.sceneId,
+            imageUrl: result.imageUrl,
+            sceneIndex: i + 1
+          });
+          latestImageUrl = result.imageUrl;  // Update displayed image
+        }
+        
+        const completedProgress: ImageGenerationProgress = {
+          completed: i + 1,
+          total: requests.length,
+          currentScene: request.sceneId,
+          currentSceneIndex: i + 1,
+          percentage: Math.round(((i + 1) / requests.length) * 100),
+          provider: this.serviceType || 'unknown',
+          completedImages: [...completedImages],
+          latestImageUrl: latestImageUrl  // Only changes when new image actually arrives
+        };
+        options.onProgress?.(completedProgress);
         
       } catch (error: any) {
         const errorResult: ImageGenerationResult = {
@@ -179,7 +207,9 @@ export class ImageGenerationService {
       currentScene: 'complete',
       currentSceneIndex: requests.length,
       percentage: 100,
-      provider: this.serviceType || 'unknown'
+      provider: this.serviceType || 'unknown',
+      completedImages: [...completedImages],
+      latestImageUrl: latestImageUrl  // Keep last successful image
     };
     options.onProgress?.(finalProgress);
     

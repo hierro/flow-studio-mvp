@@ -51,6 +51,49 @@ export default function ScenesFrameGenerationModule({
     initializeService: initializeImageService
   } = useImageGeneration();
 
+  // Modal demo mode for design review
+  const [showModalDemo, setShowModalDemo] = useState(false);
+  
+  // Modal state for real progress tracking
+  const [modalState, setModalState] = useState<{
+    isVisible: boolean;
+    currentScene: number;
+    totalScenes: number;
+    sceneTitle: string;
+    status: string;
+    progress: number;
+    currentImageUrl?: string;
+  }>({
+    isVisible: false,
+    currentScene: 1,
+    totalScenes: 3,
+    sceneTitle: 'Introduction Of The Setting And Characters',
+    status: 'Downloading from FAL.ai...',
+    progress: 33,
+    currentImageUrl: undefined
+  });
+
+  // Keyboard shortcut to show/hide modal demo
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      // Ctrl/Cmd + Shift + M to toggle modal demo
+      if ((event.ctrlKey || event.metaKey) && event.shiftKey && event.key === 'M') {
+        event.preventDefault();
+        console.log('🎯 Keyboard shortcut triggered: Toggling Phase 3 modal demo');
+        setShowModalDemo(prev => !prev);
+      }
+      // ESC to close modal demo
+      else if (event.key === 'Escape' && showModalDemo) {
+        event.preventDefault();
+        console.log('🎯 ESC pressed: Closing Phase 3 modal demo');
+        setShowModalDemo(false);
+      }
+    };
+
+    document.addEventListener('keydown', handleKeyDown);
+    return () => document.removeEventListener('keydown', handleKeyDown);
+  }, [showModalDemo]);
+
   // Initialize both services on mount
   useEffect(() => {
     console.log('🚀 ScenesFrameGenerationModule: Initializing services...');
@@ -68,6 +111,21 @@ export default function ScenesFrameGenerationModule({
 
   // Get scenes from master JSON
   const scenes = masterJSON?.scenes ? Object.keys(masterJSON.scenes) : [];
+
+  // Simple progress logging for debugging
+  useEffect(() => {
+    if (imageProgress) {
+      console.log('🔄 Image Progress Update:', imageProgress);
+    }
+  }, [imageProgress]);
+
+  // Handle completion - show custom success modal instead of auto-closing
+  useEffect(() => {
+    if (modalState.isVisible && !isGeneratingImages && imageProgress?.currentScene === 'complete') {
+      // Show success state in modal but keep it open until user closes
+      console.log('✅ Generation complete - showing success state in modal');
+    }
+  }, [modalState.isVisible, isGeneratingImages, imageProgress?.currentScene]);
   const totalScenes = scenes.length;
   const scenesWithPrompts = scenes.filter(sceneId => 
     masterJSON.scenes[sceneId]?.scene_frame_prompt
@@ -245,53 +303,28 @@ export default function ScenesFrameGenerationModule({
       hasPrompts: true
     });
 
-    // Enhanced modal with detailed process tracking
-    const modal = getGlobalModal();
-    let completedScenes = 0;
-    
-    // Scene details with process status tracking
+    // Scene details for progress tracking
     const sceneDetails = processScenes.map(sceneId => {
       const sceneData = masterJSON.scenes[sceneId];
       const sceneNumber = sceneId.replace('scene_', '');
       const title = sceneData?.title || sceneData?.action_summary || `Scene ${sceneNumber}`;
       return { 
         id: sceneId, 
-        number: sceneNumber, 
+        number: parseInt(sceneNumber), 
         title: title.substring(0, 35),
-        status: 'pending',
-        step: 'queued',
-        details: ''
+        fullTitle: title
       };
     });
 
-    // Show detailed process modal
-    if (modal) {
-      const testingNote = TESTING_MODE ? ` (Testing: First ${maxScenes} scenes only)` : '';
-      modal.showModal({
-        title: '🎨 Generating Scene Frames with Database Storage',
-        message: `Processing ${processScenes.length} scene images${testingNote}`,
-        details: [
-          `🔧 Service Pipeline: FAL.ai FLUX → Download → Supabase Storage → Database`,
-          `📊 Progress: 0/${processScenes.length} completed`,
-          `⏱️ Process: Each scene goes through 5 steps (Generate → Download → Upload → Database → Complete)`,
-          '',
-          '📋 Scene Processing List:',
-          ...sceneDetails.map(scene => `⚪ Scene ${scene.number}: ${scene.title} - Queued`),
-          '',
-          '🔄 Process Steps for Each Scene:',
-          '  1️⃣ Generate with FAL.ai FLUX API',
-          '  2️⃣ Download image from FAL.ai servers', 
-          '  3️⃣ Upload to our Supabase Storage',
-          '  4️⃣ Create database record with metadata',
-          '  5️⃣ Update masterJSON with permanent URL',
-          '',
-          '💾 Storage: Images stored permanently in our database',
-          '🔗 URLs: Permanent URLs replace temporary FAL.ai links',
-          '✅ Phase 3: Completes when all scenes have permanent stored images'
-        ],
-        type: 'loading'
-      });
-    }
+    // Show our new custom modal
+    setModalState({
+      isVisible: true,
+      currentScene: 1,
+      totalScenes: processScenes.length,
+      sceneTitle: sceneDetails[0]?.fullTitle || 'Loading scene',
+      status: 'Initializing...',
+      progress: 0
+    });
 
     try {
       console.log(`🚀 STARTING BULK FRAME GENERATION PROCESS`);
@@ -316,41 +349,8 @@ export default function ScenesFrameGenerationModule({
         hasPrompt: !!s.prompt
       })));
 
-      // Generate images with detailed real-time progress updates
-      const result = await generateAllSceneImages(scenePrompts, {
-        onProgress: (progress) => {
-          completedScenes = progress.completed;
-          if (modal) {
-            // Update scene status with detailed process tracking
-            const updatedDetails = sceneDetails.map((scene, index) => {
-              if (index < completedScenes) {
-                return `✅ Scene ${scene.number}: ${scene.title} - ✅ COMPLETE (Database Stored)`;
-              } else if (index === completedScenes) {
-                // Current scene - show detailed step
-                const currentStep = progress.currentScene === scene.id ? 
-                  '⏳ Generating → Download → Upload → Database → Complete' : 
-                  '⏳ Processing...';
-                return `🔄 Scene ${scene.number}: ${scene.title} - ${currentStep}`;
-              } else {
-                return `⚪ Scene ${scene.number}: ${scene.title} - Queued`;
-              }
-            });
-
-            modal.showModal({
-              title: '🎨 Frame Generation Progress',
-              message: `${completedScenes}/${processScenes.length} scenes completed${testingNote}`,
-              details: [
-                '📋 Scene Status:',
-                ...updatedDetails,
-                '',
-                `🔄 Current Step: ${progress.currentScene ? `Processing ${progress.currentScene}` : 'Starting...'}`,
-                `📊 Overall: ${progress.percentage}% complete`
-              ],
-              type: 'loading'
-            });
-          }
-        }
-      });
+      // Generate images - the hook will handle progress updates
+      const result = await generateAllSceneImages(scenePrompts);
 
       console.log(`🎊 BULK FRAME GENERATION PROCESS COMPLETE`);
       console.log(`📋 Final Results Summary:`, {
@@ -424,37 +424,16 @@ export default function ScenesFrameGenerationModule({
         const phase3Complete = allScenesHavePrompts && allProcessedScenesHaveImages;
         const testingProgress = TESTING_MODE ? ` (${processScenes.length}/${scenesWithPromptsData.length} in testing mode)` : '';
 
-        // Show detailed success modal with complete process summary
-        if (modal) {
-          const successfulScenes = result.results.filter(r => r.success);
-          const failedScenes = result.results.filter(r => !r.success);
-          
-          modal.showModal({
-            title: '✅ Generation Complete',
-            message: `${result.successfulScenes}/${result.totalScenes} scenes processed successfully${testingProgress}`,
-            details: [
-              '✅ Completed Scenes:',
-              ...successfulScenes.map(scene => 
-                `  ✅ ${scene.sceneId}: Stored in database`
-              ),
-              ...(failedScenes.length > 0 ? [
-                '',
-                '❌ Failed Scenes:',
-                ...failedScenes.map(scene => 
-                  `  ❌ ${scene.sceneId}: ${scene.error}`
-                )
-              ] : []),
-              '',
-              `📊 Project: ${scenesWithImages + result.successfulScenes}/${totalScenes} scenes have images`,
-              phase3Complete ? '🎉 Phase 3 Complete!' : '⏳ Generate remaining scenes to complete Phase 3'
-            ],
-            type: 'success'
-          });
-          
-          // Auto-hide success modal after 7 seconds (more details to read)
-          setTimeout(() => {
-            modal.hideModal();
-          }, 7000);
+        // Completion handled by new modal - no old modal popup
+        console.log('✅ Image generation complete, modal will show success state');
+        console.log(`📊 Final Results: ${result.successfulScenes}/${result.totalScenes} successful`);
+        
+        // Log completion for debugging
+        const successfulScenes = result.results.filter(r => r.success);
+        const failedScenes = result.results.filter(r => !r.success);
+        console.log('✅ Successful scenes:', successfulScenes.map(s => s.sceneId));
+        if (failedScenes.length > 0) {
+          console.log('❌ Failed scenes:', failedScenes.map(s => `${s.sceneId}: ${s.error}`));
         }
       } else {
         // Show error if no frames generated
@@ -483,129 +462,401 @@ export default function ScenesFrameGenerationModule({
 
   return (
     <div style={{ padding: '0.5rem' }}>
-      {/* 2-Column Layout - EXACT match to ScriptInterpretationModule */}
-      <div style={{ display: 'flex', gap: '1rem' }}>
+      {/* Main Heading - Top */}
+      <div style={{ marginBottom: '0.75rem' }}>
+        <h3 style={{ 
+          color: '#ffffff', 
+          fontSize: '1.125rem', 
+          fontWeight: 'bold',
+          margin: 0
+        }}>
+          Generate scene frames prompts and images
+        </h3>
+      </div>
+      
+      {/* Phase Status Info */}
+      <div style={{ 
+        display: 'flex', 
+        alignItems: 'center', 
+        gap: '0.75rem', 
+        fontSize: '0.875rem', 
+        color: '#999', 
+        marginBottom: '0.75rem' 
+      }}>
+        <span>
+          Phase 3: <strong style={{ color: '#66ccff' }}>Scenes Frame Generation</strong>
+        </span>
+        <span>•</span>
+        <span>
+          Status: <strong className={phase.status === 'completed' ? 'script-status-completed' : 'script-status-progress'}>
+            {phase.status === 'completed' ? 'Completed' : 'Available'}
+          </strong>
+        </span>
+        <span>•</span>
+        <span>
+          Prompts: <strong className="script-db-connected">
+            {scenesWithPrompts}/{totalScenes}
+          </strong>
+        </span>
+        <span>•</span>
+        <span>
+          Frames: <strong className="script-db-connected">
+            {scenesWithImages}/{totalScenes}
+          </strong>
+        </span>
+      </div>
+      
+      {/* Status and Buttons Row */}
+      <div style={{ 
+        display: 'flex', 
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        gap: '1rem',
+        marginBottom: '0.75rem'
+      }}>
         
-        {/* LEFT COLUMN - Information */}
-        <div style={{ flex: 1 }}>
-          {/* Phase Status Info */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', fontSize: '0.875rem', color: '#999', marginBottom: '0.375rem' }}>
-            <span>
-              Phase 3: <strong style={{ color: '#66ccff' }}>Scenes Frame Generation</strong>
-            </span>
-            <span>•</span>
-            <span>
-              Status: <strong className={phase.status === 'completed' ? 'script-status-completed' : 'script-status-progress'}>
-                {phase.status === 'completed' ? 'Completed' : 'Available'}
-              </strong>
-            </span>
-            <span>•</span>
-            <span>
-              Prompts: <strong className="script-db-connected">
-                {scenesWithPrompts}/{totalScenes}
-              </strong>
-            </span>
-            <span>•</span>
-            <span>
-              Frames: <strong className="script-db-connected">
-                {scenesWithImages}/{totalScenes}
-              </strong>
-            </span>
-          </div>
+        {/* Service Status Section - Left */}
+        <div style={{ 
+          display: 'flex', 
+          alignItems: 'center', 
+          gap: '0.75rem', 
+          fontSize: '0.875rem'
+        }}>
+          <span className={!isLLMReady ? 'text-error' : 'text-success'}>
+            {!isLLMReady ? (
+              <>❌ LLM Error</>
+            ) : isLLMReady ? (
+              <>✅ LLM Ready</>
+            ) : (
+              <>⏳ LLM Loading</>
+            )}
+          </span>
           
-          {/* Description */}
-          <div style={{ marginBottom: '0.25rem' }}>
-            <p style={{ color: '#cccccc', fontSize: '0.875rem', margin: 0 }}>
-              Generate image prompts for scene frames using LLM analysis of script elements
-            </p>
-          </div>
+          <span className={!isImageServiceReady ? 'text-error' : 'text-success'}>
+            {!isImageServiceReady ? (
+              <>❌ Image Error</>
+            ) : isImageServiceReady ? (
+              <>✅ Image Ready</>
+            ) : (
+              <>⏳ Image Loading</>
+            )}
+          </span>
           
-          {/* Status Messages */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', fontSize: '0.875rem' }}>
-            <span className={!isLLMReady ? 'text-error' : 'text-success'}>
-              {!isLLMReady ? (
-                <>❌ LLM Error</>
-              ) : isLLMReady ? (
-                <>✅ LLM Ready</>
-              ) : (
-                <>⏳ LLM Loading</>
-              )}
+          {(llmError || imageError) && (
+            <span className="text-error">❌ {llmError || imageError}</span>
+          )}
+          
+          {hasUnsavedChanges && (
+            <span className="text-warning">⚠️ Unsaved changes</span>
+          )}
+          
+          <span className={currentProvider === 'openai' ? 'text-success' : 'text-accent'}>
+            {currentProvider === 'openai' ? '🤖 OPENAI' : '🧠 CLAUDE'}
+          </span>
+          
+          {currentService && (
+            <span className="text-accent">
+              🎨 {currentService.toUpperCase().replace('_', ' ')}
             </span>
-            
-            <span className={!isImageServiceReady ? 'text-error' : 'text-success'}>
-              {!isImageServiceReady ? (
-                <>❌ Image Error</>
-              ) : isImageServiceReady ? (
-                <>✅ Image Ready</>
-              ) : (
-                <>⏳ Image Loading</>
-              )}
+          )}
+          
+          {(isGeneratingPrompts || isGeneratingImages) && (
+            <span className="text-muted" style={{ fontSize: '0.75rem' }}>
+              {isGeneratingPrompts ? 'Generating prompts...' : 'Generating frames...'}
             </span>
-            
-            {(llmError || imageError) && (
-              <span className="text-error">❌ {llmError || imageError}</span>
-            )}
-            
-            {hasUnsavedChanges && (
-              <span className="text-warning">⚠️ Unsaved changes</span>
-            )}
-            
-            <span className={currentProvider === 'openai' ? 'text-success' : 'text-accent'}>
-              {currentProvider === 'openai' ? '🤖 OPENAI' : '🧠 CLAUDE'}
-            </span>
-            
-            {currentService && (
-              <span className="text-accent">
-                🎨 {currentService.toUpperCase().replace('_', ' ')}
-              </span>
-            )}
-            
-            {(isGeneratingPrompts || isGeneratingImages) && (
-              <span className="text-muted" style={{ fontSize: '0.75rem' }}>
-                {isGeneratingPrompts ? 'Generating prompts...' : 'Generating frames...'}
-              </span>
-            )}
-          </div>
+          )}
         </div>
         
-        {/* RIGHT COLUMN - Controls */}
-        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '0.375rem' }}>
-          {/* Provider Toggle */}
-          <div>
-            <label style={{ display: 'flex', alignItems: 'center', fontSize: '0.875rem', color: '#cccccc' }}>
-              <input
-                type="checkbox"
-                checked={currentProvider === 'claude'}
-                onChange={(e) => setProvider(e.target.checked ? 'claude' : 'openai')}
-                style={{ marginRight: '0.375rem' }}
-                disabled={isGeneratingPrompts || isGeneratingImages}
-              />
-              Use Claude (vs OpenAI)
-            </label>
-          </div>
+        {/* Action Buttons Section - Right */}
+        <div style={{ 
+          display: 'flex', 
+          gap: '0.75rem',
+          alignItems: 'center'
+        }}>
+          <button
+            onClick={handleGenerateAllPrompts}
+            disabled={!isLLMReady || isGeneratingPrompts || isGeneratingImages || totalScenes === 0}
+            className={`btn text-xs px-md py-xs ${isGeneratingPrompts ? 'btn-secondary' : 'btn-primary'}`}
+          >
+            {isGeneratingPrompts ? '⏳ Generating...' : 'Generate Prompts'}
+          </button>
           
-          {/* Action Buttons */}
-          <div style={{ display: 'flex', gap: '0.375rem' }}>
-            <button
-              onClick={handleGenerateAllPrompts}
-              disabled={!isLLMReady || isGeneratingPrompts || isGeneratingImages || totalScenes === 0}
-              className={`btn text-xs px-md py-xs ${isGeneratingPrompts ? 'btn-secondary' : 'btn-primary'}`}
-            >
-              {isGeneratingPrompts ? '⏳ Generating...' : 'Generate Prompts'}
-            </button>
-            
-            <button
-              onClick={handleGenerateAllFrames}
-              disabled={!isImageServiceReady || isGeneratingPrompts || isGeneratingImages || scenesWithPrompts === 0}
-              className={`btn text-xs px-md py-xs ${isGeneratingImages ? 'btn-secondary' : 'btn-primary'}`}
-              title="Testing mode: Generates first 3 scenes only"
-            >
-              {isGeneratingImages ? '⏳ Generating...' : '🧪 Generate Frames (Test: 3 scenes)'}
-            </button>
-          </div>
+          <button
+            onClick={handleGenerateAllFrames}
+            disabled={!isImageServiceReady || isGeneratingPrompts || isGeneratingImages || scenesWithPrompts === 0}
+            className={`btn text-xs px-md py-xs ${isGeneratingImages ? 'btn-secondary' : 'btn-primary'}`}
+            title="Testing mode: Generates first 3 scenes only"
+          >
+            {isGeneratingImages ? '⏳ Generating...' : '🧪 Generate Frames (Test: 3 scenes)'}
+          </button>
         </div>
         
       </div>
+
+
+      {/* Progress Modal - Demo or Real */}
+      {(showModalDemo || modalState.isVisible) && (
+        <div className="modal-overlay" style={{ zIndex: 9999 }}>
+          <div className="modal-content" style={{ 
+            width: '80vw', 
+            maxWidth: '1000px',
+            aspectRatio: '16/9',  // Force modal to be 16:9
+            display: 'flex',
+            flexDirection: 'column'
+          }}>
+            {/* Modal Header - Clean */}
+            <div style={{ 
+              display: 'flex', 
+              justifyContent: 'space-between', 
+              alignItems: 'center',
+              padding: '0.75rem 1rem',
+              borderBottom: '1px solid #333',
+              backgroundColor: imageProgress?.currentScene === 'complete' ? '#002200' : 'transparent'
+            }}>
+              <h2 style={{ 
+                margin: 0, 
+                color: imageProgress?.currentScene === 'complete' ? '#00ff00' : '#66ccff', 
+                fontSize: '1.125rem' 
+              }}>
+                {imageProgress?.currentScene === 'complete' ? '✅ Generation Complete!' : 'Generating Scene Frames'}
+              </h2>
+              {/* Only show close button when batch is finished or in demo mode */}
+              {(showModalDemo || imageProgress?.currentScene === 'complete') && (
+                <button
+                  onClick={() => {
+                    setShowModalDemo(false);
+                    setModalState(prev => ({ ...prev, isVisible: false }));
+                  }}
+                  style={{
+                    background: '#333',
+                    border: '1px solid #666',
+                    color: '#fff',
+                    fontSize: '1rem',
+                    fontWeight: 'bold',
+                    cursor: 'pointer',
+                    padding: '0.5rem 1rem',
+                    borderRadius: '0.25rem',
+                    minWidth: '80px'
+                  }}
+                >
+                  Close
+                </button>
+              )}
+            </div>
+
+            {/* Modal Body - Equal Height Layout */}
+            <div style={{ 
+              flex: 1,
+              display: 'flex',
+              gap: '0.75rem',
+              padding: '0.75rem',
+              overflow: 'hidden'  // Prevent scrolling
+            }}>
+              
+              {/* LEFT SIDE - Progress + Current Scene (40%) */}
+              <div style={{ 
+                flex: '0 0 40%',
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '0.75rem',
+                height: '100%'  // Match right side height
+              }}>
+                
+                {/* Progress Summary - Top */}
+                <div style={{
+                  padding: '0.75rem',
+                  backgroundColor: '#0a1a2a',
+                  borderRadius: '0.375rem',
+                  border: '1px solid #0066cc'
+                }}>
+                  <div style={{ 
+                    color: '#66ccff', 
+                    fontSize: '0.875rem',
+                    fontWeight: 'bold',
+                    marginBottom: '0.25rem'
+                  }}>
+                    Progress: {imageProgress?.completed || 0}/{imageProgress?.total || 3} completed
+                  </div>
+                  <div style={{ 
+                    color: '#999', 
+                    fontSize: '0.75rem' 
+                  }}>
+                    ⏱️ ~2 minutes per scene
+                  </div>
+                </div>
+
+                {/* Current Scene Status - Bottom - SAME HEIGHT AS IMAGE */}
+                <div style={{
+                  flex: 1,  // Take remaining space to match right side
+                  padding: '0.75rem',
+                  backgroundColor: '#0a1a2a',
+                  borderRadius: '0.375rem',
+                  border: '1px solid #0066cc',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  justifyContent: 'space-between',
+                  minHeight: 0  // Allow flexbox to control height
+                }}>
+                  {/* Scene Header */}
+                  <div>
+                    <div style={{ 
+                      color: '#66ccff', 
+                      fontSize: '0.875rem',
+                      fontWeight: 'bold',
+                      marginBottom: '0.5rem'
+                    }}>
+                      {imageProgress?.currentScene === 'complete' ? 'All Scenes Complete!' : `Processing: Scene ${imageProgress?.currentSceneIndex || 1}`}
+                    </div>
+                    
+                    <div style={{ 
+                      color: '#999', 
+                      fontSize: '0.75rem',
+                      lineHeight: 1.4
+                    }}>
+                      {imageProgress?.currentScene === 'complete' 
+                        ? `Successfully generated ${imageProgress?.completedImages?.length || 0} images`
+                        : `${imageProgress?.currentScene || 'Loading scene'}...`
+                      }
+                    </div>
+                  </div>
+                  
+                  {/* Status Badge - Bottom */}
+                  <div style={{ 
+                    color: imageProgress?.currentScene === 'complete' ? '#00ff00' : '#ff9900',
+                    fontSize: '0.75rem',
+                    fontWeight: 'bold',
+                    padding: '0.5rem',
+                    backgroundColor: imageProgress?.currentScene === 'complete' ? '#002200' : '#332200',
+                    borderRadius: '0.25rem',
+                    textAlign: 'center'
+                  }}>
+                    {imageProgress?.currentScene === 'complete' 
+                      ? '✅ Generation Complete'
+                      : imageProgress?.currentScene === 'initializing' 
+                        ? '🔄 Initializing...'
+                        : `🔄 Generating ${imageProgress?.currentScene || 'scene'}...`
+                    }
+                  </div>
+                </div>
+
+              </div>
+
+              {/* RIGHT SIDE - Image Preview (60%) */}
+              <div style={{ 
+                flex: '0 0 60%',
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '0.75rem',
+                overflow: 'hidden',
+                minHeight: 0,
+                height: '100%'  // Ensure full height
+              }}>
+                
+                {/* Image Preview Area - 16:9 ASPECT RATIO */}
+                <div style={{
+                  aspectRatio: '16/9',
+                  width: '100%',
+                  backgroundColor: '#0a0a0a',
+                  borderRadius: '0.375rem',
+                  border: '2px dashed #444',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  position: 'relative',
+                  overflow: 'hidden'
+                }}>
+                  {/* Show actual generated image if available */}
+                  {imageProgress?.latestImageUrl ? (
+                    <img 
+                      src={imageProgress.latestImageUrl} 
+                      alt={`Generated scene ${imageProgress.currentSceneIndex}`}
+                      style={{
+                        width: '100%',
+                        height: '100%',
+                        objectFit: 'contain',  // Keep aspect ratio, fit within 16:9 container
+                        borderRadius: '0.25rem'
+                      }}
+                      onLoad={() => console.log(`✅ Image loaded: Scene ${imageProgress.currentSceneIndex}`)}
+                      onError={() => console.log(`❌ Image failed to load: Scene ${imageProgress.currentSceneIndex}`)}
+                    />
+                  ) : (
+                    /* Placeholder when no image yet */
+                    <div style={{
+                      textAlign: 'center',
+                      color: '#666'
+                    }}>
+                      <div style={{ fontSize: '2.5rem', marginBottom: '0.5rem' }}>🎬</div>
+                      <div style={{ fontSize: '0.875rem' }}>Scene {imageProgress?.currentSceneIndex || 1} generating...</div>
+                      <div style={{ fontSize: '0.75rem', marginTop: '0.25rem' }}>
+                        FAL.ai image will appear here first
+                      </div>
+                    </div>
+                  )}
+                  
+                  {/* Loading animation overlay - only show when generating */}
+                  {isGeneratingImages && (
+                    <div style={{
+                      position: 'absolute',
+                      top: '0.75rem',
+                      right: '0.75rem',
+                      color: '#ff9900',
+                      fontSize: '0.75rem',
+                      backgroundColor: '#332200',
+                      padding: '0.25rem 0.5rem',
+                      borderRadius: '0.25rem'
+                    }}>
+                      🔄 Loading...
+                    </div>
+                  )}
+                </div>
+
+                {/* Current Scene Prompt Info - Dynamic */}
+                <div style={{
+                  padding: '0.75rem',
+                  backgroundColor: '#2a2a2a',
+                  borderRadius: '0.375rem',
+                  width: '100%',
+                  flex: '0 0 auto'  // Don't grow, fixed size
+                }}>
+                  <div style={{ 
+                    color: '#66ccff', 
+                    fontSize: '0.75rem',
+                    fontWeight: 'bold',
+                    marginBottom: '0.375rem'
+                  }}>
+                    Current Scene Prompt:
+                  </div>
+                  <div style={{ 
+                    color: '#999', 
+                    fontSize: '0.75rem',
+                    lineHeight: 1.3,
+                    wordWrap: 'break-word',
+                    display: '-webkit-box',
+                    WebkitLineClamp: 2,
+                    WebkitBoxOrient: 'vertical',
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis',
+                    maxHeight: '2.6rem'  // ~2 lines at 1.3 line height
+                  }}>
+                    {(() => {
+                      if (showModalDemo) return '"A stunning cinematic wide shot of a circular futuristic library with floating holographic books and ancient knowledge crystals..."';
+                      if (!imageProgress?.currentScene || imageProgress?.currentScene === 'complete') {
+                        return imageProgress?.currentScene === 'complete' 
+                          ? 'All scene prompts processed successfully!' 
+                          : 'Waiting for generation to start...';
+                      }
+                      const currentSceneData = masterJSON?.scenes?.[imageProgress.currentScene];
+                      const prompt = currentSceneData?.scene_frame_prompt;
+                      return prompt ? `"${prompt}"` : 'No prompt available for this scene';
+                    })()} 
+                  </div>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      )}
     </div>
   );
 }

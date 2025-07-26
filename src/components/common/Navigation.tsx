@@ -69,19 +69,14 @@ export default function ProjectViewNavigation({
                 ${!isUnlocked ? 'opacity-50 cursor-not-allowed' : ''}
               `}
               style={{
-                padding: '1rem 1.5rem',
-                fontSize: '1rem',
-                minHeight: '3rem'
+                padding: '0.75rem 1.5rem',
+                fontSize: '0.875rem',
+                minHeight: '2.5rem'
               }}
               disabled={!isUnlocked}
               title={getTabTooltip(tab.id)}
             >
-              <span className="font-semibold">{tab.label}</span>
-              {(tab.id === 'elements' || tab.id === 'style') && (
-                <span className="text-xs text-muted">
-                  {tab.id === 'elements' ? '(Phase 2+)' : '(Soon)'}
-                </span>
-              )}
+              <span className="font-semibold">{tab.label.toUpperCase()}</span>
             </button>
           )
         })}
