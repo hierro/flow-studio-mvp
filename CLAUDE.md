@@ -696,33 +696,35 @@ node project-scanner.js
 - **Storage Cleanup Fix**: Complete project deletion with storage file cleanup implemented and tested
 - **Critical Success**: Database-centric architecture achieved, Phase 4+ workflow compatibility ensured
 
-### **2025-07-26: Phase 3 UI Refinement & Revolutionary Modal System - COMPLETE**
-- **Achievement**: Complete Phase 3 UI refinement with cinematic modal architecture
-- **16:9 Modal Container**: True aspect ratio enforcement with adaptive layout design
+### **2025-07-26: Architectural Evolution Analysis & Revolutionary Modal System - COMPLETE**
+- **Major Discovery**: Complete transition from n8n webhook architecture to direct API integration
+- **n8n Infrastructure**: Preserved for backward compatibility but not actively used in current user flow
+- **Direct API Pattern**: LLMService + ImageGenerationService bypass webhooks for real-time control
+- **Master JSON Architecture**: Single source of truth with content-driven phase progression
+- **16:9 Modal Container**: True cinematic aspect ratio enforcement with adaptive layout design
 - **Intelligent Image Persistence**: Generated images persist until new ones arrive, eliminating premature resets
-- **Conditional UX Controls**: Close button only appears when batch complete, prevents accidental workflow interruption
-- **Horizontal Status Layout**: Service status left, action buttons right for optimal space utilization
-- **Dynamic Content Display**: Real-time scene prompt preview with 2-line truncation maintaining layout integrity
-- **Header Refinement**: "Generate scene frames prompts and images" positioned as bold top-level heading
-- **Clean Element Removal**: Eliminated provider toggle and keyboard shortcut hints for streamlined interface
-- **Layout Architecture**: Vertical organization with separate divs for better component management
-- **Critical Success**: Revolutionary modal system achieved, setting foundation for Phase 4 video workflows
+- **Conditional UX Controls**: Close button only appears when batch complete, prevents workflow interruption
+- **Service Layer Mapping**: 5-service orchestration (LLM, Image, Storage, Reference, Providers)
+- **Phase Completion Logic**: Content-based analysis via PhaseCompletion.ts, not database flags
+- **Timeline System Integration**: 3-layer UX (Navigation → Timeline → Phase Modules) over master JSON
+- **Critical Success**: Complete architectural understanding achieved, ready for Phase 4 development
 
 ### **Next Session Priorities**
-1. **PHASE 4 VIDEO GENERATION**: Video compilation system using established image storage patterns  
-2. **ADVANCED TIMELINE FEATURES**: Complete 3-tab timeline (scenes, elements, style) implementation
-3. **INDIVIDUAL IMAGE REGENERATION**: Single scene image regeneration workflow with versioning
-4. **ASSET MANAGEMENT**: Multiple image versions per scene with proper cleanup mechanisms
-5. **PERFORMANCE OPTIMIZATION**: Address bundle size (594KB main chunk) with dynamic imports
+1. **PHASE 4 VIDEO GENERATION**: Video compilation using direct API pattern (FAL.ai video models)
+2. **n8n INTEGRATION DECISION**: Evaluate hybrid approach vs pure direct API for video workflows
+3. **ADVANCED TIMELINE FEATURES**: Complete 3-tab timeline (scenes, elements, style) implementation
+4. **INDIVIDUAL REGENERATION**: Single scene image/video regeneration with asset versioning
+5. **PERFORMANCE OPTIMIZATION**: Dynamic imports for 594KB bundle, code splitting strategies
+6. **SERVICE CONSOLIDATION**: Potentially merge LLMService + ImageGenerationService for unified generation
 
 ### **Session Completion Validation**
-- [x] **16:9 Modal Architecture**: True cinematic aspect ratio with adaptive layout system implemented
+- [x] **Architectural Analysis**: Complete understanding of n8n evolution to direct API integration
+- [x] **Service Layer Mapping**: 5-service orchestration documented (LLM, Image, Storage, Reference, Providers)
+- [x] **Phase Workflow Analysis**: Content-driven progression via PhaseCompletion.ts understood
+- [x] **Database Schema Evolution**: Schema v3.0 master JSON architecture with asset separation
+- [x] **Timeline System Integration**: 3-layer UX architecture (Navigation → Timeline → Modules) mapped
+- [x] **16:9 Modal Architecture**: True cinematic aspect ratio with adaptive layout system
 - [x] **Image Persistence Logic**: Generated images persist until new ones arrive, no premature resets
-- [x] **Conditional Close Button**: Only appears when batch complete or in demo mode, prevents interruption
-- [x] **Horizontal Layout System**: Service status left, action buttons right for optimal organization
-- [x] **Dynamic Prompt Display**: Real-time scene prompt with 2-line truncation maintaining layout integrity
-- [x] **Header Positioning**: "Generate scene frames prompts and images" as bold top-level heading
-- [x] **Clean Interface**: Removed provider toggle and keyboard shortcut hints for streamlined UX
-- [x] **Layout Architecture**: Vertical organization with separate component divs for better management
-- [x] **Build System**: Clean compilation (6.19s), 40 warnings (unused variables), 594.60KB bundle
-- [x] **Revolutionary UX**: Cinematic modal system ready for Phase 4 video generation workflows
+- [x] **Direct API Pattern**: No n8n webhooks in active flow, all services coordinate via master JSON
+- [x] **Build System**: Clean compilation (9.54s), 40 warnings (unused variables), 594.60KB bundle
+- [x] **Holistic Understanding**: Complete codebase analysis ready for strategic Phase 4 development

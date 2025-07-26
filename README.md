@@ -12,13 +12,14 @@
 
 FLOW.STUDIO revolutionizes video production by providing **Story Intelligence** - understanding narrative relationships across scenes instead of just perfecting individual frames. Built for directors, content creators, and production teams who need professional video content with narrative coherence.
 
-### **Revolutionary Architecture: Cinematic Modal System**
-- **16:9 Aspect Ratio Enforcement**: True cinematic modal experience with adaptive layout design
-- **Intelligent Progress Tracking**: Generated images persist until new ones arrive, eliminating premature resets
-- **Conditional UX Controls**: Smart close button logic prevents accidental workflow interruption
+### **Revolutionary Architecture: Direct API Integration**
+- **Master JSON Single Source**: Content-driven phase progression with clean separation of concerns
+- **Direct Service Integration**: LLM + Image generation bypass webhooks for real-time control
+- **5-Service Orchestration**: Modular architecture (LLM, Image, Storage, Reference, Providers)
+- **16:9 Cinematic Modal**: True aspect ratio enforcement with intelligent progress tracking
 - **Database-Centric Storage**: Complete FAL.ai → Supabase Storage → Database pipeline with permanent URLs
+- **Timeline System**: 3-layer UX architecture (Navigation → Timeline → Phase Modules)
 - **Enterprise Security**: RLS policies for authenticated uploads with public read access
-- **Timeline Integrity**: masterJSON architecture maintains consistency across all development phases
 
 ### **Project Alignment Workflow Integration**
 - **Session Start Protocol**: Systematic 3-phase workflow for project understanding
