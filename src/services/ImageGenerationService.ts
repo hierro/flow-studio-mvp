@@ -223,6 +223,7 @@ export class ImageGenerationService {
       provider: this.serviceType
     });
     
+    
     return {
       success: successfulScenes === requests.length,
       totalScenes: requests.length,

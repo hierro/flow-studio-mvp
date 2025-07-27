@@ -37,14 +37,17 @@ export default function ConfigurationTab() {
   };
 
   const handleSave = async () => {
+    console.log('💾 Save button clicked, hasUnsavedChanges:', hasUnsavedChanges);
     setIsSaving(true);
     setError('');
     try {
       const parsedConfig = JSON.parse(jsonContent);
+      console.log('📤 Saving configuration to database...');
       const success = await saveAppConfiguration(parsedConfig);
       if (success) {
         setConfigData(parsedConfig);
         setHasUnsavedChanges(false);
+        console.log('✅ Configuration marked as saved, hasUnsavedChanges set to false');
         
         // Trigger global config reload event
         window.dispatchEvent(new CustomEvent('llm-config-updated', { 
@@ -57,6 +60,7 @@ export default function ConfigurationTab() {
         console.log('✅ Configuration saved and reloaded successfully');
       } else {
         setError('Failed to save configuration');
+        console.error('❌ Save failed');
       }
     } catch (error) {
       setError('Invalid JSON format');
@@ -120,14 +124,40 @@ export default function ConfigurationTab() {
           >
             🔄 Reload
           </button>
-          <button 
-            onClick={handleSave} 
-            disabled={!hasUnsavedChanges || isSaving}
-            className={`btn ${hasUnsavedChanges ? 'btn-primary' : 'btn-secondary'}`}
-          >
-            {isSaving ? '💾 Saving...' : hasUnsavedChanges ? '💾 Save Config' : '✅ Saved'}
-          </button>
         </div>
+      </div>
+
+      {/* Save Button & Status - Always Visible at Top */}
+      <div style={{
+        padding: '1rem',
+        backgroundColor: hasUnsavedChanges ? '#2d1b00' : '#0a2a0a',
+        border: `2px solid ${hasUnsavedChanges ? '#ff6b35' : '#4ade80'}`,
+        borderRadius: '0.5rem',
+        marginBottom: '1rem',
+        display: 'flex',
+        justifyContent: 'space-between',
+        alignItems: 'center'
+      }}>
+        <div style={{
+          fontSize: '0.875rem',
+          fontWeight: 'bold',
+          color: hasUnsavedChanges ? '#ff6b35' : '#4ade80'
+        }}>
+          {hasUnsavedChanges ? '⚠️ UNSAVED CHANGES' : '✅ ALL CHANGES SAVED'}
+          {hasUnsavedChanges && (
+            <div style={{ fontSize: '0.75rem', fontWeight: 'normal', marginTop: '0.25rem', opacity: 0.8 }}>
+              Click "Save Configuration" to persist changes to database
+            </div>
+          )}
+        </div>
+        <button 
+          onClick={handleSave} 
+          disabled={!hasUnsavedChanges || isSaving}
+          className={`btn ${hasUnsavedChanges ? 'btn-primary' : 'btn-secondary'}`}
+          style={{ minWidth: '140px' }}
+        >
+          {isSaving ? '💾 Saving...' : hasUnsavedChanges ? '💾 Save Configuration' : '✅ Saved'}
+        </button>
       </div>
 
       {/* Error Display */}
@@ -161,7 +191,7 @@ export default function ConfigurationTab() {
                   };
                   setConfigData(updatedConfig);
                   setJsonContent(JSON.stringify(updatedConfig, null, 2));
-                  setHasUnsavedChanges(true);
+                  setHasUnsavedChanges(true); // Mark as changed, require manual save
                   setError('');
                 }}
                 className="section-textarea prompt-textarea"
@@ -197,7 +227,7 @@ export default function ConfigurationTab() {
                   };
                   setConfigData(updatedConfig);
                   setJsonContent(JSON.stringify(updatedConfig, null, 2));
-                  setHasUnsavedChanges(true);
+                  setHasUnsavedChanges(true); // Mark as changed, require manual save
                   setError('');
                 }}
                 className="section-textarea prompt-textarea"
@@ -268,14 +298,16 @@ export default function ConfigurationTab() {
 
       </div>
 
-      {/* Status */}
-      <div className="config-status">
-        <span>
-          Status: {hasUnsavedChanges ? '⚠️ Unsaved changes' : '✅ Saved'}
-        </span>
-        <span>
-          Version: {configData?.configuration_metadata?.version || 'Unknown'}
-        </span>
+      {/* Version Info */}
+      <div style={{ 
+        textAlign: 'center', 
+        fontSize: '0.75rem', 
+        color: '#666', 
+        marginTop: '1rem',
+        paddingTop: '1rem',
+        borderTop: '1px solid #333'
+      }}>
+        Configuration Version: {configData?.configuration_metadata?.version || 'Unknown'}
       </div>
     </div>
   );

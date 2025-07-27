@@ -194,6 +194,7 @@ export function useLLMGeneration() {
             `Generated image prompts for ${result.successfulScenes} scenes`
           );
           console.log(`✅ Saved prompts for ${updatedScenes.length} scenes to database`);
+          
         } catch (saveError) {
           console.error(`❌ Failed to save prompts to database:`, saveError);
           // Don't fail the generation, just log the save error

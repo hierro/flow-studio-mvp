@@ -1,0 +1,292 @@
+{
+  "generation_timestamp": "2025-07-27T09:46:15.246Z",
+  "project_id": "3bd2607c-840c-4e50-88d4-f9323e95eeb2",
+  "project_name": "UN CONSIGLIO STELLARE",
+  "total_scenes": 13,
+  "scenes": {
+    "scene_1": {
+      "scene_title": "The spot opens in a magnificent circular environme",
+      "prompt": "wide establishing shot of the magnificent circular library at Monte Porzio Catone Observatory, 16:9 composition showing multi-level wood and modern architecture, warm ambient lighting, balcony overlooks. Foreground: Samantha Cristoforetti, 47, short brown hair, confident, in blue ESA astronaut uniform, stands at entrance, welcoming gesture toward five diverse children aged 6-7 in casual school clothes, clustered together, carrying backpacks and books, gazing in wonder at the grand library. Clean vector outlines, deep blue backgrounds, cinematic storyboard framing, inspiring educational mood.",
+      "model_used": "openai",
+      "parameters": {
+        "usage": {
+          "promptTokens": 1000,
+          "completionTokens": 110
+        },
+        "provider": "openai",
+        "generated_at": "2025-07-27T08:56:02.739Z",
+        "character_count": 799
+      },
+      "generation_time": "2025-07-27T08:56:02.739Z",
+      "has_image": true,
+      "image_filename": "scene_1_image.jpeg",
+      "image_local_path": "docs/test/scene_1_image.jpeg",
+      "original_url": "https://ssxxaztyibwkcrowyarw.supabase.co/storage/v1/object/public/scene-images/projects/3bd2607c-840c-4e50-88d4-f9323e95eeb2/scenes/scene_1_2025-07-27T09-38-25-882Z.jpeg",
+      "image_metadata": {
+        "seed": 827052571,
+        "width": 1024,
+        "height": 768,
+        "provider": "fal_ai_flux",
+        "request_id": "4447f7da-ce76-482b-9822-0d6b6f478631",
+        "content_type": "image/jpeg",
+        "generated_at": "2025-07-27T09:38:39.982Z"
+      }
+    },
+    "scene_2": {
+      "scene_title": "Samantha, in the company of some small guests, sho",
+      "prompt": "medium shot of Samantha Cristoforetti in blue ESA uniform, short brown hair, confident, at library display area, 16:9 composition showing her pointing at educational space imagery and astronomical displays, explaining space dangers to five diverse children aged 6-7 in casual school clothes, semicircle facing Samantha, some holding backpacks, focused, learning. Circular library’s wood and modern elements, warm ambient lighting, multi-levels visible, blue-dominant space content, clean vector outlines, cinematic educational style.",
+      "model_used": "openai",
+      "parameters": {
+        "usage": {
+          "promptTokens": 1000,
+          "completionTokens": 110
+        },
+        "provider": "openai",
+        "generated_at": "2025-07-27T08:56:02.739Z",
+        "character_count": 796
+      },
+      "generation_time": "2025-07-27T08:56:02.739Z",
+      "has_image": true,
+      "image_filename": "scene_2_image.jpeg",
+      "image_local_path": "docs/test/scene_2_image.jpeg",
+      "original_url": "https://ssxxaztyibwkcrowyarw.supabase.co/storage/v1/object/public/scene-images/projects/3bd2607c-840c-4e50-88d4-f9323e95eeb2/scenes/scene_2_2025-07-27T09-38-32-588Z.jpeg",
+      "image_metadata": {
+        "seed": 2035680373,
+        "width": 1024,
+        "height": 768,
+        "provider": "fal_ai_flux",
+        "request_id": "76a0d215-0ebf-480d-8dc8-94730d1307af",
+        "content_type": "image/jpeg",
+        "generated_at": "2025-07-27T09:38:39.982Z"
+      }
+    },
+    "scene_3": {
+      "scene_title": "Samantha interacts with the hologram of an astrona",
+      "prompt": "close-up on hologram interaction of Samantha Cristoforetti, blue ESA uniform, short brown hair, confident, at library table, 16:9 composition showing her demonstrating a full-body astronaut hologram in detailed spacesuit, blue holographic glow, realistic proportions, Samantha engaging with projection, warm library lighting, wood and modern circular architecture in background, clean vector outlines, deep blue tech ambiance, cinematic educational storyboard style.",
+      "model_used": "openai",
+      "parameters": {
+        "usage": {
+          "promptTokens": 1000,
+          "completionTokens": 110
+        },
+        "provider": "openai",
+        "generated_at": "2025-07-27T08:56:02.739Z",
+        "character_count": 796
+      },
+      "generation_time": "2025-07-27T08:56:02.739Z",
+      "has_image": true,
+      "image_filename": "scene_3_image.jpeg",
+      "image_local_path": "docs/test/scene_3_image.jpeg",
+      "original_url": "https://ssxxaztyibwkcrowyarw.supabase.co/storage/v1/object/public/scene-images/projects/3bd2607c-840c-4e50-88d4-f9323e95eeb2/scenes/scene_3_2025-07-27T09-38-38-960Z.jpeg",
+      "image_metadata": {
+        "seed": 727788670,
+        "width": 1024,
+        "height": 768,
+        "provider": "fal_ai_flux",
+        "request_id": "0705d19b-e3b0-4d86-8e0a-b548e75fcb68",
+        "content_type": "image/jpeg",
+        "generated_at": "2025-07-27T09:38:39.982Z"
+      }
+    },
+    "scene_4": {
+      "scene_title": "Children look at space images with eyes full of wo",
+      "prompt": "wide shot of five diverse children aged 6-7 in casual school clothes, gathered around space imagery displays in the magnificent circular library, 16:9 composition showing children’s amazed expressions, some backpacks set aside, watching projections of astronauts and space operations. Multi-level wood and modern architecture, warm ambient lighting, dramatic blue-dominant space content, technology seamlessly integrated, clean vector outlines, cinematic educational framing, inspiring mood.",
+      "model_used": "openai",
+      "parameters": {
+        "usage": {
+          "promptTokens": 1000,
+          "completionTokens": 110
+        },
+        "provider": "openai",
+        "generated_at": "2025-07-27T08:56:02.740Z",
+        "character_count": 797
+      },
+      "generation_time": "2025-07-27T08:56:02.740Z",
+      "has_image": false,
+      "image_filename": null,
+      "image_local_path": null,
+      "original_url": null,
+      "image_metadata": {}
+    },
+    "scene_5": {
+      "scene_title": "Children follow Samantha's story with increasing f",
+      "prompt": "medium shot of Samantha Cristoforetti, blue ESA uniform, short brown hair, confident, leading five diverse children aged 6-7 along the circular library walkway, 16:9 composition showing group on balcony, children carrying backpacks, fascinated as they approach a realistic Earth hologram with glowing red indicator points on Italy, central space below, multi-level wood and modern architecture, warm ambient lighting, clean vector outlines, cinematic educational style.",
+      "model_used": "openai",
+      "parameters": {
+        "usage": {
+          "promptTokens": 1000,
+          "completionTokens": 110
+        },
+        "provider": "openai",
+        "generated_at": "2025-07-27T08:56:02.740Z",
+        "character_count": 796
+      },
+      "generation_time": "2025-07-27T08:56:02.740Z",
+      "has_image": false,
+      "image_filename": null,
+      "image_local_path": null,
+      "original_url": null,
+      "image_metadata": {}
+    },
+    "scene_6": {
+      "scene_title": "...It's majestic. While Samantha continues her exp",
+      "prompt": "close-up on Earth hologram of Samantha Cristoforetti, blue ESA uniform, short brown hair, confident, beside a realistic Earth hologram in the circular library, 16:9 composition showing her explaining with pointing gestures, red indicator points concentrated on Italy, blue holographic glow, warm ambient lighting, wood and modern architecture, multi-levels visible, educational cinematic framing, clean vector outlines, inspiring mood.",
+      "model_used": "openai",
+      "parameters": {
+        "usage": {
+          "promptTokens": 1000,
+          "completionTokens": 110
+        },
+        "provider": "openai",
+        "generated_at": "2025-07-27T08:56:02.740Z",
+        "character_count": 796
+      },
+      "generation_time": "2025-07-27T08:56:02.740Z",
+      "has_image": false,
+      "image_filename": null,
+      "image_local_path": null,
+      "original_url": null,
+      "image_metadata": {}
+    },
+    "scene_7": {
+      "scene_title": "Children look with curious but fearful air: what i",
+      "prompt": "medium shot of Samantha Cristoforetti, blue ESA uniform, short brown hair, confident, determined, reassuring five diverse children aged 6-7 in casual school clothes, clustered together, holding backpacks closer, facing Earth hologram with red indicators on Italy, 16:9 composition in circular library, warm ambient lighting, wood and modern elements, emotional interaction, clean vector outlines, cinematic educational style.",
+      "model_used": "openai",
+      "parameters": {
+        "usage": {
+          "promptTokens": 1000,
+          "completionTokens": 110
+        },
+        "provider": "openai",
+        "generated_at": "2025-07-27T08:56:02.740Z",
+        "character_count": 796
+      },
+      "generation_time": "2025-07-27T08:56:02.740Z",
+      "has_image": false,
+      "image_filename": null,
+      "image_local_path": null,
+      "original_url": null,
+      "image_metadata": {}
+    },
+    "scene_8": {
+      "scene_title": "The camera quickly approaches Europe, we recognize",
+      "prompt": "close-up on Italy mapping of Samantha Cristoforetti, blue ESA uniform, short brown hair, confident, pointing at detailed Earth hologram zoomed on Italy, 16:9 composition showing red indicator points flashing on Italy’s territory, some with sick person emoji, intense hologram lighting, advanced projection, warm ambient library background, wood and modern architecture, clean vector outlines, cinematic educational framing.",
+      "model_used": "openai",
+      "parameters": {
+        "usage": {
+          "promptTokens": 1000,
+          "completionTokens": 110
+        },
+        "provider": "openai",
+        "generated_at": "2025-07-27T08:56:02.740Z",
+        "character_count": 796
+      },
+      "generation_time": "2025-07-27T08:56:02.740Z",
+      "has_image": false,
+      "image_filename": null,
+      "image_local_path": null,
+      "original_url": null,
+      "image_metadata": {}
+    },
+    "scene_9": {
+      "scene_title": "The small visitors try to understand more, making ",
+      "prompt": "medium shot of Samantha Cristoforetti, blue ESA uniform, short brown hair, confident, listening attentively to five diverse children aged 6-7 in casual school clothes, engaged group facing Samantha, asking questions, backpacks set aside, 16:9 composition in circular library, warm conversational lighting, wood and modern architecture, educational dialogue, clean vector outlines, cinematic inspiring storyboard style.",
+      "model_used": "openai",
+      "parameters": {
+        "usage": {
+          "promptTokens": 1000,
+          "completionTokens": 110
+        },
+        "provider": "openai",
+        "generated_at": "2025-07-27T08:56:02.740Z",
+        "character_count": 796
+      },
+      "generation_time": "2025-07-27T08:56:02.740Z",
+      "has_image": false,
+      "image_filename": null,
+      "image_local_path": null,
+      "original_url": null,
+      "image_metadata": {}
+    },
+    "scene_10": {
+      "scene_title": "... Samantha, once again, manages to explain in a ",
+      "prompt": "close-up on Samantha of Samantha Cristoforetti, blue ESA uniform, short brown hair, confident, providing clear, simple explanation to children, educational stance, addressing camera, 16:9 composition in circular library, warm focused lighting, wood and modern background, multi-levels subtly visible, clean vector outlines, deep blue accents, cinematic educational framing, reassuring and knowledgeable mood.",
+      "model_used": "openai",
+      "parameters": {
+        "usage": {
+          "promptTokens": 1000,
+          "completionTokens": 110
+        },
+        "provider": "openai",
+        "generated_at": "2025-07-27T08:56:02.740Z",
+        "character_count": 796
+      },
+      "generation_time": "2025-07-27T08:56:02.740Z",
+      "has_image": false,
+      "image_filename": null,
+      "image_local_path": null,
+      "original_url": null,
+      "image_metadata": {}
+    },
+    "scene_11": {
+      "scene_title": "Sign: Let's team up for our health #ivaccinifunzio",
+      "prompt": "full screen text overlay of campaign message in the circular library, 16:9 composition showing five diverse children aged 6-7 in casual school clothes, arranged with Samantha Cristoforetti, blue ESA uniform, confident, group shot, clean neutral background, even warm lighting, minimal library elements, overlaid text: \"Let's team up for our health #ivaccinifunzionano\", clean vector outlines, cinematic educational style.",
+      "model_used": "openai",
+      "parameters": {
+        "usage": {
+          "promptTokens": 1000,
+          "completionTokens": 110
+        },
+        "provider": "openai",
+        "generated_at": "2025-07-27T08:56:02.740Z",
+        "character_count": 798
+      },
+      "generation_time": "2025-07-27T08:56:02.740Z",
+      "has_image": false,
+      "image_filename": null,
+      "image_local_path": null,
+      "original_url": null,
+      "image_metadata": {}
+    },
+    "scene_12": {
+      "scene_title": "Samantha looks towards the camera, reassuring, to ",
+      "prompt": "medium shot group of Samantha Cristoforetti, blue ESA uniform, short brown hair, confident, facing camera, delivering final reassuring message, standing with five diverse children aged 6-7 in casual school clothes, beside her in unity, 16:9 composition in circular library, warm inclusive lighting, wood and modern architecture, no backpacks, clean vector outlines, cinematic educational framing.",
+      "model_used": "openai",
+      "parameters": {
+        "usage": {
+          "promptTokens": 1000,
+          "completionTokens": 110
+        },
+        "provider": "openai",
+        "generated_at": "2025-07-27T08:56:02.741Z",
+        "character_count": 796
+      },
+      "generation_time": "2025-07-27T08:56:02.741Z",
+      "has_image": false,
+      "image_filename": null,
+      "image_local_path": null,
+      "original_url": null,
+      "image_metadata": {}
+    },
+    "scene_13": {
+      "scene_title": "Institutional sign",
+      "prompt": "full screen institutional of the circular library, 16:9 composition showing clean neutral background, minimal library elements, professional warm lighting, optimized for institutional logo and information presentation, wood and modern circular architecture subtly visible, deep blue accents, clean vector outlines, cinematic educational storyboard style, supporting institutional message.",
+      "model_used": "openai",
+      "parameters": {
+        "usage": {
+          "promptTokens": 1000,
+          "completionTokens": 110
+        },
+        "provider": "openai",
+        "generated_at": "2025-07-27T08:56:02.741Z",
+        "character_count": 796
+      },
+      "generation_time": "2025-07-27T08:56:02.741Z",
+      "has_image": false,
+      "image_filename": null,
+      "image_local_path": null,
+      "original_url": null,
+      "image_metadata": {}
+    }
+  }
+}

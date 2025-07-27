@@ -25,6 +25,18 @@ export class JsonFieldEditor {
     const updatedJson = { ...masterJson };
     const pathParts = fieldPath.split('.');
     
+    // 🎨 STYLE DEBUG: Log when style fields are updated
+    if (fieldPath.includes('global_style')) {
+      const oldValue = JsonFieldEditor.getField(masterJson, fieldPath);
+      console.log('🎨 STYLE FIELD UPDATE:', {
+        fieldPath,
+        oldValue,
+        newValue,
+        isColorPrimary: fieldPath.includes('color_palette.primary'),
+        isRenderingLevel: fieldPath.includes('rendering_style.level')
+      });
+    }
+    
     // Navigate to parent object
     let current = updatedJson;
     for (let i = 0; i < pathParts.length - 1; i++) {
@@ -40,6 +52,15 @@ export class JsonFieldEditor {
     // Set the final value
     const finalKey = pathParts[pathParts.length - 1];
     current[finalKey] = newValue;
+    
+    // 🎨 STYLE DEBUG: Log updated global_style state
+    if (fieldPath.includes('global_style')) {
+      console.log('🎨 UPDATED GLOBAL_STYLE:', {
+        primaryColor: updatedJson?.global_style?.color_palette?.primary,
+        renderingLevel: updatedJson?.global_style?.rendering_style?.level,
+        fullGlobalStyle: updatedJson?.global_style
+      });
+    }
     
     return updatedJson;
   }

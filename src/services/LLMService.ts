@@ -33,39 +33,46 @@ export interface BulkPromptResult {
 }
 
 export class LLMService {
-  private config: any = null;
   private defaultProvider: LLMProviderType = 'openai';
   
   /**
-   * Initialize service by loading configuration
+   * Initialize service - simple validation (no caching)
    */
   async initialize(): Promise<void> {
     try {
-      this.config = await getAppConfiguration();
+      const config = await this.getFreshConfig();
       
-      console.log('🔍 LLM Service Debug - Raw config loaded:', {
-        configExists: !!this.config,
-        configKeys: Object.keys(this.config || {}),
-        hasStartFrame: !!this.config?.start_frame_prompt_generation,
-        fullStartFrameConfig: this.config?.start_frame_prompt_generation
-      });
-      
-      if (!this.config?.start_frame_prompt_generation) {
-        throw new Error('LLM configuration not found - please configure prompts in Config tab');
+      if (!config || Object.keys(config).length === 0) {
+        throw new Error('No configuration found - please create initial configuration in Config tab');
       }
       
-      console.log('✅ LLM Service initialized with config:', {
-        hasSystemPrompt: !!this.config.start_frame_prompt_generation.system_prompt,
-        hasUserPrompt: !!this.config.start_frame_prompt_generation.user_prompt,
-        systemPromptLength: this.config.start_frame_prompt_generation.system_prompt?.length || 0,
-        userPromptLength: this.config.start_frame_prompt_generation.user_prompt?.length || 0,
-        defaultProvider: this.defaultProvider
-      });
+      if (!config?.start_frame_prompt_generation) {
+        throw new Error('LLM configuration incomplete - please configure prompts in Config tab');
+      }
+      
+      console.log('✅ LLM Service initialized successfully (no caching)');
       
     } catch (error) {
       console.error('LLM Service initialization failed:', error);
       throw error;
     }
+  }
+  
+  /**
+   * Get fresh configuration from database (no caching)
+   */
+  private async getFreshConfig(): Promise<any> {
+    const config = await getAppConfiguration();
+    
+    console.log('🔍 LLM Service Debug - Fresh config loaded:', {
+      configExists: !!config,
+      configKeys: Object.keys(config || {}),
+      hasStartFrame: !!config?.start_frame_prompt_generation,
+      systemPromptLength: config?.start_frame_prompt_generation?.system_prompt?.length || 0,
+      userPromptLength: config?.start_frame_prompt_generation?.user_prompt?.length || 0
+    });
+    
+    return config;
   }
   
   /**
@@ -80,9 +87,11 @@ export class LLMService {
     } = {}
   ): Promise<ScenePromptResult> {
     try {
-      // Ensure service is initialized
-      if (!this.config) {
-        await this.initialize();
+      // Always get fresh config from database
+      const config = await this.getFreshConfig();
+      
+      if (!config?.start_frame_prompt_generation) {
+        throw new Error('LLM configuration not found - please configure prompts in Config tab');
       }
       
       const provider = options.provider || this.defaultProvider;
@@ -95,9 +104,9 @@ export class LLMService {
         options.extractionMetadata
       );
       
-      // 2. Get prompts from configuration
-      const systemPrompt = this.config.start_frame_prompt_generation.system_prompt;
-      const userPromptTemplate = this.config.start_frame_prompt_generation.user_prompt;
+      // 2. Get prompts from fresh configuration
+      const systemPrompt = config.start_frame_prompt_generation.system_prompt;
+      const userPromptTemplate = config.start_frame_prompt_generation.user_prompt;
       
       if (!systemPrompt || !userPromptTemplate) {
         throw new Error('System or user prompt not configured');
@@ -114,16 +123,37 @@ export class LLMService {
         currentScene: sceneData
       };
       
+      // 🎨 STYLE DEBUG: Log style values before injection
+      const primaryColor = masterJSON?.global_style?.color_palette?.primary;
+      const renderingLevel = masterJSON?.global_style?.rendering_style?.level;
+      console.log('🤖 LLM SERVICE STYLE DEBUG:', {
+        sceneId,
+        primaryColor,
+        renderingLevel,
+        hasGlobalStyle: !!masterJSON?.global_style,
+        globalStyleKeys: masterJSON?.global_style ? Object.keys(masterJSON.global_style) : 'none'
+      });
+      
       const finalSystemPrompt = VariableInjection.processTemplate(processedSystemTemplate, context);
       const finalUserPrompt = VariableInjection.processTemplate(processedUserTemplate, context);
+      
+      // 🎨 STYLE DEBUG: Check if style variables appear in final prompts
+      const systemContainsStyle = finalSystemPrompt.includes(primaryColor) || finalSystemPrompt.includes(renderingLevel);
+      const userContainsStyle = finalUserPrompt.includes(primaryColor) || finalUserPrompt.includes(renderingLevel);
+      console.log('🎨 FINAL PROMPT STYLE CHECK:', {
+        systemContainsStyle,
+        userContainsStyle,
+        systemPromptLength: finalSystemPrompt.length,
+        userPromptLength: finalUserPrompt.length
+      });
       
       // 5. Get LLM provider and configuration
       const llmProvider = LLMProviderFactory.getProvider(provider);
       const llmConfig: LLMConfig = {
-        model: this.config.llm_providers?.[provider]?.model || 
+        model: config.llm_providers?.[provider]?.model || 
                (provider === 'openai' ? 'gpt-4-turbo' : 'claude-3-sonnet-20240229'),
-        max_tokens: this.config.llm_providers?.[provider]?.max_tokens || 1000,
-        temperature: this.config.llm_providers?.[provider]?.temperature || 0.7
+        max_tokens: config.llm_providers?.[provider]?.max_tokens || 1000,
+        temperature: config.llm_providers?.[provider]?.temperature || 0.7
       };
       
       console.log('Calling LLM with:', {
@@ -211,9 +241,11 @@ export class LLMService {
     });
     
     try {
-      // Ensure service is initialized
-      if (!this.config) {
-        await this.initialize();
+      // Always get fresh config from database
+      const config = await this.getFreshConfig();
+      
+      if (!config?.start_frame_prompt_generation) {
+        throw new Error('LLM configuration not found - please configure prompts in Config tab');
       }
       
       const provider = options.provider || this.defaultProvider;
@@ -227,9 +259,9 @@ export class LLMService {
         };
       });
       
-      // 2. Get prompts from configuration
-      const systemPromptTemplate = this.config.start_frame_prompt_generation.system_prompt;
-      const userPromptTemplate = this.config.start_frame_prompt_generation.user_prompt;
+      // 2. Get prompts from fresh configuration
+      const systemPromptTemplate = config.start_frame_prompt_generation.system_prompt;
+      const userPromptTemplate = config.start_frame_prompt_generation.user_prompt;
       
       if (!systemPromptTemplate || !userPromptTemplate) {
         throw new Error('System or user prompt not configured');
@@ -271,10 +303,10 @@ REQUIRED OUTPUT FORMAT:
       // 6. Get LLM provider and configuration
       const llmProvider = LLMProviderFactory.getProvider(provider);
       const llmConfig: LLMConfig = {
-        model: this.config.llm_providers?.[provider]?.model || 
+        model: config.llm_providers?.[provider]?.model || 
                (provider === 'openai' ? 'gpt-4-turbo' : 'claude-3-sonnet-20240229'),
-        max_tokens: this.config.llm_providers?.[provider]?.max_tokens || 4000, // Increased for batch
-        temperature: this.config.llm_providers?.[provider]?.temperature || 0.7
+        max_tokens: config.llm_providers?.[provider]?.max_tokens || 4000, // Increased for batch
+        temperature: config.llm_providers?.[provider]?.temperature || 0.7
       };
       
       console.log('🔥 BATCH LLM call:', {
@@ -341,6 +373,7 @@ REQUIRED OUTPUT FORMAT:
       results.forEach(result => {
         console.log(`📝 ${result.sceneId}: "${result.generatedPrompt?.substring(0, 100)}..." (${result.characterCount} chars)`);
       });
+      
       
       return {
         success: true,

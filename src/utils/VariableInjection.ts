@@ -145,9 +145,21 @@ export class VariableInjection {
 
     // Global style variables
     if (masterJSON?.global_style) {
+      // 🎨 STYLE DEBUG: Log style values being injected
+      const primaryColor = masterJSON.global_style?.color_palette?.primary;
+      const renderingLevel = masterJSON.global_style?.rendering_style?.level;
+      console.log('🎨 STYLE INJECTION DEBUG:', {
+        primaryColor,
+        renderingLevel,
+        fullGlobalStyle: masterJSON.global_style,
+        availableStyleKeys: Object.keys(masterJSON.global_style)
+      });
+      
       Object.keys(masterJSON.global_style).forEach(key => {
         variables[`global_style.${key}`] = masterJSON.global_style[key];
       });
+    } else {
+      console.log('⚠️ STYLE INJECTION WARNING: No global_style found in masterJSON');
     }
 
     return variables;

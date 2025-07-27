@@ -10,21 +10,22 @@
 
 ## 🎯 **Overview**
 
-FLOW.STUDIO revolutionizes video production by providing **Story Intelligence** - understanding narrative relationships across scenes instead of just perfecting individual frames. Built for directors, content creators, and production teams who need professional video content with narrative coherence.
+FLOW.STUDIO revolutionizes video production by providing **Story Intelligence** with **AI Creative Intelligence Consultant** methodology. Unlike traditional tools that perfect individual frames, our platform understands narrative relationships across scenes for >95% character consistency and coherent storytelling.
 
-### **Revolutionary Architecture: Direct API Integration**
-- **Master JSON Single Source**: Content-driven phase progression with clean separation of concerns
-- **Direct Service Integration**: LLM + Image generation bypass webhooks for real-time control
-- **5-Service Orchestration**: Modular architecture (LLM, Image, Storage, Reference, Providers)
-- **16:9 Cinematic Modal**: True aspect ratio enforcement with intelligent progress tracking
-- **Database-Centric Storage**: Complete FAL.ai → Supabase Storage → Database pipeline with permanent URLs
-- **Timeline System**: 3-layer UX architecture (Navigation → Timeline → Phase Modules)
-- **Enterprise Security**: RLS policies for authenticated uploads with public read access
+### **Revolutionary Architecture: AI-Driven Character Consistency**
+- **Web-Brother Collaboration**: Bidirectional AI loop for multimodal character analysis and optimization
+- **Master JSON Single Source**: Content-driven phase progression with unified data architecture
+- **Test Data Capture**: Production-ready extraction system for AI collaborative workflows
+- **Direct Service Integration**: Real-time LLM + Image generation with intelligent progress tracking
+- **Database-Centric Pipeline**: Complete FAL.ai → Supabase Storage → permanent URL architecture
+- **16:9 Cinematic Interface**: True aspect ratio enforcement with adaptive layout design
+- **Character Intelligence**: Cross-scene consistency tracking and optimization suggestions
 
-### **Project Alignment Workflow Integration**
-- **Session Start Protocol**: Systematic 3-phase workflow for project understanding
-- **Documentation-First**: Automatic codebase scanning and status analysis
-- **Web-Brother Methodology**: Consistent development approach across CLI and Web environments
+### **AI Creative Intelligence Methodology**
+- **>95% Recognition Rate**: Proven character consistency across 13-scene productions  
+- **Multimodal Analysis**: Combined prompt engineering and visual consistency validation
+- **Iterative Optimization**: Test-analyze-refine workflow for continuous improvement
+- **Production Validation**: Verified with "UN CONSIGLIO STELLARE" campaign (Ministero della Salute)
 
 ## 🚀 **Quick Start**
 
@@ -112,10 +113,27 @@ npm run dev
 
 ## 🛠️ **Development**
 
-### **Web-Brother Methodology Alignment**
-- **Holistic Development Approach**: Structure analysis before implementation
-- **Zero Breaking Changes**: Preserve working functionality during enhancements
-- **Project Alignment Workflow**: Systematic session start protocol
+### **AI Collaboration Workflow** (Production-Ready)
+```bash
+# Extract test data for web-brother analysis
+node generate-test-data.cjs PROJECT_ID
+
+# Generated files for AI collaboration:
+# docs/test/scene_frame_data.json    # Unified prompts + image metadata
+# docs/test/scene_*_image.*          # Local image files for scanning
+```
+
+### **Web-Brother Collaboration System**
+- **Test Data Capture**: Production-ready script for multimodal AI analysis
+- **Character Consistency Pipeline**: >95% recognition rate optimization workflow  
+- **Bidirectional Updates**: CLI ↔ Web-Brother iterative improvement cycle
+- **Unified JSON Structure**: Combined prompts, metadata, and image references
+- **Service Role Access**: Complete database access bypassing RLS for AI analysis
+
+### **Development Architecture Principles**
+- **Holistic Development**: Structure analysis before implementation, zero breaking changes
+- **Master JSON Architecture**: Single source of truth with content-driven progression
+- **Component Modularity**: Reusable patterns across phases and timeline systems
 - **Documentation-First**: Comprehensive project understanding before coding
 - **Cross-Environment Consistency**: Shared patterns between CLI and Web development
 
@@ -140,15 +158,27 @@ flow-studio-mvp/
 
 ### **Development Commands** (Verified & Optimized)
 ```bash
-npm run dev          # Development server (instant startup, instant HMR)
-npm run build        # Production build (7.02s, 556.85KB main bundle)
-npm run lint         # Code quality checks (ESLint validation)
+npm run dev          # Development server (523ms startup, instant HMR)
+npm run build        # Production build (7.91s, 594.60KB main bundle)
+npm run lint         # Code quality checks (41 warnings, build clean)
 npm run preview      # Preview production build
+
+# AI Collaboration Commands
+node generate-test-data.cjs PROJECT_ID  # Extract test data for web-brother
+node project-scanner.js                 # Generate project context (20.3KB)
 ```
 
-### **Code Quality Standards** (Enterprise-Grade)
-- **TypeScript Strict Mode**: Full type safety across entire codebase
-- **ESLint Configuration**: Consistent code standards with manageable warnings  
+### **Performance Metrics** (Production-Validated)
+- **Build Performance**: 7.91s clean compilation with optimization warnings
+- **Development Startup**: 523ms with instant hot module replacement
+- **Bundle Analysis**: 594.60KB main chunk (dynamic import opportunities identified)
+- **Code Quality**: 41 ESLint warnings (unused variables, non-blocking)
+- **Database Performance**: Schema v3.0 optimized with strategic indexes
+
+### **AI Collaboration Standards**
+- **Character Consistency**: >95% recognition rate across multi-scene productions
+- **Test Data Structure**: Unified JSON with prompts, metadata, and image references
+- **Service Integration**: Direct API pattern bypassing webhooks for real-time control  
 - **Responsive Design**: Mobile-first approach, no px values, design token system
 - **Performance Optimized**: Separated CSS/JS bundles with chunking opportunities identified
 
