@@ -5,7 +5,7 @@
  * Smart storage using scene IDs in master JSON
  */
 
-import { getAppConfiguration } from '../lib/database';
+import { getProjectConfiguration } from '../lib/database';
 import { VariableInjection } from '../utils/VariableInjection';
 import { PromptProcessor } from '../utils/PromptProcessor';
 import { SceneDataTransformer, ScenePromptData } from '../utils/SceneDataTransformer';
@@ -36,35 +36,36 @@ export class LLMService {
   private defaultProvider: LLMProviderType = 'openai';
   
   /**
-   * Initialize service - simple validation (no caching)
+   * Initialize service - simple validation (no caching) 
    */
-  async initialize(): Promise<void> {
+  async initialize(projectId: string): Promise<void> {
     try {
-      const config = await this.getFreshConfig();
+      const config = await this.getFreshConfig(projectId);
       
       if (!config || Object.keys(config).length === 0) {
-        throw new Error('No configuration found - please create initial configuration in Config tab');
+        throw new Error(`No configuration found for project ${projectId} - please initialize project configuration`);
       }
       
       if (!config?.start_frame_prompt_generation) {
         throw new Error('LLM configuration incomplete - please configure prompts in Config tab');
       }
       
-      console.log('✅ LLM Service initialized successfully (no caching)');
+      console.log(`✅ LLM Service initialized successfully for project ${projectId}`);
       
     } catch (error) {
-      console.error('LLM Service initialization failed:', error);
+      console.error(`LLM Service initialization failed for project ${projectId}:`, error);
       throw error;
     }
   }
   
   /**
-   * Get fresh configuration from database (no caching)
+   * Get fresh configuration from database (project-specific, no caching)
    */
-  private async getFreshConfig(): Promise<any> {
-    const config = await getAppConfiguration();
+  private async getFreshConfig(projectId: string): Promise<any> {
+    const config = await getProjectConfiguration(projectId);
     
-    console.log('🔍 LLM Service Debug - Fresh config loaded:', {
+    console.log('🔍 LLM Service Debug - Fresh project config loaded:', {
+      projectId,
       configExists: !!config,
       configKeys: Object.keys(config || {}),
       hasStartFrame: !!config?.start_frame_prompt_generation,
@@ -79,6 +80,7 @@ export class LLMService {
    * Generate image prompt for a single scene
    */
   async generateSceneImagePrompt(
+    projectId: string,
     sceneId: string, 
     masterJSON: any,
     options: {
@@ -87,8 +89,8 @@ export class LLMService {
     } = {}
   ): Promise<ScenePromptResult> {
     try {
-      // Always get fresh config from database
-      const config = await this.getFreshConfig();
+      // Always get fresh config from database (project-specific)
+      const config = await this.getFreshConfig(projectId);
       
       if (!config?.start_frame_prompt_generation) {
         throw new Error('LLM configuration not found - please configure prompts in Config tab');
@@ -221,6 +223,7 @@ export class LLMService {
    * Generate prompts for multiple scenes in single batch call (n8n pattern)
    */
   async generateAllScenePrompts(
+    projectId: string,
     masterJSON: any,
     options: {
       provider?: LLMProviderType;
@@ -241,8 +244,8 @@ export class LLMService {
     });
     
     try {
-      // Always get fresh config from database
-      const config = await this.getFreshConfig();
+      // Always get fresh config from database (project-specific)
+      const config = await this.getFreshConfig(projectId);
       
       if (!config?.start_frame_prompt_generation) {
         throw new Error('LLM configuration not found - please configure prompts in Config tab');

@@ -417,7 +417,7 @@ export default function ProjectDetailPage({ user }: ProjectDetailPageProps) {
         )
 
       case 'config':
-        return <ConfigurationTab />
+        return <ConfigurationTab projectId={project.id} />
 
       default:
         return null
@@ -589,7 +589,7 @@ export default function ProjectDetailPage({ user }: ProjectDetailPageProps) {
     )
   }
 
-  if (loading) {
+  if (loading || !project) {
     return (
       <div className="loading-container">
         Loading project...

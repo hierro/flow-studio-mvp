@@ -54,36 +54,88 @@ export async function deleteProject(projectId: string): Promise<boolean> {
       return false
     }
 
-    // 3. Clean up storage files
-    if (assets && assets.length > 0) {
-      // First, remove all files in the project folder
-      const { data: files, error: listError } = await supabase.storage
+    // 3. BULLETPROOF STORAGE CLEANUP - Multiple strategies to ensure complete deletion
+    console.log(`🧹 Starting comprehensive storage cleanup for project: ${projectId}`);
+    
+    let totalFilesRemoved = 0;
+    let cleanupErrors: string[] = [];
+    
+    // STRATEGY 1: Clean files from scenes directory
+    console.log(`📂 STRATEGY 1: Scanning projects/${projectId}/scenes/`);
+    const { data: sceneFiles, error: sceneListError } = await supabase.storage
+      .from('scene-images')
+      .list(`projects/${projectId}/scenes`);
+    
+    if (sceneListError) {
+      console.error(`❌ Failed to list scenes directory:`, sceneListError);
+      cleanupErrors.push(`Scenes list error: ${sceneListError.message}`);
+    } else if (sceneFiles && sceneFiles.length > 0) {
+      console.log(`📋 Found ${sceneFiles.length} files in scenes directory`);
+      const sceneFilePaths = sceneFiles.map(file => `projects/${projectId}/scenes/${file.name}`);
+      
+      const { error: sceneRemoveError } = await supabase.storage
         .from('scene-images')
-        .list(`projects/${projectId}/scenes`);
+        .remove(sceneFilePaths);
+        
+      if (sceneRemoveError) {
+        console.error(`❌ Failed to remove scene files:`, sceneRemoveError);
+        cleanupErrors.push(`Scene removal error: ${sceneRemoveError.message}`);
+      } else {
+        totalFilesRemoved += sceneFiles.length;
+        console.log(`✅ STRATEGY 1 SUCCESS: Removed ${sceneFiles.length} scene files`);
+      }
+    } else {
+      console.log(`📋 No files found in scenes directory`);
+    }
+    
+    // STRATEGY 2: Clean any remaining files in project root directory
+    console.log(`📂 STRATEGY 2: Scanning projects/${projectId}/`);
+    const { data: projectFiles, error: projectListError } = await supabase.storage
+      .from('scene-images')
+      .list(`projects/${projectId}`, { limit: 100 });
+    
+    if (projectListError) {
+      console.error(`❌ Failed to list project directory:`, projectListError);
+      cleanupErrors.push(`Project list error: ${projectListError.message}`);
+    } else if (projectFiles && projectFiles.length > 0) {
+      console.log(`📋 Found ${projectFiles.length} items in project directory`);
       
-      if (!listError && files && files.length > 0) {
-        const filePaths = files.map(file => `projects/${projectId}/scenes/${file.name}`);
+      // Filter for files only, not subdirectories
+      const fileItems = projectFiles.filter(item => item.name && !item.name.endsWith('/'));
+      
+      if (fileItems.length > 0) {
+        const projectFilePaths = fileItems.map(file => `projects/${projectId}/${file.name}`);
         
-        const { error: storageError } = await supabase.storage
+        const { error: projectRemoveError } = await supabase.storage
           .from('scene-images')
-          .remove(filePaths);
-        
-        if (storageError) {
-          console.warn('Storage cleanup failed (non-critical):', storageError);
+          .remove(projectFilePaths);
+          
+        if (projectRemoveError) {
+          console.error(`❌ Failed to remove project files:`, projectRemoveError);
+          cleanupErrors.push(`Project removal error: ${projectRemoveError.message}`);
         } else {
-          console.log(`✅ Cleaned up ${filePaths.length} storage files`);
+          totalFilesRemoved += fileItems.length;
+          console.log(`✅ STRATEGY 2 SUCCESS: Removed ${fileItems.length} additional files`);
         }
+      } else {
+        console.log(`📋 No additional files found in project root`);
       }
+    } else {
+      console.log(`📋 Project directory is empty or doesn't exist`);
+    }
+    
+    // FINAL REPORT
+    if (cleanupErrors.length > 0) {
+      console.error(`⚠️ Storage cleanup completed with ${cleanupErrors.length} errors:`);
+      cleanupErrors.forEach((error, index) => console.error(`   ${index + 1}. ${error}`));
+      console.log(`📊 Files successfully removed: ${totalFilesRemoved}`);
       
-      // Also try to remove the project folder structure if empty
-      try {
-        await supabase.storage
-          .from('scene-images')
-          .remove([`projects/${projectId}/scenes`, `projects/${projectId}`]);
-      } catch (folderError) {
-        // Folder cleanup is optional - may fail if not empty
-        console.log('Folder cleanup completed (or folders non-empty)');
-      }
+      // Don't fail the entire deletion due to storage cleanup issues
+      console.log(`🔄 Project deletion continues despite storage cleanup errors`);
+    } else {
+      console.log(`🎉 COMPLETE SUCCESS: Storage cleanup finished perfectly`);
+      console.log(`📊 Total files removed: ${totalFilesRemoved}`);
+      console.log(`🗂️ Project ${projectId} storage completely cleaned`);
     }
 
     return true
@@ -104,7 +156,10 @@ export async function createProject(name: string, userId: string): Promise<{ pro
       }
     }
 
-    // Create project with master JSON
+    // Get default configuration template (AUTOMATIC CONFIG INJECTION)
+    const defaultConfiguration = await getDefaultConfigurationTemplate()
+    
+    // Create project with master JSON and configuration
     const { data: project, error: projectError } = await supabase
       .from('projects')
       .insert({
@@ -112,6 +167,7 @@ export async function createProject(name: string, userId: string): Promise<{ pro
         user_id: userId,
         status: 'active',
         master_json: initialMasterJSON,
+        configuration_data: defaultConfiguration, // AUTOMATIC CONFIG INJECTION
         current_version: 0
       })
       .select()
@@ -121,6 +177,8 @@ export async function createProject(name: string, userId: string): Promise<{ pro
       console.error('Error creating project:', projectError)
       return null
     }
+
+    console.log(`✅ Project "${name}" created with automatic configuration injection`)
 
     // Don't create initial version - let first user save create version 1
 
@@ -617,45 +675,123 @@ export async function savePhaseAndUnlockNext(phaseId: string): Promise<boolean> 
   }
 }
 
-// App Configuration Functions
-export async function getAppConfiguration(): Promise<any> {
+// Project Configuration Functions (Project-Specific)
+export async function getProjectConfiguration(projectId: string): Promise<any> {
   try {
     const { data, error } = await supabase
-      .from('app_configuration')
-      .select('config_data')
-      .order('updated_at', { ascending: false })
-      .limit(1);
+      .from('projects')
+      .select('configuration_data')
+      .eq('id', projectId)
+      .single();
       
     if (error) {
-      console.error('Error loading app configuration:', error);
+      console.error('Error loading project configuration:', error);
       return {};
     }
     
-    if (!data || data.length === 0) {
-      console.log('No app configuration found in database');
+    if (!data?.configuration_data) {
+      console.log('No configuration found for project, loading default template');
+      // Auto-fix: Copy default template if missing
+      const defaultConfig = await getDefaultConfigurationTemplate();
+      if (defaultConfig && Object.keys(defaultConfig).length > 0) {
+        await saveProjectConfiguration(projectId, defaultConfig);
+        return defaultConfig;
+      }
       return {};
     }
     
-    return data[0]?.config_data || {};
+    return data.configuration_data || {};
   } catch (error) {
-    console.error('Error loading app configuration:', error);
+    console.error('Error loading project configuration:', error);
     return {};
   }
 }
 
-export async function saveAppConfiguration(configData: any): Promise<boolean> {
+export async function saveProjectConfiguration(projectId: string, configData: any): Promise<boolean> {
   try {
     const { error } = await supabase
-      .from('app_configuration')
-      .upsert({
-        config_data: configData,
+      .from('projects')
+      .update({
+        configuration_data: configData,
         updated_at: new Date().toISOString()
-      });
+      })
+      .eq('id', projectId);
       
-    if (error) throw error;
+    if (error) {
+      console.error('Error saving project configuration:', error);
+      return false;
+    }
+    
+    console.log('✅ Project configuration saved successfully');
     return true;
   } catch (error) {
-    console.error('Error saving app configuration:', error);
+    console.error('Error saving project configuration:', error);
     return false;
   }
+}
+
+// Configuration Template Functions
+export async function getDefaultConfigurationTemplate(): Promise<any> {
+  try {
+    const { data, error } = await supabase
+      .from('project_configuration_templates')
+      .select('template_data')
+      .eq('name', 'default')
+      .single();
+      
+    if (error || !data) {
+      console.error('Error loading default configuration template:', error);
+      return {};
+    }
+    
+    return data.template_data || {};
+  } catch (error) {
+    console.error('Error loading default configuration template:', error);
+    return {};
+  }
+}
+
+export async function resetProjectConfigurationToDefault(projectId: string, section?: string): Promise<boolean> {
+  try {
+    const defaultTemplate = await getDefaultConfigurationTemplate();
+    
+    if (!defaultTemplate || Object.keys(defaultTemplate).length === 0) {
+      console.error('No default template found');
+      return false;
+    }
+    
+    let configToSave = defaultTemplate;
+    
+    // Future: Modular reset (reset only specific section)
+    if (section) {
+      // Get current config
+      const currentConfig = await getProjectConfiguration(projectId);
+      
+      // Replace only the specified section
+      configToSave = {
+        ...currentConfig,
+        [section]: defaultTemplate[section]
+      };
+      
+      console.log(`🔄 Resetting section "${section}" to default`);
+    } else {
+      console.log('🔄 Resetting entire configuration to default');
+    }
+    
+    return await saveProjectConfiguration(projectId, configToSave);
+  } catch (error) {
+    console.error('Error resetting project configuration to default:', error);
+    return false;
+  }
+}
+
+// Legacy Functions (Backward Compatibility - DEPRECATED)
+export async function getAppConfiguration(): Promise<any> {
+  console.warn('getAppConfiguration() is deprecated - use getProjectConfiguration(projectId) instead');
+  return {};
+}
+
+export async function saveAppConfiguration(configData: any): Promise<boolean> {
+  console.warn('saveAppConfiguration() is deprecated - use saveProjectConfiguration(projectId, configData) instead');
+  return false;
 }

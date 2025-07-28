@@ -39,7 +39,7 @@ export default function ScenesFrameGenerationModule({
     currentProvider,
     setProvider,
     initializeService: initializeLLMService
-  } = useLLMGeneration();
+  } = useLLMGeneration(projectId);
 
   const {
     generateAllSceneImages,
@@ -49,7 +49,7 @@ export default function ScenesFrameGenerationModule({
     error: imageError,
     currentService,
     initializeService: initializeImageService
-  } = useImageGeneration();
+  } = useImageGeneration(projectId);
 
   // Modal demo mode for design review
   const [showModalDemo, setShowModalDemo] = useState(false);
@@ -94,8 +94,10 @@ export default function ScenesFrameGenerationModule({
     return () => document.removeEventListener('keydown', handleKeyDown);
   }, [showModalDemo]);
 
-  // Initialize both services on mount
+  // Initialize both services when projectId is available
   useEffect(() => {
+    if (!projectId) return;
+    
     console.log('🚀 ScenesFrameGenerationModule: Initializing services...');
     
     // Initialize LLM service
@@ -107,7 +109,7 @@ export default function ScenesFrameGenerationModule({
     initializeImageService().then((success) => {
       console.log(`✅ Image service initialization: ${success ? 'SUCCESS' : 'FAILED'}`);
     });
-  }, []);
+  }, [projectId, initializeLLMService, initializeImageService]);
 
   // Get scenes from master JSON
   const scenes = masterJSON?.scenes ? Object.keys(masterJSON.scenes) : [];

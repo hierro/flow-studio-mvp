@@ -34,7 +34,7 @@ export interface LLMGenerationState {
   currentProvider: LLMProviderType;
 }
 
-export function useLLMGeneration() {
+export function useLLMGeneration(projectId: string) {
   const [state, setState] = useState<LLMGenerationState>({
     isGenerating: false,
     isInitializing: false,
@@ -50,7 +50,7 @@ export function useLLMGeneration() {
     setState(prev => ({ ...prev, isInitializing: true, error: null }));
     
     try {
-      await llmService.initialize();
+      await llmService.initialize(projectId);
       const availableProviders = llmService.getAvailableProviders();
       
       setState(prev => ({ 
@@ -68,7 +68,7 @@ export function useLLMGeneration() {
       }));
       return false;
     }
-  }, []);
+  }, [projectId]);
   
   // Generate prompt for single scene
   const generateScenePrompt = useCallback(async (
@@ -167,7 +167,7 @@ export function useLLMGeneration() {
       }
       
       // Generate all prompts with progress tracking
-      const result = await llmService.generateAllScenePrompts(masterJSON, {
+      const result = await llmService.generateAllScenePrompts(projectId, masterJSON, {
         provider: options.provider || state.currentProvider,
         extractionMetadata: options.extractionMetadata,
         sceneIds: options.sceneIds, // Pass specific scene IDs if provided

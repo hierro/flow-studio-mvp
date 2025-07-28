@@ -5,7 +5,7 @@
  * Currently supports FAL.ai FLUX (ported from n8n), extensible for future services
  */
 
-import { getAppConfiguration } from '../lib/database';
+import { getProjectConfiguration } from '../lib/database';
 import { ImageStorageService } from './ImageStorageService';
 
 export interface SceneImageRequest {
@@ -57,9 +57,9 @@ export class ImageGenerationService {
   /**
    * Initialize service by loading and analyzing configuration
    */
-  async initialize(): Promise<void> {
+  async initialize(projectId: string): Promise<void> {
     try {
-      this.config = await getAppConfiguration();
+      this.config = await getProjectConfiguration(projectId);
       
       if (!this.config?.image_generation) {
         throw new Error('Image generation configuration not found');

@@ -21,7 +21,8 @@
       "Bash(mkdir:*)",
       "Bash(grep:*)",
       "Bash(npx supabase:*)",
-      "Bash(sed:*)"
+      "Bash(sed:*)",
+      "WebFetch(domain:supabase.com)"
     ],
     "deny": []
   }

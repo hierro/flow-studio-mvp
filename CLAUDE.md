@@ -15,7 +15,7 @@
 **✅ PHASE 3 SYSTEM**: Database-centric image storage with permanent URLs operational  
 **✅ CINEMATIC MODAL**: 16:9 aspect ratio with intelligent image persistence and conditional UX  
 **🚀 NEXT PRIORITY**: Bidirectional web-brother collaboration loop for >95% character consistency  
-**📊 DATABASE**: Schema v3.0 with integrated asset storage and cross-phase change tracking  
+**📊 DATABASE**: Schema v4.0 with project-specific configuration and integrated asset storage  
 **🤖 WEB-BROTHER**: AI Creative Intelligence Consultant methodology ready for implementation  
 
 ---
@@ -127,10 +127,34 @@ When asked to update CLAUDE.md or README.md independently (outside finalize work
 ❌ **Raw JSON Editing**: Phase 1 needs structured editor, not textarea for production  
 ❌ **Multiple Database Clients**: Use centralized client in `lib/supabase.ts`  
 ❌ **Inline Style Proliferation**: Use global CSS classes, maintain 88% reduction achieved  
+❌ **Complex Storage RLS Policies**: Avoid `storage.foldername()`, `EXISTS` subqueries, complex path parsing  
+❌ **Admin Role Hacks**: Never use service role keys in frontend - fix RLS policies instead  
 
 ### **Current Known Issues**
-⚠️ **ESLint Warnings**: 38 warnings (unused variables, mostly in timeline components) - build works perfectly  
-⚠️ **Bundle Size**: Main chunk 556KB (consider dynamic imports for future optimization)  
+⚠️ **ESLint Warnings**: 42 warnings (unused variables, mostly in timeline components) - build works perfectly  
+⚠️ **Bundle Size**: Main chunk 600KB+ (consider dynamic imports for future optimization)
+
+### **Supabase Storage Troubleshooting Guide** (PRODUCTION-TESTED)
+```typescript
+// ISSUE: Storage deletion returns success but files remain
+// CAUSE: Complex RLS policies fail silently
+// SOLUTION: Use simple policy patterns
+
+// ✅ WORKING POLICY
+bucket_id = 'scene-images' AND 
+name LIKE 'projects/%' AND 
+auth.uid() IS NOT NULL
+
+// ❌ BROKEN PATTERNS
+storage.foldername(name)[1] = 'projects' AND    // Function may not work as expected
+EXISTS (SELECT 1 FROM projects...)              // Subqueries can cause silent failures
+
+// TESTING METHODOLOGY
+// 1. Create test-storage-deletion.js with authentication
+// 2. Test policy with known project + files
+// 3. Verify actual deletion in Supabase Dashboard
+// 4. Simple policies work, complex ones fail silently
+```  
 
 ### **Proven Development Patterns**
 ```typescript
@@ -169,6 +193,19 @@ const n8nPattern = {
   completion: "Results in phase content_data JSONB",
   versioning: "New version created automatically"
 }
+
+// Supabase Storage RLS Pattern (PRODUCTION-TESTED)
+const supabaseStorageRLS = {
+  working_policy: "bucket_id = 'scene-images' AND name LIKE 'projects/%' AND auth.uid() IS NOT NULL",
+  broken_patterns: [
+    "storage.foldername() with complex path parsing",
+    "EXISTS subqueries referencing other tables", 
+    "Complex string_to_array() operations"
+  ],
+  testing_methodology: "test-storage-deletion.js with authentication + verification",
+  deletion_architecture: "Dual-strategy: scenes directory + project root cleanup",
+  key_lesson: "Simple policies work, complex policies fail silently"
+}
 ```
 
 ---
@@ -179,7 +216,7 @@ const n8nPattern = {
 ```typescript
 Frontend: Vite 5.4.19 + React 19 + TypeScript 5 + React Router 6.28.0
 Styling: Global CSS system with design tokens (88% inline reduction achieved)
-Database: Supabase PostgreSQL with schema v3.0 + integrated asset storage
+Database: Supabase PostgreSQL with schema v4.0 + project-specific configuration
 Authentication: Supabase Auth with RLS policies for storage access
 Storage: Supabase Storage with scene-images bucket for permanent image URLs
 Integration: n8n TESTA_ANIMATIC workflow (production-ready, 95%+ success)
@@ -188,62 +225,33 @@ Performance: 8.55s build, instant dev startup, instant HMR
 Bundle: CSS 48.74kB, JS 556.85kB main chunk (consider dynamic imports)
 ```
 
-### **Schema v3.0 with Integrated Asset Storage** (DEPLOYED & PRODUCTION-TESTED)
-**Reference**: `docs/db/schema_v3.sql` (current active schema)
+### **Schema v4.0 with Project-Specific Configuration** (DEPLOYED & PRODUCTION-TESTED)
+**Reference**: `docs/db/schema_v4.sql` (current active schema)
 
 ```sql
--- Core Tables (Clean Master JSON Architecture)
-✅ projects          -- Master JSON single source of truth + metadata
-✅ project_phases    -- 5-phase workflow + unlock progression  
-✅ phase_versions    -- Version history + backup management
-✅ n8n_jobs         -- Workflow tracking + enhanced reliability
+-- Core Tables (Clean Master JSON Architecture + Project Config)
+✅ projects                      -- Master JSON + project-specific configuration
+✅ project_configuration_templates -- Default configuration system
+✅ project_phases               -- 5-phase workflow + unlock progression  
+✅ phase_versions               -- Version history + backup management
+✅ n8n_jobs                     -- Workflow tracking + enhanced reliability
 
 -- Asset Storage Architecture (Production-Ready)
 ✅ project_assets    -- Image storage with permanent URLs + metadata
 ✅ content_changes   -- Cross-phase change tracking for timeline
 ✅ user_activities   -- Analytics and debugging support
 
--- Image Storage Features (WORKING)
-✅ Permanent URL system (no external dependencies on FAL.ai)
-✅ Database-centric architecture (masterJSON references our URLs)
-✅ RLS policies configured (authenticated upload, public read)  
-✅ Metadata tracking (generation prompts, model info, versioning)
+-- Configuration System Features (v4.0)
+✅ Project-specific configuration (automatic injection on project creation)
+✅ Template-based defaults with manual save and reset-to-default
+✅ Proper JSON formatting (jsonb_build_object vs escaped strings)
+✅ Storage deletion system with working RLS policies
 ```
 
-### **CSS Globalization System** (COMPLETE & BATTLE-TESTED)
-**Achievement**: 96 → 11 inline styles (88% reduction) across all components
-
-```css
-/* Design Token System - globals.css */
-:root {
-  /* Colors - Dark Theme Optimized */
-  --color-bg-primary: #000000;
-  --color-bg-secondary: #1a1a1a;
-  --color-text-primary: #ffffff;
-  --color-border-focus: #0066cc;
-  
-  /* Responsive Spacing Scale (rem-based) */
-  --space-xs: 0.25rem;   /* 4px - scales with user preferences */
-  --space-xl: 1rem;      /* 16px */
-  --space-4xl: 2rem;     /* 32px */
-  
-  /* Typography Scale (mobile-first) */
-  --text-xs: 0.6875rem;  /* 11px */
-  --text-base: 0.875rem; /* 14px - responsive breakpoints */
-  --text-3xl: 1.5rem;    /* 24px */
-}
-
-/* Component-Specific Classes (Organized) */
-.script-modal-loading { /* ScriptInterpretationModule styles */ }
-.version-item { /* Version history styles */ }
-.project-card { /* Dashboard project cards */ }
-/* ... all components now use global classes */
-```
-
-**3-Area UX Architecture** (IMPLEMENTED):
-- **🌐 Area 1**: Global Navigation (top horizontal bar)
-- **⚙️ Area 2**: Phase-Specific Controls (left sidebar)  
-- **📋 Area 3**: View Content (main area - ready for 4-tab timeline system)
+### **CSS & UX Architecture** (PRODUCTION READY)
+**Global CSS System**: 96 → 11 inline styles (88% reduction), design token system in `globals.css`  
+**3-Area UX Layout**: Global Navigation → Phase Controls → Content (timeline-ready)  
+**Component Classes**: All components use centralized CSS classes vs inline styles
 
 ---
 
@@ -256,168 +264,50 @@ Bundle: CSS 48.74kB, JS 556.85kB main chunk (consider dynamic imports)
 - **Character Consistency**: Samantha Cristoforetti >95% recognition across scenes
 - **Integration**: Direct web app triggers via `ScriptInterpretationModule.tsx`
 
-### **Italian Campaign Integration** (PRODUCTION DATA)
-**References**: 
-- `docs/script_data/scenes_description.json` - Scene structure data
-- `docs/script_data/script_description.json` - Script content data
-- `docs/script_data/script_description_full.json` - Extended script data
-- `docs/TESTA_ANIMATIC.json` - Production n8n workflow
-
-```typescript
-// UN CONSIGLIO STELLARE - Ministero della Salute (FULLY INTEGRATED)
-interface ItalianCampaignContent {
-  project_metadata: {
-    title: "UN CONSIGLIO STELLARE",
-    client: "Ministero della Salute"
-  },
-  elements: {
-    samantha: { frequency: 10/13, consistency_rules: [...] },
-    children_group: { frequency: 7/13, scenes_present: [...] },
-    circular_library: { primary_location: true }
-  },
-  scenes: {
-    scene_1: { duration: "3s", camera: "wide", mood: "wonder" },
-    // ... all 13 scenes with complete metadata
-  }
-}
-```
+### **Italian Campaign Integration** (PRODUCTION VALIDATED)
+**"UN CONSIGLIO STELLARE" - Ministero della Salute**: 13 scenes, >95% character consistency  
+**Key Elements**: Samantha Cristoforetti (10/13 scenes), children group, circular library  
+**Data References**: `docs/script_data/` (scene/script structure), `docs/TESTA_ANIMATIC.json` (workflow)
 
 ---
 
-## 🎯 **REVOLUTIONARY TIMELINE VISION**
+## 🎯 **TIMELINE ARCHITECTURE VISION**
 
-### **Story Intelligence vs Frame Generation**
-**Problem**: Traditional tools perfect individual scenes but lack narrative understanding  
-**Solution**: Cross-scene relationship visualization with story intelligence
+### **Story Intelligence Approach**
+**Concept**: Cross-scene relationship visualization vs individual frame perfection  
+**Advantage**: Narrative-aware AI suggestions with >95% character consistency  
 
-```
-Frame Tools: "Perfect this individual scene"
-FLOW.STUDIO: "Understand how this scene strengthens your story"
+### **3-Tab Timeline System** (Implementation Ready)
+1. **Scenes Tab**: Horizontal timeline with scene cards, phase-aware content evolution
+2. **Elements Tab**: Character/location grid with cross-scene frequency tracking  
+3. **Style Tab**: Global configuration with instant visual updates across phases
 
-Our Advantages:
-✅ Visual Story DNA (scene-element relationship networks)
-✅ Cross-Scene Character Intelligence (>95% consistency with narrative context)  
-✅ Contextual AI Suggestions (story-aware vs mechanical improvements)
-✅ Narrative Flow Visualization (directors see entire story structure)
-```
-
-### **3-Tab Timeline Architecture** (NEXT IMPLEMENTATION PRIORITY)
-**References**: 
-- `docs/design_and_planning/flow_studio_phase1_master_plan.md` - Timeline vision
-- `docs/design_and_planning/timeline_implementation_plan.md` - Implementation details
-- `src/components/timeline/DirectorsTimeline.tsx` - Timeline component (started)
-- `src/utils/TimelineParser.ts` - Timeline utility (exists)
-
-```typescript
-interface TimelineArchitecture {
-  // Tab 1: Scenes (Primary view) 
-  scenes_tab: {
-    layout: "Horizontal timeline of scene cards",
-    evolution: {
-      phase_1: "JSON content + scene metadata",
-      phase_2: "Same + reference images", 
-      phase_3: "Same + generated scene frames",
-      phase_4_5: "Same + video compilation"
-    },
-    interactions: "Click scene → show elements present (expandable)"
-  },
-  
-  // Tab 2: Elements (Cross-scene view)
-  elements_tab: {
-    layout: "Grid of element cards (characters, locations, props)",
-    features: {
-      samantha: "Frequency: 10/13 scenes, consistency tracking",
-      children_group: "Frequency: 7/13 scenes, relationship mapping", 
-      circular_library: "Primary location with scene connections"
-    },
-    interactions: "Click element → highlight across all scenes"
-  },
-  
-  // Tab 3: Style (Global control)
-  style_tab: {
-    layout: "Global style configuration panel",
-    features: "Color palette, rendering style, mood controls",
-    impact: "Changes instantly visible in scenes/elements tabs",
-    versioning: "Cross-phase change tracking via content_changes table"
-  }
-}
-```
-
-**Technical Foundation Ready** (Database schema v3.0 supports all timeline features):
-- Cross-phase change tracking enables style modifications from any phase
-- Element relationship mapping supports elements tab functionality  
-- Asset management ready for Phase 2+ images with approval workflows
-- Strategic indexes optimize timeline queries for performance
+**Technical Foundation**: Schema v3.0 supports cross-phase tracking, element relationships, asset management
 
 ---
 
-## 💻 **CURRENT SYSTEM STATUS & DEVELOPMENT ENVIRONMENT**
+## 💻 **CURRENT SYSTEM STATUS**
 
-### **✅ Working Components** (VALIDATED & TESTED)
-```typescript
-// All database functions 100% compatible with schema v3.0
-✅ createProject()           // Creates project with Italian campaign template
-✅ getUserProjects()         // Dashboard project cards with progress tracking  
-✅ updatePhaseContent()      // Phase 1 JSON editing and versioning
-✅ savePhaseAndUnlockNext()  // Linear phase progression system
-✅ createN8NJob()           // n8n webhook integration for script generation
-✅ getPhaseVersions()       // Version history and content restoration
-```
+### **✅ Working Components**
+- **Database Functions**: All CRUD operations, schema v3.0 compatible (`database.ts`)
+- **Phase System**: Script editing, image generation, version history, n8n integration  
+- **Authentication**: Complete Supabase Auth with protected routes
+- **Asset Management**: Permanent URL storage, RLS policies, cleanup on deletion
 
-### **Development Environment** (OPTIMIZED & WORKING)
+### **Development Environment** 
 ```bash
-Platform: Windows + VS Code + Git
-Runtime: Node.js LTS + npm  
-Framework: Vite 5.4.19 (8.55s build, instant dev startup, instant HMR)
-
-# Verified Commands (ALL PASSING)
-npm run dev     # ✅ Instant startup, instant page loads
-npm run build   # ✅ 8.55s TypeScript compilation clean, 556KB main bundle
-npm run lint    # ✅ ESLint validation passes
-
-# Core Functionality Verified
-# Login → Dashboard → Create Project → Test Phase 1 module
-# Authentication, project management, n8n integration all working
+# Current Performance (Latest Build)
+npm run build   # 22.28s, 597KB main bundle, 47 modules
+npm run lint    # 41 warnings (unused variables, non-blocking)
+npm run dev     # 523ms startup, instant HMR
 ```
 
-### **Project Structure** (ORGANIZED & DOCUMENTED)
-```
-flow-studio-mvp/
-├── docs/                    # ✅ Complete documentation system
-│   ├── db/
-│   │   ├── schema_v3.sql    # ✅ Current active database schema
-│   │   ├── schema_v1.sql    # ✅ Original schema backup
-│   │   └── README.md        # ✅ Schema evolution overview
-│   ├── design_and_planning/
-│   │   ├── flow_studio_phase1_master_plan.md    # ✅ Timeline vision
-│   │   ├── timeline_implementation_plan.md      # ✅ Implementation details
-│   │   └── mvp_original_doc.md                  # ✅ Original specifications
-│   ├── script_data/
-│   │   ├── scenes_description.json              # ✅ Scene structure data
-│   │   ├── script_description.json              # ✅ Script content data
-│   │   └── script_description_full.json         # ✅ Extended script data
-│   ├── resources/
-│   │   └── N8N Webhook Architecture Expert Analysis.md  # ✅ n8n insights
-│   └── TESTA_ANIMATIC.json  # ✅ Production n8n workflow
-├── src/
-│   ├── components/
-│   │   ├── ScriptInterpretationModule.tsx       # ✅ Phase 1 complete
-│   │   ├── ProjectViewNavigation.tsx            # ✅ 4-tab navigation
-│   │   └── timeline/
-│   │       ├── DirectorsTimeline.tsx            # ✅ Timeline component (started)
-│   │       └── SceneCard.tsx                    # ✅ Scene visualization
-│   ├── lib/
-│   │   ├── database.ts      # ✅ All CRUD functions working
-│   │   └── supabase.ts      # ✅ Centralized client
-│   ├── pages/
-│   │   ├── DashboardPage.tsx        # ✅ Project management
-│   │   ├── LoginPage.tsx            # ✅ Complete auth system
-│   │   └── ProjectDetailPage.tsx    # ✅ 5-phase sidebar navigation
-│   ├── types/project.ts     # ✅ Complete TypeScript interfaces
-│   ├── utils/TimelineParser.ts # ✅ Timeline utility exists
-│   └── globals.css          # ✅ Complete design system (88% inline reduction)
-└── Configuration Files      # ✅ All optimized and working
-```
+### **Key File References**
+- **Database**: `src/lib/database.ts`, `docs/db/schema_v4.sql`
+- **Types**: `src/types/project.ts` (complete interfaces)
+- **Timeline**: `src/components/timeline/`, `src/utils/TimelineParser.ts`
+- **Services**: `src/services/` (LLM, Image, Storage integration)
+- **Configuration**: `src/components/admin/ConfigurationTab.tsx`
 
 ---
 
@@ -700,136 +590,26 @@ npm run dev
 
 ## 📋 **SESSION COMPLETION LOG**
 
-### **2025-07-27: Configuration UX & Style Flow Investigation**
-- **Critical UX Issue Resolved**: Inconsistent save behavior between auto-save prompts and manual-save JSON
-- **Solution Implemented**: Unified manual save approach with prominent save button and unsaved changes warning at top
-- **Root Cause Investigation**: Empty app_configuration table identified as blocker for LLM service initialization
-- **Debug System Added**: Comprehensive style tracking logs throughout editing → variable injection → prompt generation pipeline
-- **Files Ready**: `proper-config.json` contains exact configuration from original SQL script for initialization
-- **Next Session Priority**: Initialize configuration system via web interface, then test style flow with debug logs
+### **Latest Session: 2025-07-28 Complete System Restoration & Configuration Fix - PRODUCTION READY**
+- **Configuration System Blocker**: Empty `app_configuration` table preventing all AI operations → Fixed with project-specific schema v4.0
+- **Database Schema Evolution**: v3.0 → v4.0 with project-specific configuration using `jsonb_build_object()` for proper JSON
+- **React Race Conditions**: projectId undefined errors in Phase 3 → Fixed with proper hook parameters and loading guards
+- **Storage Deletion Critical Issue**: Files remaining after project deletion → Fixed with working RLS policies and dual-strategy cleanup
+- **Complete RLS Policy Troubleshooting**: Complex policies with `storage.foldername()` fail silently → Simple pattern-matching works
+- **Production-Ready Testing**: Full authentication test framework for storage deletion verification
+- **Systematic Problem-Solving**: Holistic approach identifying root causes vs surface-level patches
 
-### **Configuration Management Improvements**
-- **UX Enhancement**: Save button moved to top with clear unsaved state indicators
-- **Consistent Behavior**: All configuration fields now require manual save (no auto-save confusion)
-- **Visual Feedback**: Orange/green border system for unsaved/saved states with instructional text
-- **Technical Pattern**: Established clean manual save workflow for complex configuration management
+### **Technical Breakthroughs Achieved**
+- **Project-Specific Configuration**: Automatic injection system eliminates global configuration dependencies
+- **Schema v4.0 Deployment**: Clean database architecture with proper JSON formatting and CASCADE DELETE
+- **React State Management**: Fixed race conditions with proper loading guards and dependency management
+- **Supabase Storage Mastery**: Working RLS policy patterns documented with production testing methodology
+- **Bulletproof Deletion System**: Dual-strategy cleanup (scenes + project root) with comprehensive error handling
+- **Development Methodology**: Anti-pattern documentation prevents future patch-based approaches
 
-### **Style Flow Debug System** 
-- **JsonFieldEditor**: `🎨 STYLE FIELD UPDATE` logs when style fields are edited with old/new values
-- **VariableInjection**: `🎨 STYLE INJECTION DEBUG` logs style values being processed for template variables
-- **LLMService**: `🤖 LLM SERVICE STYLE DEBUG` + `🎨 FINAL PROMPT STYLE CHECK` logs style presence in final prompts
-- **Purpose**: Track user concern that style edits may not reflect in generated prompts
-- **Action Required**: Test with real data after configuration initialization, then clean up debug logs
-
-### **Critical Technical Debt Identified**
-- **Configuration Blocker**: app_configuration table empty since project creation (system never worked)
-- **Debug Logging**: Extensive console logging added for investigation (needs cleanup after testing)
-- **ESLint Warnings**: 41 unused variable warnings across components (manageable but should be cleaned)
-- **Bundle Analysis**: 597KB main chunk suggests dynamic import opportunities for performance
-
-### **2025-01-24: JSON Data Flow Crisis & Resolution**
-- **Problem**: Complex timeline context system causing JSON corruption and editing failures
-- **Root Cause**: Multiple competing save systems, over-engineered abstractions, data loss during operations
-- **Solution**: Disabled timeline context saves, fixed core JSON save/load, eliminated unnecessary reloads
-- **Results**: ✅ Complete JSON preserved ✅ Timeline display working ✅ No data corruption
-- **Critical Lesson**: Simple data flow > Complex architecture. JSON as single source of truth.
-
-### **Technical Debt Identified**
-- **Timeline Context System**: 4 files of complex abstractions (needs removal/simplification)
-- **Field Registry/Change Manager**: Over-engineered for simple field editing requirements
-- **Multiple Save Paths**: Competing systems causing confusion and corruption
-- **UI Complexity**: Over-abstracted components when direct JSON editing would work
-
-### **2025-01-24: Timeline Editing System Implementation & Clean Architecture**
-- **Achievement**: Complete JsonFieldEditor utility system for editing any JSON field
-- **Implementation**: Timeline title editing fully working with click-to-edit, local state, database versioning
-- **Architecture**: Clean phase-agnostic additive system - all phases read/write same master JSON
-- **Data Flow**: Local edits → User saves → Database + versioning (no version conflicts)
-- **Foundation**: Reusable patterns ready for extending to any JSON field across all phases
-- **Critical Success**: Master JSON architecture working, timeline editing working, build system clean
-
-### **2025-07-25: Complete Phase 1 Timeline System & UX Refinement**
-- **Scene Field Editing**: All 6 properties editable (camera_type, mood, dialogue, description, primary_focus, composition)
-- **Global Style Control**: 4-card system with 16 style properties using proven JsonFieldEditor patterns
-- **Universal Save System**: Centralized sticky header with save/history buttons across all phases
-- **Smart Change Detection**: Fixed false unsaved changes, only triggers on actual content modifications
-- **localStorage Backup**: Complete data loss prevention with auto-backup and restoration prompts
-- **Navigation Enhancement**: Sticky navigation bar with proper tab unlock logic based on Phase 1 completion
-- **UX Polish**: Refined sidebar layout, centralized hover effects, proper spacing and typography
-- **Phase Tracking**: Content-based completion using PhaseCompletion utility (database-independent)
-
-### **2025-07-25: Revolutionary 3-Column Scene Card Architecture**
-- **Layout Transformation**: Replaced horizontal scene cards with full-width 3-column system (Configuration + Image Generation + Video Generation)
-- **Integrated Title Editing**: Scene number + editable title in single bordered container with proper visual hierarchy
-- **Progressive Workflow**: Timeline visualization showing scene → image → video generation pipeline for Phases 3-4
-- **Media Placeholders**: 16:9 aspect ratio placeholders for image/video with horizontal button layouts
-- **Component Architecture**: Clean SceneCard component replacing old V2 system, eliminated duplicate code
-- **Phase Name Updates**: Refined sidebar labels (Script Rendering, Elements Creation, Scene Start Frame, Scene Video, Assembly)
-- **Data Flow Integrity**: Fixed display/edit synchronization ensuring immediate visual updates after JSON changes
-- **Typography System**: Added Roboto font integration for consistent modern appearance
-
-### **2025-01-25: LLM Configuration Management System - Production Complete**
-- **Achievement**: Full accordion-based configuration interface with 5 organized sections
-- **Prompt Pipeline**: Clean textarea → database → LLM workflow with proper line break preservation
-- **Variable Injection**: n8n-compatible `{{$json.field}}` system ready for scene data processing
-- **Auto-reload System**: Configuration changes immediately available to all interfaces after save
-- **Accordion Persistence**: localStorage state management across tab switches for improved workflow
-- **Format Processing**: Raw text storage (LLM-ready) with preview system for debugging stored format
-- **Web-Brother Alignment**: Complete documentation and implementation guide created for prompt generation workflows
-- **Critical Success**: Eliminated complex escape processing, established clean data flow for AI generation
-
-### **2025-07-26: Phase 3 Image Generation & Database Storage System - COMPLETE**
-- **Achievement**: Full database-centric image storage pipeline working in production
-- **Architecture**: FAL.ai generation → Download → Supabase Storage → Database record → masterJSON update
-- **Permanent URLs**: All images stored with permanent database URLs (no external FAL.ai dependencies)
-- **RLS Configuration**: Supabase storage policies configured for authenticated upload, public read access
-- **Comprehensive Logging**: Real-time progress tracking with timing metrics and visual feedback
-- **Modal Enhancement**: Clean synthetic progress tracker focused on dynamic status updates
-- **Database Integration**: project_assets table with full metadata, versioning, and generation parameters
-- **System Validation**: 3 scenes successfully processed with permanent URLs in masterJSON
-- **Storage Cleanup Fix**: Complete project deletion with storage file cleanup implemented and tested
-- **Critical Success**: Database-centric architecture achieved, Phase 4+ workflow compatibility ensured
-
-### **2025-07-26: Architectural Evolution Analysis & Revolutionary Modal System - COMPLETE**
-- **Major Discovery**: Complete transition from n8n webhook architecture to direct API integration
-- **n8n Infrastructure**: Preserved for backward compatibility but not actively used in current user flow
-- **Direct API Pattern**: LLMService + ImageGenerationService bypass webhooks for real-time control
-- **Master JSON Architecture**: Single source of truth with content-driven phase progression
-- **16:9 Modal Container**: True cinematic aspect ratio enforcement with adaptive layout design
-- **Intelligent Image Persistence**: Generated images persist until new ones arrive, eliminating premature resets
-- **Conditional UX Controls**: Close button only appears when batch complete, prevents workflow interruption
-- **Service Layer Mapping**: 5-service orchestration (LLM, Image, Storage, Reference, Providers)
-- **Phase Completion Logic**: Content-based analysis via PhaseCompletion.ts, not database flags
-- **Timeline System Integration**: 3-layer UX (Navigation → Timeline → Phase Modules) over master JSON
-- **Critical Success**: Complete architectural understanding achieved, ready for Phase 4 development
-
-### **2025-07-27: Web-Brother Collaboration System Implementation - COMPLETE**
-- **Achievement**: Complete test data capture system for multimodal AI collaboration
-- **Script Implementation**: `generate-test-data.cjs` with service role database access and unified JSON output
-- **Database Analysis**: Fixed RLS policy bypass using SUPABASE_SERVICE_ROLE_KEY for complete project access
-- **Image Pipeline**: Automatic detection of `scene_start_frame` URLs with smart download and local file management
-- **Unified Structure**: Single `scene_frame_data.json` combining prompts, metadata, and image references
-- **Production Testing**: Verified with "UN CONSIGLIO STELLARE" project (13 scenes, 3 images downloaded)
-- **File Management**: Smart handling of projects with/without images, proper file overwriting
-- **Project Discovery**: Enhanced database connection with complete project listing for debugging
-- **Critical Success**: Ready for bidirectional web-brother collaboration with >95% character consistency methodology
-
-### **Next Session Priorities**
-1. **WEB-BROTHER COLLABORATION ACTIVE**: Share test data with web-brother for character consistency analysis
-2. **BIDIRECTIONAL FEEDBACK LOOP**: Implement prompt refinements based on web-brother multimodal insights
-3. **CHARACTER CONSISTENCY OPTIMIZATION**: >95% Samantha Cristoforetti recognition across all scenes
-4. **ITERATIVE IMPROVEMENT CYCLE**: Test-analyze-refine workflow for prompt optimization
-5. **ADVANCED TIMELINE FEATURES**: Enhanced by AI Creative Intelligence insights and suggestions
-6. **PHASE 4 VIDEO GENERATION**: Video compilation with character consistency validation
-
-### **Session Completion Validation**
-- [x] **Web-Brother System**: Test data capture script production-ready with unified JSON + image downloads
-- [x] **Database Integration**: Service role RLS bypass working, complete project access established
-- [x] **Production Testing**: Verified with actual project data (13 scenes, 3 images, perfect extraction)
-- [x] **Documentation Sync**: webapp-project-context.md (20.3KB), CLAUDE.md, README.md aligned
-- [x] **Build System**: Clean compilation (7.91s), dev startup (523ms), 41 ESLint warnings (manageable)
-- [x] **System Health**: All core functionality operational, image storage pipeline working
-- [x] **Collaboration Ready**: Bidirectional update loop architecture complete for web-brother integration
-- [x] **Character Consistency**: Framework ready for >95% Samantha Cristoforetti recognition workflow
-- [x] **Bundle Analysis**: 594.60KB main chunk (optimization opportunities identified)
-- [x] **Strategic Alignment**: Complete web-brother collaboration methodology implemented and tested
+### **Current Technical Status** 
+- **System Health**: Build passing (6.70s), 42 ESLint warnings (unused variables, non-blocking)
+- **Database**: Schema v4.0 operational with project-specific configuration system
+- **Storage**: Working RLS policies with verified deletion system
+- **Core Functionality**: Authentication, project management, Phase 1-3 operational
+- **Configuration**: Project-specific system with automatic injection and manual save/reset

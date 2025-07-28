@@ -32,7 +32,7 @@ export interface ImageGenerationState {
   availableServices: string[];
 }
 
-export function useImageGeneration() {
+export function useImageGeneration(projectId: string) {
   const [state, setState] = useState<ImageGenerationState>({
     isGenerating: false,
     isInitializing: false,
@@ -48,7 +48,7 @@ export function useImageGeneration() {
     setState(prev => ({ ...prev, isInitializing: true, error: null }));
     
     try {
-      await imageGenerationService.initialize();
+      await imageGenerationService.initialize(projectId);
       const currentService = imageGenerationService.getCurrentService();
       const availableServices = imageGenerationService.getAvailableProviders();
       
@@ -68,7 +68,7 @@ export function useImageGeneration() {
       }));
       return false;
     }
-  }, []);
+  }, [projectId]);
   
   // Generate image for single scene
   const generateSceneImage = useCallback(async (

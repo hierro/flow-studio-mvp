@@ -1,14 +1,18 @@
 /**
- * ConfigurationTab - LLM Configuration Management
+ * ConfigurationTab - LLM Configuration Management (Project-Specific)
  * 
- * Simple JSON editor for app configuration with load/save testing
+ * Project-specific configuration editor with manual save and reset-to-default
  */
 
 import { useState, useEffect } from 'react';
-import { getAppConfiguration, saveAppConfiguration } from '../../lib/database';
+import { getProjectConfiguration, saveProjectConfiguration, resetProjectConfigurationToDefault } from '../../lib/database';
 import AccordionSection from '../common/AccordionSection';
 
-export default function ConfigurationTab() {
+interface ConfigurationTabProps {
+  projectId: string;
+}
+
+export default function ConfigurationTab({ projectId }: ConfigurationTabProps) {
   const [configData, setConfigData] = useState<any>({});
   const [jsonContent, setJsonContent] = useState('');
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
@@ -25,12 +29,14 @@ export default function ConfigurationTab() {
     setIsLoading(true);
     setError('');
     try {
-      const config = await getAppConfiguration();
+      const config = await getProjectConfiguration(projectId);
       setConfigData(config);
       setJsonContent(JSON.stringify(config, null, 2));
       setHasUnsavedChanges(false);
+      
+      console.log('✅ Project configuration loaded successfully');
     } catch (error) {
-      setError('Failed to load configuration');
+      setError('Failed to load project configuration');
       console.error('Load error:', error);
     }
     setIsLoading(false);
@@ -42,24 +48,25 @@ export default function ConfigurationTab() {
     setError('');
     try {
       const parsedConfig = JSON.parse(jsonContent);
-      console.log('📤 Saving configuration to database...');
-      const success = await saveAppConfiguration(parsedConfig);
+      console.log('📤 Saving project configuration to database...');
+      const success = await saveProjectConfiguration(projectId, parsedConfig);
       if (success) {
         setConfigData(parsedConfig);
         setHasUnsavedChanges(false);
         console.log('✅ Configuration marked as saved, hasUnsavedChanges set to false');
         
-        // Trigger global config reload event
+        // Trigger global config reload event (for LLM service reinitialization)
         window.dispatchEvent(new CustomEvent('llm-config-updated', { 
-          detail: parsedConfig 
+          detail: { projectId, config: parsedConfig }
         }));
         
         // Reload local config to ensure sync
         await loadConfiguration();
         
-        console.log('✅ Configuration saved and reloaded successfully');
+        console.log('✅ Project configuration saved and reloaded successfully');
+        console.log('🔄 LLM services should reinitialize automatically');
       } else {
-        setError('Failed to save configuration');
+        setError('Failed to save project configuration');
         console.error('❌ Save failed');
       }
     } catch (error) {
@@ -73,6 +80,45 @@ export default function ConfigurationTab() {
     setJsonContent(value);
     setHasUnsavedChanges(true);
     setError('');
+  };
+
+  const handleResetToDefault = async () => {
+    // Confirmation dialog
+    const confirmed = window.confirm(
+      'Are you sure you want to reset all configuration to default?\n\n' +
+      'This will overwrite all your current settings and cannot be undone.'
+    );
+    
+    if (!confirmed) return;
+    
+    setIsSaving(true);
+    setError('');
+    
+    try {
+      console.log('🔄 Resetting project configuration to default...');
+      const success = await resetProjectConfigurationToDefault(projectId);
+      
+      if (success) {
+        // Reload configuration to show the reset changes
+        await loadConfiguration();
+        
+        // Trigger global config reload event (for LLM service reinitialization)
+        window.dispatchEvent(new CustomEvent('llm-config-updated', { 
+          detail: { projectId, resetToDefault: true }
+        }));
+        
+        console.log('✅ Configuration reset to default successfully');
+        console.log('🔄 LLM services should reinitialize automatically');
+      } else {
+        setError('Failed to reset configuration to default');
+        console.error('❌ Reset failed');
+      }
+    } catch (error) {
+      setError('Error resetting configuration');
+      console.error('Reset error:', error);
+    }
+    
+    setIsSaving(false);
   };
 
   const updateConfigSection = (section: string, value: string) => {
@@ -123,6 +169,14 @@ export default function ConfigurationTab() {
             className="btn btn-secondary"
           >
             🔄 Reload
+          </button>
+          <button 
+            onClick={handleResetToDefault}
+            disabled={isSaving}
+            className="btn btn-warning"
+            title="Reset all configuration to default template"
+          >
+            🔄 Reset to Default
           </button>
         </div>
       </div>

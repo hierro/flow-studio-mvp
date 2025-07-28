@@ -1,6 +1,6 @@
 FLOW STUDIO MVP - COMPLETE PROJECT CONTEXT FOR DEVELOPMENT ALIGNMENT
 ================================================================
-Generated: 2025-07-27T09:57:35.735Z
+Generated: 2025-07-28T09:33:04.075Z
 Purpose: Technical implementation + Creative intelligence collaboration + Session insights + Development roadmap
 
 ## MODULE 1: TECHNICAL IMPLEMENTATION CONTEXT
@@ -218,15 +218,15 @@ export async function deleteProject(projectId: string): Promise<boolean> {
       return false
     }
 
-    // 3. Clean up storage files
-    if (assets && assets.length > 0) {
-      // First, remove all files in the project folder
-      const { data: files, error: listError } = await supabase.storage
-        .from('scene-images')
-        .list(`projects/${projectId}/scenes`);
-      
-      if (!listError && files && files.length > 0) {
-        const filePaths = files.map(file => `projects/${projectId}/
+    // 3. BULLETPROOF STORAGE CLEANUP - Multiple strategies to ensure complete deletion
+    console.log(`🧹 Starting comprehensive storage cleanup for project: ${projectId}`);
+    
+    let totalFilesRemoved = 0;
+    let cleanupErrors: string[] = [];
+    
+    // STRATEGY 1: Clean files from scenes directory
+    console.log(`📂 STRATEGY 1: Scanning projects/${projectId}/scenes/`);
+    const { data: sc
 ```
 
 ### 4. TYPESCRIPT INTERFACES (src/types/project.ts) - COMPLETE SYSTEM ✅
